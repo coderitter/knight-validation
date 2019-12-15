@@ -1,0 +1,31 @@
+{
+  "name": "mega-nice-validation",
+  "version": "0.0.0",
+  "description": "A mega validation lib",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "ts-node": "^8.4.1",
+    "typescript": "^3.7.2"
+  },
+  "scripts": {
+    "test": "mocha -r ts-node/register test/**/*.spec.ts",
+    "build": "rm -rf lib && tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/c0deritter/mega-nice-validation.git"
+  },
+  "keywords": [
+    ""
+  ],
+  "author": "Coderitter GmbH",
+  "bugs": {
+    "url": "https://github.com/c0deritter/mega-nice-validation/issues"
+  },
+  "homepage": "https://github.com/c0deritter/mega-nice-validation#readme"
+}
