@@ -1,1 +1,1 @@
-export { default as Mismatch } from './lib/Mismatch'
+export { default as Misfit } from './lib/Misfit'
