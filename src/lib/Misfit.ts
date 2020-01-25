@@ -1,26 +1,29 @@
 export default class Misfit {
 
-  field?: string
   code: string
-  message: string
+  field?: string
+  message?: string
 
-  constructor(fieldOrCode: string, codeOrMessage: string, message?: string) {
-    if (message != undefined) {
-      this.field = fieldOrCode
-      this.code = codeOrMessage
-      this.message = message
+  constructor(fieldOrCode: string, code?: string) {
+    if (code == undefined) {
+      this.code = fieldOrCode
     }
     else {
-      this.code = fieldOrCode
-      this.message = codeOrMessage
+      this.field = fieldOrCode
+      this.code = code
     }
   }
 
-  static missing(field: string) {
-    return new Misfit(field, 'Missing', '')
+  setMessage(message: string|undefined): this {
+    this.message = message
+    return this
   }
 
-  static notFound(field: string) {
-    return new Misfit(field, 'NotFound', '')
+  static missing(field: string, message?: string) {
+    return new Misfit(field, 'Missing').setMessage(message)
+  }
+
+  static notFound(field: string, message?: string) {
+    return new Misfit(field, 'NotFound').setMessage(message)
   }
 }
