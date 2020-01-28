@@ -11,6 +11,10 @@ export default class Exists extends Constraint {
   }
 
   async validate(value: any): Promise<Misfit|undefined> {
+    if (value === undefined) {
+      return undefined
+    }
+
     if (! await this.isExists(value)) {
       return new Misfit(this.name)
     }
