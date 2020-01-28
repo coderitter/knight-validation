@@ -4,5 +4,5 @@ export default abstract class Constraint {
 
   name: string = this.constructor.name
   
-  abstract validate(value: any, obj: any): Misfit|undefined
+  abstract validate(value: any, obj: any): Promise<Misfit|undefined>
 }

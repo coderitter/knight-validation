@@ -10,7 +10,7 @@ export default class Unique extends Constraint {
     this.isUnique = isUnique
   }
 
-  validate(value: any): Misfit|undefined {
+  async validate(value: any): Promise<Misfit|undefined> {
     if (! this.isUnique(value)) {
       return new Misfit(this.name)
     }

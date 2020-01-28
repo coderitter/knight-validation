@@ -3,7 +3,7 @@ import Misfit from '../Misfit'
 
 export default class Required extends Constraint {
 
-  validate(value: any): Misfit|undefined {
+  async validate(value: any): Promise<Misfit|undefined> {
     if (value === undefined || 
         value === null || 
         value === '' || 

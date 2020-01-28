@@ -40,7 +40,7 @@ export default class Validator {
     this.constraints[field].push(constraint)
   }
 
-  validate(object: any, options?: ValidatorOptions): Misfit[] {
+  async validate(object: any, options?: ValidatorOptions): Promise<Misfit[]> {
     let misfits: Misfit[] = []
 
     for (let field in this.constraints) {
@@ -50,7 +50,7 @@ export default class Validator {
         for (let constraint of fieldConstraints) {
           let misfit
           if (constraint instanceof Constraint) {
-            misfit = constraint.validate(object[field], object)
+            misfit = await constraint.validate(object[field], object)
           }
           else {
             misfit = constraint(object[field], object)

@@ -48,55 +48,55 @@ describe('Validator', function() {
   })
 
   describe('validate', function() {
-    it('should have a misfit if it was a misfit', function() {
+    it('should have a misfit if it was a misfit', async function() {
       let validator = new Validator
       validator.add('a', () => new Misfit('TestConstraint1'))
 
-      let misfits = validator.validate({})
+      let misfits = await validator.validate({})
 
       expect(misfits).to.be.instanceOf(Array)
       expect(misfits.length).to.equal(1)
       expect(misfits[0].name).to.equal('TestConstraint1')
     })
 
-    it('should have a not misfit if it was not a misfit', function() {
+    it('should have a not misfit if it was not a misfit', async function() {
       let validator = new Validator
       validator.add('a', () => undefined)
 
-      let misfits = validator.validate({})
+      let misfits = await validator.validate({})
 
       expect(misfits).to.be.instanceOf(Array)
       expect(misfits.length).to.equal(0)
     })
 
-    it('should add the field name to the misfit', function() {
+    it('should add the field name to the misfit', async function() {
       let validator = new Validator
       validator.add('a', () => new Misfit())
 
-      let misfits = validator.validate({})
+      let misfits = await validator.validate({})
 
       expect(misfits).to.be.instanceOf(Array)
       expect(misfits.length).to.equal(1)
       expect(misfits[0].field).to.equal('a')
     })
 
-    it('should not add the field name to the misfit if there is not field given', function() {
+    it('should not add the field name to the misfit if there is not field given', async function() {
       let validator = new Validator
       validator.add(() => new Misfit())
 
-      let misfits = validator.validate({})
+      let misfits = await validator.validate({})
 
       expect(misfits).to.be.instanceOf(Array)
       expect(misfits.length).to.equal(1)
       expect(misfits[0].field).to.be.undefined
     })
 
-    it('should collect misfits for different fields', function() {
+    it('should collect misfits for different fields', async function() {
       let validator = new Validator
       validator.add('a', () => new Misfit())
       validator.add('b', () => new Misfit())
 
-      let misfits = validator.validate({})
+      let misfits = await validator.validate({})
 
       expect(misfits).to.be.instanceOf(Array)
       expect(misfits.length).to.equal(2)
@@ -104,23 +104,23 @@ describe('Validator', function() {
       expect(misfits[1].field).to.equal('b')
     })
 
-    it('should check only one constraint if more a given', function () {
+    it('should check only one constraint if more a given', async function () {
       let validator = new Validator
       validator.add('a', () => new Misfit('M1'))
       validator.add('a', () => new Misfit('M2'))
 
-      let misfits = validator.validate({})
+      let misfits = await validator.validate({})
 
       expect(misfits).to.be.instanceOf(Array)
       expect(misfits.length).to.equal(1)
     })
 
-    it('should check the constraints in the order given', function () {
+    it('should check the constraints in the order given', async function () {
       let validator = new Validator
       validator.add('a', () => new Misfit('M1'))
       validator.add('a', () => new Misfit('M2'))
 
-      let misfits = validator.validate({})
+      let misfits = await validator.validate({})
 
       expect(misfits).to.be.instanceOf(Array)
       expect(misfits.length).to.equal(1)
@@ -128,12 +128,12 @@ describe('Validator', function() {
       expect(misfits[0].name).to.equal('M1')      
     })
 
-    it('should check all constraints for a field ', function () {
+    it('should check all constraints for a field ', async function () {
       let validator = new Validator
       validator.add('a', () => undefined)
       validator.add('a', () => new Misfit('M2'))
 
-      let misfits = validator.validate({})
+      let misfits = await validator.validate({})
 
       expect(misfits).to.be.instanceOf(Array)
       expect(misfits.length).to.equal(1)
@@ -141,12 +141,12 @@ describe('Validator', function() {
       expect(misfits[0].name).to.equal('M2')
     })
 
-    it('should check the constraints only for properties existent on the object if the option is set', function() {
+    it('should check the constraints only for properties existent on the object if the option is set', async function() {
       let validator = new Validator
       validator.add('a', () => new Misfit('M1'))
       validator.add('b', () => new Misfit('M2'))
 
-      let misfits = validator.validate({ a: 'a' }, { checkOnlyWhatIsThere: true })
+      let misfits = await validator.validate({ a: 'a' }, { checkOnlyWhatIsThere: true })
 
       expect(misfits).to.be.instanceOf(Array)
       expect(misfits.length).to.equal(1)
