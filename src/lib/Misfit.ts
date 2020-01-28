@@ -1,16 +1,19 @@
+import Required from './constraints/Required'
+import Unique from './constraints/Unique'
+
 export default class Misfit {
 
-  code: string
+  name!: string
   field?: string
   message?: string
 
-  constructor(fieldOrCode: string, code?: string) {
-    if (code == undefined) {
-      this.code = fieldOrCode
+  constructor(fieldOrName?: string, name?: string) {
+    if (name == undefined) {
+      this.name = <any> fieldOrName // avoid type checking with any
     }
     else {
-      this.field = fieldOrCode
-      this.code = code
+      this.field = fieldOrName
+      this.name = <any> name // avoid type checking with <any>
     }
   }
 
@@ -19,8 +22,12 @@ export default class Misfit {
     return this
   }
 
-  static missing(field: string, message?: string) {
-    return new Misfit(field, 'Missing').setMessage(message)
+  static required(field: string, message?: string) {
+    return new Misfit(field, Required.name).setMessage(message)
+  }
+
+  static unique(field: string, message?: string) {
+    return new Misfit(field, Unique.name).setMessage(message)
   }
 
   static notFound(field: string, message?: string) {

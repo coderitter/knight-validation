@@ -4,18 +4,18 @@ import { Misfit } from '../src'
 
 describe('Misfit', function() {
   describe('constructor', function() {
-    it('should accept a field and a code', function() {
-      let misfit = new Misfit('field', 'code')
+    it('should accept a field and a name', function() {
+      let misfit = new Misfit('field', 'name')
 
       expect(misfit.field).to.equal('field')
-      expect(misfit.code).to.equal('code')
+      expect(misfit.name).to.equal('name')
     })
 
-    it('should accept a code', function() {
-      let misfit = new Misfit('code')
+    it('should accept a name', function() {
+      let misfit = new Misfit('name')
 
       expect(misfit.field).to.be.undefined
-      expect(misfit.code).to.equal('code')
+      expect(misfit.name).to.equal('name')
     })
   })
 })
