@@ -8,14 +8,24 @@ export default class Misfit {
   name!: string
   field?: string
   message?: string
+  constraints!: any
 
-  constructor(fieldOrName?: string, name?: string) {
-    if (name == undefined) {
-      this.name = <any> fieldOrName // avoid type checking with any
-    }
-    else {
+  constructor(fieldOrName?: string, nameOrConstraints?: string|object, constraints?: object) {
+    if (typeof nameOrConstraints == 'string' && constraints != undefined) {
       this.field = fieldOrName
-      this.name = <any> name // avoid type checking with <any>
+      this.name = nameOrConstraints
+      this.constraints = constraints
+    }
+    else if (typeof fieldOrName == 'string' && typeof nameOrConstraints == 'object') {
+      this.name = fieldOrName
+      this.constraints = nameOrConstraints
+    }
+    else if (typeof fieldOrName == 'string' && typeof nameOrConstraints == 'string') {
+      this.field = fieldOrName
+      this.name = nameOrConstraints
+    }
+    else if (typeof fieldOrName == 'string') {
+      this.name = fieldOrName
     }
   }
 

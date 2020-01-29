@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import 'mocha'
 import { Misfit } from '../../src'
-import TypeOf from '../../src/lib/constraints/TypeOf'
+import TypeOf, { TypeOfConstraints } from '../../src/lib/constraints/TypeOf'
 
 describe('constraints', function() {
   describe('TypeOf', function() {
@@ -16,6 +16,7 @@ describe('constraints', function() {
         let typeOf = new TypeOf('number')
         let misfit = await typeOf.validate('1')
         expect(misfit).to.be.instanceOf(Misfit)
+        expect(misfit?.constraints).to.deep.equal(<TypeOfConstraints> { type: 'number' })
       })
 
       it('should return a undefined the value is undefined', async function() {
