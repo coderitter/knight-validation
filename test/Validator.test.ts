@@ -29,7 +29,7 @@ describe('Validator', function() {
     it('should accept validate function', function() {
       let validator = new Validator
       
-      validator.add(() => undefined)
+      validator.add(async () => undefined)
 
       expect(validator.constraints).to.have.key('')
       expect(validator.constraints[''].length).to.equal(1)
@@ -39,7 +39,7 @@ describe('Validator', function() {
     it('should accept a field name and a validate function', function() {
       let validator = new Validator
       
-      validator.add('testField', () => undefined)
+      validator.add('testField', async () => undefined)
 
       expect(validator.constraints).to.have.key('testField')
       expect(validator.constraints['testField'].length).to.equal(1)

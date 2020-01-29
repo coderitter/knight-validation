@@ -7,11 +7,13 @@ export interface ValidatorOptions {
 
 export default class Validator {
 
-  constraints: {[field: string]: (Constraint|((value: any, object: any) => Misfit|undefined))[]} = {}
+  constraints: {[field: string]: (Constraint|((value: any, object: any) => Promise<Misfit|undefined>))[]} = {}
 
-  add(fieldOrConstraintOrValidate: string|Constraint|((value: any, object: any) => Misfit|undefined), constraintOrValidate?: Constraint|((value: any, object: any) => Misfit|undefined)) {
+  add(fieldOrConstraintOrValidate: string|Constraint|((value: any, object: any) => Promise<Misfit|undefined>), 
+      constraintOrValidate?: Constraint|((value: any, object: any) => Promise<Misfit|undefined>)) {
+
     let field: string
-    let constraint: Constraint|((value: any, object: any) => Misfit|undefined)
+    let constraint: Constraint|((value: any, object: any) => Promise<Misfit|undefined>)
 
     if (fieldOrConstraintOrValidate instanceof Constraint) {
       field = ''
@@ -53,7 +55,7 @@ export default class Validator {
             misfit = await constraint.validate(object[field], object)
           }
           else {
-            misfit = constraint(object[field], object)
+            misfit = await constraint(object[field], object)
           }
           
           if (misfit) {
