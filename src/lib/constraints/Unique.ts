@@ -3,19 +3,19 @@ import Misfit from '../Misfit'
 
 export default class Unique extends Constraint {
 
-  isUnique: (value: any) => Promise<boolean>
+  isUnique: (value: any, obj: any) => Promise<boolean>
 
-  constructor(isUnique: (value: any) => Promise<boolean>) {
+  constructor(isUnique: (value: any, obj: any) => Promise<boolean>) {
     super()
     this.isUnique = isUnique
   }
 
-  async validate(value: any): Promise<Misfit|undefined> {
+  async validate(value: any, obj: any): Promise<Misfit|undefined> {
     if (value === undefined) {
       return undefined
     }
 
-    if (! await this.isUnique(value)) {
+    if (! await this.isUnique(value, obj)) {
       return new Misfit(this.name)
     }
   }
