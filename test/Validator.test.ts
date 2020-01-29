@@ -50,7 +50,7 @@ describe('Validator', function() {
   describe('validate', function() {
     it('should have a misfit if it was a misfit', async function() {
       let validator = new Validator
-      validator.add('a', () => new Misfit('TestConstraint1'))
+      validator.add('a', async () => new Misfit('TestConstraint1'))
 
       let misfits = await validator.validate({})
 
@@ -61,7 +61,7 @@ describe('Validator', function() {
 
     it('should have a not misfit if it was not a misfit', async function() {
       let validator = new Validator
-      validator.add('a', () => undefined)
+      validator.add('a', async () => undefined)
 
       let misfits = await validator.validate({})
 
@@ -71,7 +71,7 @@ describe('Validator', function() {
 
     it('should add the field name to the misfit', async function() {
       let validator = new Validator
-      validator.add('a', () => new Misfit())
+      validator.add('a', async () => new Misfit())
 
       let misfits = await validator.validate({})
 
@@ -82,7 +82,7 @@ describe('Validator', function() {
 
     it('should not add the field name to the misfit if there is not field given', async function() {
       let validator = new Validator
-      validator.add(() => new Misfit())
+      validator.add(async () => new Misfit())
 
       let misfits = await validator.validate({})
 
@@ -93,8 +93,8 @@ describe('Validator', function() {
 
     it('should collect misfits for different fields', async function() {
       let validator = new Validator
-      validator.add('a', () => new Misfit())
-      validator.add('b', () => new Misfit())
+      validator.add('a', async () => new Misfit())
+      validator.add('b', async () => new Misfit())
 
       let misfits = await validator.validate({})
 
@@ -106,8 +106,8 @@ describe('Validator', function() {
 
     it('should check only one constraint if more a given', async function () {
       let validator = new Validator
-      validator.add('a', () => new Misfit('M1'))
-      validator.add('a', () => new Misfit('M2'))
+      validator.add('a', async () => new Misfit('M1'))
+      validator.add('a', async () => new Misfit('M2'))
 
       let misfits = await validator.validate({})
 
@@ -117,8 +117,8 @@ describe('Validator', function() {
 
     it('should check the constraints in the order given', async function () {
       let validator = new Validator
-      validator.add('a', () => new Misfit('M1'))
-      validator.add('a', () => new Misfit('M2'))
+      validator.add('a', async () => new Misfit('M1'))
+      validator.add('a', async () => new Misfit('M2'))
 
       let misfits = await validator.validate({})
 
@@ -130,8 +130,8 @@ describe('Validator', function() {
 
     it('should check all constraints for a field ', async function () {
       let validator = new Validator
-      validator.add('a', () => undefined)
-      validator.add('a', () => new Misfit('M2'))
+      validator.add('a', async () => undefined)
+      validator.add('a', async () => new Misfit('M2'))
 
       let misfits = await validator.validate({})
 
@@ -143,8 +143,8 @@ describe('Validator', function() {
 
     it('should check the constraints only for properties existent on the object if the option is set', async function() {
       let validator = new Validator
-      validator.add('a', () => new Misfit('M1'))
-      validator.add('b', () => new Misfit('M2'))
+      validator.add('a', async () => new Misfit('M1'))
+      validator.add('b', async () => new Misfit('M2'))
 
       let misfits = await validator.validate({ a: 'a' }, { checkOnlyWhatIsThere: true })
 
