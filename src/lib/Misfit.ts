@@ -1,4 +1,6 @@
+import { Exists } from '..'
 import Required from './constraints/Required'
+import TypeOf from './constraints/TypeOf'
 import Unique from './constraints/Unique'
 
 export default class Misfit {
@@ -30,7 +32,11 @@ export default class Misfit {
     return new Misfit(field, Unique.name).setMessage(message)
   }
 
-  static notFound(field: string, message?: string) {
-    return new Misfit(field, 'NotFound').setMessage(message)
+  static exists(field: string, message?: string) {
+    return new Misfit(field, Exists.name).setMessage(message)
+  }
+
+  static typeOf(field: string, message?: string) {
+    return new Misfit(field, TypeOf.name).setMessage(message)
   }
 }
