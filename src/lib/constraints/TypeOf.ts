@@ -1,7 +1,7 @@
 import Constraint from '../Constraint'
 import Misfit from '../Misfit'
 
-export default class TypeOf extends Constraint implements TypeOfConstraints {
+export default class TypeOf extends Constraint {
 
   type: string
 
@@ -16,7 +16,9 @@ export default class TypeOf extends Constraint implements TypeOfConstraints {
     }
     
     if (typeof value !== this.type) {
-      return new Misfit(this.name, <TypeOfConstraints> { type: this.type })
+      let misfit = new Misfit(this.type)
+      misfit.constraints = <TypeOfConstraints> { type: this.type }
+      return misfit
     }
   }
 }

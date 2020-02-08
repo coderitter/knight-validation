@@ -5,33 +5,36 @@ import Unique from './constraints/Unique'
 
 export default class Misfit {
 
-  name!: string
-  field?: string
+  type!: string
+  field!: string
+  fields!: string[]
+  constraints?: any
   message?: string
-  constraints!: any
 
-  constructor(fieldOrName?: string, nameOrConstraints?: string|object, constraints?: object) {
-    if (typeof nameOrConstraints == 'string' && constraints != undefined) {
-      this.field = fieldOrName
-      this.name = nameOrConstraints
-      this.constraints = constraints
+  constructor(type?: string, field?: string|string[], constraints?: object) {
+    this.type = <any> type
+    
+    if (typeof field == 'string') {
+      this.field = field
     }
-    else if (typeof fieldOrName == 'string' && typeof nameOrConstraints == 'object') {
-      this.name = fieldOrName
-      this.constraints = nameOrConstraints
+    else if (field instanceof Array) {
+      this.fields = field
     }
-    else if (typeof fieldOrName == 'string' && typeof nameOrConstraints == 'string') {
-      this.field = fieldOrName
-      this.name = nameOrConstraints
-    }
-    else if (typeof fieldOrName == 'string') {
-      this.name = fieldOrName
-    }
+
+    this.constraints = constraints
   }
 
   setMessage(message: string|undefined): this {
     this.message = message
     return this
+  }
+
+  isSingleField(): boolean {
+    return this.field != undefined
+  }
+
+  isFieldCombination(): boolean {
+    return this.fields != undefined
   }
 
   static required(field: string, message?: string) {

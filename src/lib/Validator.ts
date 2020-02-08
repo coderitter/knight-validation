@@ -7,73 +7,167 @@ export interface ValidatorOptions {
 
 export default class Validator {
 
-  constraints: {[field: string]: (Constraint|((value: any, object: any) => Promise<Misfit|undefined>))[]} = {}
+  fieldConstraints: { 
+    field?: string,
+    fields?: string[],
+    constraint: Constraint|((value: any, object: any) => Promise<Misfit|undefined>)
+  }[] = []
 
-  add(fieldOrConstraintOrValidate: string|Constraint|((value: any, object: any) => Promise<Misfit|undefined>), 
-      constraintOrValidate?: Constraint|((value: any, object: any) => Promise<Misfit|undefined>)) {
+  add(field: string|string[], constraint: Constraint|((value: any, object: any) => Promise<Misfit|undefined>)) {
+    this.fieldConstraints.push({
+      field: typeof field == 'string' ? field : undefined,
+      fields: field instanceof Array ? field : undefined,
+      constraint: constraint
+    })
+  }
 
-    let field: string
-    let constraint: Constraint|((value: any, object: any) => Promise<Misfit|undefined>)
+  get fields(): (string|string[])[] {
+    let fields: (string|string[])[] = []
 
-    if (fieldOrConstraintOrValidate instanceof Constraint) {
-      field = ''
-      constraint = fieldOrConstraintOrValidate
-    }
-    else if (typeof fieldOrConstraintOrValidate === 'function') {
-      field = ''
-      constraint = fieldOrConstraintOrValidate
-    }
-    else if (constraintOrValidate instanceof Constraint) {
-      field = fieldOrConstraintOrValidate
-      constraint = constraintOrValidate
-    }
-    else if (typeof constraintOrValidate == 'function') {
-      field = fieldOrConstraintOrValidate
-      constraint = constraintOrValidate
-    }
-    else {
-      throw new Error('Unexpected parameter')
+    for (let fieldConstraint of this.fieldConstraints) {
+      if (fieldConstraint.field != undefined) {
+        fields.push(fieldConstraint.field)
+      }
+      else if (fieldConstraint.fields != undefined) {
+        fields.push(fieldConstraint.fields)
+      }
     }
 
-    if (!(field in this.constraints)) {
-      this.constraints[field] = []
+    return fields
+  }
+
+  get singleFields(): string[] {
+    let fields: string[] = []
+
+    for (let fieldConstraint of this.fieldConstraints) {
+      if (fieldConstraint.field != undefined && fields.indexOf(fieldConstraint.field) == -1) {
+        fields.push(fieldConstraint.field)
+      }
     }
 
-    this.constraints[field].push(constraint)
+    return fields
+  }
+
+  get combinedFields(): string[][] {
+    let fields: string[][] = []
+
+    for (let fieldConstraint of this.fieldConstraints) {
+      if (fieldConstraint.fields != undefined && ! fields.some((fields: string[]) => arraysEqual(fields, fieldConstraint.fields))) {
+        fields.push(fieldConstraint.fields)
+      }
+    }
+
+    return fields
+  }
+
+  constraints(field: string|string[]): (Constraint|((value: any, object: any) => Promise<Misfit|undefined>))[] {
+    let constraints: (Constraint|((value: any, object: any) => Promise<Misfit|undefined>))[] = []
+    
+    for (let fieldConstraint of this.fieldConstraints) {
+      if (field === fieldConstraint.field) {
+        constraints.push(fieldConstraint.constraint)
+      }
+      else if (field instanceof Array && fieldConstraint.fields && arraysEqual(field, fieldConstraint.fields)) {
+        constraints.push(fieldConstraint.constraint)
+      }
+    }
+
+    return constraints
   }
 
   async validate(object: any, options?: ValidatorOptions): Promise<Misfit[]> {
     let misfits: Misfit[] = []
+    let misfittingFields: string[] = []
 
-    for (let field in this.constraints) {
-      let fieldConstraints = this.constraints[field]
+    for (let field of this.singleFields) {
+      if (! (field in object) && options && options.checkOnlyWhatIsThere) {
+        continue
+      }
 
-      if (field in object || ! options || options && ! options.checkOnlyWhatIsThere) {
-        for (let constraint of fieldConstraints) {
-          let misfit
-          if (constraint instanceof Constraint) {
-            misfit = await constraint.validate(object[field], object)
-          }
-          else {
-            misfit = await constraint(object[field], object)
-          }
-          
-          if (misfit) {
-            if (field) {
-              misfit.field = field
-            }
+      let constraints = this.constraints(field)
 
-            if (! misfit.name) {
-              misfit.name = constraint.name
-            }
-            
-            misfits.push(misfit)
-            break
-          }
+      for (let constraint of constraints) {
+        let misfit
+
+        if (constraint instanceof Constraint) {
+          misfit = await constraint.validate(object[field], object)
         }
+        else {
+          misfit = await constraint(object[field], object)
+        }
+
+        if (misfit) {
+          misfittingFields.push(field)
+          misfit.field = field              
+          misfits.push(misfit)
+          break
+        }    
+      }
+    }
+
+    for (let fields of this.combinedFields) {
+      let oneOfTheFieldsAlreadyHasAMisfit = false
+      for (let field of fields) {
+        if (misfittingFields.indexOf(field) > -1) {
+          oneOfTheFieldsAlreadyHasAMisfit = true
+          break
+        }
+      }
+
+      if (oneOfTheFieldsAlreadyHasAMisfit) {
+        continue
+      }
+
+      let atLeastOneOfTheFieldsMissingInObject = false
+      for (let field of fields) {
+        if (! (field in object)) {
+          atLeastOneOfTheFieldsMissingInObject = true
+          break
+        }
+      }
+
+      if (atLeastOneOfTheFieldsMissingInObject && options && options.checkOnlyWhatIsThere) {
+        continue
+      }
+
+      let constraints = this.constraints(fields)
+
+      for (let constraint of constraints) {
+        let misfit
+
+        if (constraint instanceof Constraint) {
+          misfit = await constraint.validate(undefined, object)
+        }
+        else {
+          misfit = await constraint(undefined, object)
+        }
+
+        if (misfit) {
+          misfit.fields = fields
+          misfits.push(misfit)
+          break
+        }    
       }
     }
 
     return misfits
   }
+}
+
+function arraysEqual(a1?: string[], a2?: string[]): boolean {
+  if (! a1 || ! a2) {
+    return false
+  }
+
+  if (a1.length != a2.length) {
+    return false
+  }
+
+  for (let i = 0; i < a1.length; i++) {
+    if (a2.indexOf(a1[i]) == -1) {
+      return false
+    }
+  }
+
+  return true
 }

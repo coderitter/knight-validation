@@ -10,7 +10,7 @@ export default class Required extends Constraint {
         typeof value === 'number' && isNaN(value) || 
         typeof value === 'object' && Object.keys(value).length == 0) {
       
-      return new Misfit(this.name)
+      return new Misfit(this.type)
     }
   }
 }

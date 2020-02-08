@@ -16,7 +16,7 @@ export default class Unique extends Constraint {
     }
 
     if (! await this.isUnique(value, obj)) {
-      return new Misfit(this.name)
+      return new Misfit(this.type)
     }
   }
 }
