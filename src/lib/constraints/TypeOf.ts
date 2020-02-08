@@ -1,3 +1,4 @@
+import { Required } from '../..'
 import Constraint from '../Constraint'
 import Misfit from '../Misfit'
 
@@ -11,7 +12,7 @@ export default class TypeOf extends Constraint {
   }
 
   async validate(value: any, obj?: any): Promise<Misfit|undefined> {
-    if (value === undefined) {
+    if (Required.missing(value)) {
       return
     }
     

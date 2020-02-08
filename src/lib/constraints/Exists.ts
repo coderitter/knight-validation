@@ -1,3 +1,4 @@
+import { Required } from '../..'
 import Constraint from '../Constraint'
 import Misfit from '../Misfit'
 
@@ -11,8 +12,8 @@ export default class Exists extends Constraint {
   }
 
   async validate(value: any, obj?: any): Promise<Misfit|undefined> {
-    if (value === undefined) {
-      return undefined
+    if (Required.missing(value)) {
+      return
     }
 
     if (! await this.isExists(value, obj)) {
