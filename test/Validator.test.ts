@@ -141,7 +141,20 @@ describe('Validator', function() {
         validator.add('a', async () => new Misfit('M1'))
         validator.add('b', async () => new Misfit('M2'))
   
-        let misfits = await validator.validate({ a: 'a' }, { checkOnlyWhatIsThere: true })
+        let misfits = await validator.validate({ a: 'a', b: undefined }, { checkOnlyWhatIsThere: true })
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].type).to.equal('M1')
+        expect(misfits[0].field).to.equal('a')
+      })  
+
+      it('should check the constraints for properties that are null even if the options to check only what is there is set', async function() {
+        let validator = new Validator
+        validator.add('a', async () => new Misfit('M1'))
+        validator.add('b', async () => new Misfit('M2'))
+  
+        let misfits = await validator.validate({ a: null, b: undefined }, { checkOnlyWhatIsThere: true })
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
@@ -254,13 +267,26 @@ describe('Validator', function() {
         validator.add(['a', 'b'], async () => new Misfit('M1'))
         validator.add(['b', 'c'], async () => new Misfit('M2'))
   
-        let misfits = await validator.validate({ a: 'a', b: 'b' }, { checkOnlyWhatIsThere: true })
+        let misfits = await validator.validate({ a: 'a', b: 'b', c: undefined }, { checkOnlyWhatIsThere: true })
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
         expect(misfits[0].type).to.equal('M1')
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
       })  
+
+      it('should check the constraints for properties that are null even if the options to check only what is there is set', async function() {
+        let validator = new Validator
+        validator.add(['a', 'b'], async () => new Misfit('M1'))
+        validator.add(['b', 'c'], async () => new Misfit('M2'))
+  
+        let misfits = await validator.validate({ a: null, b: null, c: undefined }, { checkOnlyWhatIsThere: true })
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].type).to.equal('M1')
+        expect(misfits[0].fields).to.deep.equal(['a', 'b'])
+      })
     })
   })
 })

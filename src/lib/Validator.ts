@@ -80,7 +80,7 @@ export default class Validator {
     let misfittingFields: string[] = []
 
     for (let field of this.singleFields) {
-      if (! (field in object) && options && options.checkOnlyWhatIsThere) {
+      if (object[field] === undefined && options && options.checkOnlyWhatIsThere) {
         continue
       }
 
@@ -98,7 +98,7 @@ export default class Validator {
 
         if (misfit) {
           misfittingFields.push(field)
-          misfit.field = field              
+          misfit.field = field
           misfits.push(misfit)
           break
         }    
@@ -120,7 +120,7 @@ export default class Validator {
 
       let atLeastOneOfTheFieldsMissingInObject = false
       for (let field of fields) {
-        if (! (field in object)) {
+        if (object[field] === undefined) {
           atLeastOneOfTheFieldsMissingInObject = true
           break
         }
