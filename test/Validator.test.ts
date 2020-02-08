@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
-import { Validator, Misfit, Required } from '../src'
+import { Misfit, Required, Validator } from '../src'
 
 describe('Validator', function() {
   describe('add', function() {
@@ -160,7 +160,25 @@ describe('Validator', function() {
         expect(misfits.length).to.equal(1)
         expect(misfits[0].type).to.equal('M1')
         expect(misfits[0].field).to.equal('a')
-      })  
+      })
+
+      it('should only check a constraint if the given condition is met', async function() {
+        let validator = new Validator
+        validator.add('a', async () => new Misfit('M1'), async () => true)
+        
+        let misfits = await validator.validate({})
+
+        expect(misfits.length).to.equal(1)
+      })
+
+      it('should not check a constraint if the given condition is not met', async function() {
+        let validator = new Validator
+        validator.add('a', async () => new Misfit('M1'), async () => false)
+        
+        let misfits = await validator.validate({})
+
+        expect(misfits.length).to.equal(0)
+      })
     })
 
     describe('field combination', function() {
@@ -286,6 +304,24 @@ describe('Validator', function() {
         expect(misfits.length).to.equal(1)
         expect(misfits[0].type).to.equal('M1')
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
+      })
+
+      it('should only check a constraint if the given condition is met', async function() {
+        let validator = new Validator
+        validator.add(['a', 'b'], async () => new Misfit('M1'), async () => true)
+        
+        let misfits = await validator.validate({})
+
+        expect(misfits.length).to.equal(1)
+      })
+
+      it('should not check a constraint if the given condition is not met', async function() {
+        let validator = new Validator
+        validator.add(['a', 'b'], async () => new Misfit('M1'), async () => false)
+        
+        let misfits = await validator.validate({})
+
+        expect(misfits.length).to.equal(0)
       })
     })
   })
