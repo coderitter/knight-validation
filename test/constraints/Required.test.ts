@@ -9,30 +9,35 @@ describe('constraints', function() {
         let required = new Required
         let misfit = await required.validate(undefined)
         expect(misfit).to.be.instanceOf(Misfit)
+        expect(misfit?.type).to.equal('Required')
       })
   
       it('should return a misfit on null', async function() {
         let required = new Required
         let misfit = await required.validate(null)
         expect(misfit).to.be.instanceOf(Misfit)
+        expect(misfit?.type).to.equal('Required')
       })
   
       it('should return a misfit on empty string', async function() {
         let required = new Required
         let misfit = await required.validate('')
         expect(misfit).to.be.instanceOf(Misfit)
+        expect(misfit?.type).to.equal('Required')
       })
   
       it('should return a misfit on NaN', async function() {
         let required = new Required
         let misfit = await required.validate(NaN)
         expect(misfit).to.be.instanceOf(Misfit)
+        expect(misfit?.type).to.equal('Required')
       })
   
       it('should return a misfit on empty object', async function() {
         let required = new Required
         let misfit = await required.validate({})
         expect(misfit).to.be.instanceOf(Misfit)
+        expect(misfit?.type).to.equal('Required')
       })
   
       it('should not return a misfit on number', async function() {

@@ -26,6 +26,7 @@ describe('constraints', function() {
         let unique = new Unique(async (value: number) => value === 1)
         let misfit = await unique.validate(2)
         expect(misfit).to.be.instanceOf(Misfit)
+        expect(misfit?.type).to.equal('Unique')
       })
     })
   })

@@ -4,11 +4,11 @@ import Misfit from '../Misfit'
 
 export default class TypeOf extends Constraint {
 
-  type: string
+  valueType: string
 
-  constructor(type: string) {
+  constructor(valueType: string) {
     super()
-    this.type = type
+    this.valueType = valueType
   }
 
   async validate(value: any, obj?: any): Promise<Misfit|undefined> {
@@ -16,9 +16,9 @@ export default class TypeOf extends Constraint {
       return
     }
     
-    if (typeof value !== this.type) {
+    if (typeof value !== this.valueType) {
       let misfit = new Misfit(this.type)
-      misfit.constraints = <TypeOfConstraints> { type: this.type }
+      misfit.constraints = <TypeOfConstraints> { type: this.valueType }
       return misfit
     }
   }

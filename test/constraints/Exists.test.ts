@@ -26,6 +26,7 @@ describe('constraints', function() {
         let exists = new Exists(async (value: number) => value === 1)
         let misfit = await exists.validate(2)
         expect(misfit).to.be.instanceOf(Misfit)
+        expect(misfit?.type).to.equal('Exists')
       })
     })
   })
