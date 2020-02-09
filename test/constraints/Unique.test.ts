@@ -19,7 +19,6 @@ describe('constraints', function() {
         expect(await unique.validate(null)).to.be.undefined
         expect(await unique.validate('')).to.be.undefined
         expect(await unique.validate(NaN)).to.be.undefined
-        expect(await unique.validate({})).to.be.undefined
       })
 
       it('should return a misfit if not unique', async function() {

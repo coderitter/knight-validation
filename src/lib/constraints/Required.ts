@@ -13,7 +13,6 @@ export default class Required extends Constraint {
     return value === undefined || 
       value === null || 
       value === '' || 
-      typeof value === 'number' && isNaN(value) || 
-      typeof value === 'object' && Object.keys(value).length == 0
+      typeof value === 'number' && isNaN(value)
   }
 }

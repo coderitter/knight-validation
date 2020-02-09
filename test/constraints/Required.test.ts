@@ -33,13 +33,6 @@ describe('constraints', function() {
         expect(misfit?.type).to.equal('Required')
       })
   
-      it('should return a misfit on empty object', async function() {
-        let required = new Required
-        let misfit = await required.validate({})
-        expect(misfit).to.be.instanceOf(Misfit)
-        expect(misfit?.type).to.equal('Required')
-      })
-  
       it('should not return a misfit on number', async function() {
         let required = new Required
         let misfit = await required.validate(1)
@@ -60,9 +53,11 @@ describe('constraints', function() {
   
       it('should not return a misfit on object', async function() {
         let required = new Required
-        let misfit = await required.validate({ a: 'a' })
+        let misfit = await required.validate({})
         expect(misfit).to.be.undefined
       })
     })
   })
 })
+
+class EmptyClass {}

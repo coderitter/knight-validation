@@ -19,7 +19,6 @@ describe('constraints', function() {
         expect(await exists.validate(null)).to.be.undefined
         expect(await exists.validate('')).to.be.undefined
         expect(await exists.validate(NaN)).to.be.undefined
-        expect(await exists.validate({})).to.be.undefined
       })
 
       it('should return a misfit if not exists', async function() {

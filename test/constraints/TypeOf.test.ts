@@ -19,7 +19,6 @@ describe('constraints', function() {
         expect(await typeOf.validate(null)).to.be.undefined
         expect(await typeOf.validate('')).to.be.undefined
         expect(await typeOf.validate(NaN)).to.be.undefined
-        expect(await typeOf.validate({})).to.be.undefined
       })
 
       it('should return a misfit if wrong type', async function() {
