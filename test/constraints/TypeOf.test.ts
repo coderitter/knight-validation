@@ -25,7 +25,7 @@ describe('constraints', function() {
         let typeOf = new TypeOf('number')
         let misfit = await typeOf.validate('1')
         expect(misfit).to.be.instanceOf(Misfit)
-        expect(misfit?.type).to.equal('TypeOf')
+        expect(misfit?.name).to.equal('TypeOf')
         expect(misfit?.constraints).to.deep.equal(<TypeOfConstraints> { type: 'number' })
       })
     })

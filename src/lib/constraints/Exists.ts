@@ -17,7 +17,7 @@ export default class Exists extends Constraint {
     }
 
     if (! await this.isExists(value, obj)) {
-      return new Misfit(this.type)
+      return new Misfit(this.name)
     }
   }
 }

@@ -5,7 +5,7 @@ export default class Required extends Constraint {
 
   async validate(value: any): Promise<Misfit|undefined> {
     if (Required.missing(value)) {
-      return new Misfit(this.type)
+      return new Misfit(this.name)
     }
   }
 

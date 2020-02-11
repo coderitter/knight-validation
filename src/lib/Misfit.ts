@@ -5,14 +5,14 @@ import Unique from './constraints/Unique'
 
 export default class Misfit {
 
-  type!: string
+  name!: string
   field!: string
   fields!: string[]
   constraints?: any
   message?: string
 
-  constructor(type?: string, field?: string|string[], constraints?: object) {
-    this.type = <any> type
+  constructor(name?: string, field?: string|string[], constraints?: object) {
+    this.name = <any> name
     
     if (typeof field == 'string') {
       this.field = field

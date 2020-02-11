@@ -17,7 +17,7 @@ export default class TypeOf extends Constraint {
     }
     
     if (typeof value !== this.valueType) {
-      let misfit = new Misfit(this.type)
+      let misfit = new Misfit(this.name)
       misfit.constraints = <TypeOfConstraints> { type: this.valueType }
       return misfit
     }
