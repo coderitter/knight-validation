@@ -4,7 +4,7 @@ import QuickConstraint from './QuickConstraint'
 
 export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean,
-  exclude?: [ string | string[] | {field: string|string[], constraintName?: string} ]
+  exclude?: [ string | string[] | {field: string|string[], constraintName?: string|string[]} ]
 }
 
 export default class Validator {
@@ -208,7 +208,7 @@ class FieldConstraint {
   }
 }
 
-function containsFieldAndConstraint(fieldsAndConstraints: [string|string[]|{field: string|string[], constraintName?: string}], field: string|string[], constraint?: string|Constraint|FieldConstraint): boolean {
+function containsFieldAndConstraint(fieldsAndConstraints: [string|string[]|{field: string|string[], constraintName?: string|string[]}], field: string|string[], constraint?: string|Constraint|FieldConstraint): boolean {
   for (let fieldAndConstraint of fieldsAndConstraints) {
     if (constraint == undefined) {
       if (typeof fieldAndConstraint == 'string') {
@@ -249,13 +249,28 @@ function containsFieldAndConstraint(fieldsAndConstraints: [string|string[]|{fiel
         throw new Error('Unexpected constraint type')
       }
 
-      if (fieldAndConstraint.constraintName === constraintName) {
-        if (typeof fieldAndConstraint.field == 'string' && fieldAndConstraint.field === field) {
-          return true
-        }
-      
-        if (fieldAndConstraint.field instanceof Array && field instanceof Array && arraysEqual(fieldAndConstraint.field, field)) {
-          return true
+      if (typeof fieldAndConstraint.constraintName == 'string') {
+        if (fieldAndConstraint.constraintName === constraintName) {
+          if (typeof fieldAndConstraint.field == 'string' && fieldAndConstraint.field === field) {
+            return true
+          }
+        
+          if (fieldAndConstraint.field instanceof Array && field instanceof Array && arraysEqual(fieldAndConstraint.field, field)) {
+            return true
+          }
+        }          
+      }
+      else if (fieldAndConstraint.constraintName instanceof Array) {
+        for (let possibleConstraintName of fieldAndConstraint.constraintName) {
+          if (possibleConstraintName === constraintName) {
+            if (typeof fieldAndConstraint.field == 'string' && fieldAndConstraint.field === field) {
+              return true
+            }
+          
+            if (fieldAndConstraint.field instanceof Array && field instanceof Array && arraysEqual(fieldAndConstraint.field, field)) {
+              return true
+            }
+          }
         }
       }
     }

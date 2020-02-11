@@ -1,6 +1,6 @@
 {
   "name": "mega-nice-validation",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "A mega nice validation lib",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
