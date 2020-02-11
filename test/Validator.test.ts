@@ -182,6 +182,47 @@ describe('Validator', function() {
 
         expect(misfits.length).to.equal(0)
       })
+
+      it('should exclude a field if the option is set', async function() {
+        let validator = new Validator
+        validator.add('a', 'TestConstraint1', async () => new Misfit)
+        validator.add('a', 'TestConstraint2', async () => new Misfit)
+        validator.add('b', 'TestConstraint1', async () => new Misfit)
+
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: ['a']})
+
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].field).to.equal('b')
+        expect(misfits[0].name).to.equal('TestConstraint1')
+      })
+
+      it('should exclude a field if the option is set even as object with missing constraintName property', async function() {
+        let validator = new Validator
+        validator.add('a', 'TestConstraint1', async () => new Misfit)
+        validator.add('a', 'TestConstraint2', async () => new Misfit)
+        validator.add('b', 'TestConstraint1', async () => new Misfit)
+
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{ field: 'a' }]})
+
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].field).to.equal('b')
+        expect(misfits[0].name).to.equal('TestConstraint1')
+      })
+
+      it('should exclude a certain constraint if the option is set', async function() {
+        let validator = new Validator
+        validator.add('a', 'TestConstraint1', async () => new Misfit)
+        validator.add('a', 'TestConstraint2', async () => new Misfit)
+        validator.add('b', 'TestConstraint1', async () => new Misfit)
+
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{field: 'a', constraintName: 'TestConstraint1'}]})
+
+        expect(misfits.length).to.equal(2)
+        expect(misfits[0].field).to.equal('a')
+        expect(misfits[0].name).to.equal('TestConstraint2')
+        expect(misfits[1].field).to.equal('b')
+        expect(misfits[1].name).to.equal('TestConstraint1')
+      })
     })
 
     describe('field combination', function() {
@@ -325,6 +366,47 @@ describe('Validator', function() {
         let misfits = await validator.validate({})
 
         expect(misfits.length).to.equal(0)
+      })
+
+      it('should exclude a field if the option is set', async function() {
+        let validator = new Validator
+        validator.add(['a', 'b'], 'TestConstraint1', async () => new Misfit)
+        validator.add(['a', 'b'], 'TestConstraint2', async () => new Misfit)
+        validator.add(['c', 'd'], 'TestConstraint1', async () => new Misfit)
+
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [['a', 'b']]})
+
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].fields).to.deep.equal(['c', 'd'])
+        expect(misfits[0].name).to.equal('TestConstraint1')
+      })
+      
+      it('should exclude a field if the option is set even as object with missing constraintName property', async function() {
+        let validator = new Validator
+        validator.add(['a', 'b'], 'TestConstraint1', async () => new Misfit)
+        validator.add(['a', 'b'], 'TestConstraint2', async () => new Misfit)
+        validator.add(['c', 'd'], 'TestConstraint1', async () => new Misfit)
+
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{ field: ['a', 'b'] }]})
+
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].fields).to.deep.equal(['c', 'd'])
+        expect(misfits[0].name).to.equal('TestConstraint1')
+      })
+
+      it('should exclude a certain constraint if the option is set', async function() {
+        let validator = new Validator
+        validator.add(['a', 'b'], 'TestConstraint1', async () => new Misfit)
+        validator.add(['a', 'b'], 'TestConstraint2', async () => new Misfit)
+        validator.add(['c', 'd'], 'TestConstraint1', async () => new Misfit)
+
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{field: ['a', 'b'], constraintName: 'TestConstraint1'}]})
+
+        expect(misfits.length).to.equal(2)
+        expect(misfits[0].fields).to.deep.equal(['a', 'b'])
+        expect(misfits[0].name).to.equal('TestConstraint2')
+        expect(misfits[1].fields).to.deep.equal(['c', 'd'])
+        expect(misfits[1].name).to.equal('TestConstraint1')
       })
     })
   })

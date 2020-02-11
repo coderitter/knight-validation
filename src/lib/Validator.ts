@@ -3,7 +3,8 @@ import Misfit from './Misfit'
 import QuickConstraint from './QuickConstraint'
 
 export interface ValidatorOptions {
-  checkOnlyWhatIsThere?: boolean
+  checkOnlyWhatIsThere?: boolean,
+  exclude?: [ string | string[] | {field: string|string[], constraintName?: string} ]
 }
 
 export default class Validator {
@@ -105,6 +106,10 @@ export default class Validator {
     let misfittingFields: string[] = []
 
     for (let field of this.singleFields) {
+      if (options && options.exclude instanceof Array && containsFieldAndConstraint(options.exclude, field)) {
+        continue
+      }
+
       if (object[field] === undefined && options && options.checkOnlyWhatIsThere) {
         continue
       }
@@ -112,13 +117,15 @@ export default class Validator {
       let constraints = this.fieldConstraintsForField(field)
 
       for (let constraint of constraints) {
-        let misfit
-
+        if (options && options.exclude instanceof Array && containsFieldAndConstraint(options.exclude, field, constraint)) {
+          continue
+        }
+    
         if (constraint.condition != undefined && ! await constraint.condition(object)) {
           continue
         }
 
-        misfit = await constraint.validate(object[field], object)
+        let misfit = await constraint.validate(object[field], object)
 
         if (misfit) {
           misfittingFields.push(field)
@@ -130,6 +137,10 @@ export default class Validator {
     }
 
     for (let fields of this.combinedFields) {
+      if (options && options.exclude instanceof Array && containsFieldAndConstraint(options.exclude, fields)) {
+        continue
+      }
+
       let oneOfTheFieldsAlreadyHasAMisfit = false
       for (let field of fields) {
         if (misfittingFields.indexOf(field) > -1) {
@@ -157,13 +168,15 @@ export default class Validator {
       let constraints = this.fieldConstraintsForField(fields)
 
       for (let constraint of constraints) {
-        let misfit
-
+        if (options && options.exclude instanceof Array && containsFieldAndConstraint(options.exclude, fields, constraint)) {
+          continue
+        }
+  
         if (constraint.condition != undefined && ! await constraint.condition(object)) {
           continue
         }
 
-        misfit = await constraint.validate(undefined, object)
+        let misfit = await constraint.validate(undefined, object)
 
         if (misfit) {
           misfit.fields = fields
@@ -175,24 +188,6 @@ export default class Validator {
 
     return misfits
   }
-}
-
-function arraysEqual(a1?: string[], a2?: string[]): boolean {
-  if (! a1 || ! a2) {
-    return false
-  }
-
-  if (a1.length != a2.length) {
-    return false
-  }
-
-  for (let i = 0; i < a1.length; i++) {
-    if (a2.indexOf(a1[i]) == -1) {
-      return false
-    }
-  }
-
-  return true
 }
 
 class FieldConstraint {
@@ -211,4 +206,78 @@ class FieldConstraint {
   async validate(value: any, object: any): Promise<Misfit|undefined> {
     return await this.constraint.validate(value, object)
   }
+}
+
+function containsFieldAndConstraint(fieldsAndConstraints: [string|string[]|{field: string|string[], constraintName?: string}], field: string|string[], constraint?: string|Constraint|FieldConstraint): boolean {
+  for (let fieldAndConstraint of fieldsAndConstraints) {
+    if (constraint == undefined) {
+      if (typeof fieldAndConstraint == 'string') {
+        if (fieldAndConstraint === field) {
+          return true
+        }
+      }
+      
+      else if (fieldAndConstraint instanceof Array) {
+        if (field instanceof Array && arraysEqual(fieldAndConstraint, field)) {
+          return true
+        }
+      }
+
+      else if (typeof fieldAndConstraint == 'object' && fieldAndConstraint.field != undefined && fieldAndConstraint.constraintName == undefined) {
+        if (typeof fieldAndConstraint.field == 'string' && fieldAndConstraint.field === field) {
+          return true
+        }
+      
+        if (fieldAndConstraint.field instanceof Array && field instanceof Array && arraysEqual(fieldAndConstraint.field, field)) {
+          return true
+        }
+      }
+    }
+    else if (typeof fieldAndConstraint == 'object' && 'field' in fieldAndConstraint && 'constraintName' in fieldAndConstraint) {
+      let constraintName
+
+      if (typeof constraint == 'string') {
+        constraintName = constraint
+      }
+      else if (constraint instanceof Constraint) {
+        constraintName = constraint.name
+      }
+      else if (constraint instanceof FieldConstraint) {
+        constraintName = constraint.constraint.name
+      }
+      else {
+        throw new Error('Unexpected constraint type')
+      }
+
+      if (fieldAndConstraint.constraintName === constraintName) {
+        if (typeof fieldAndConstraint.field == 'string' && fieldAndConstraint.field === field) {
+          return true
+        }
+      
+        if (fieldAndConstraint.field instanceof Array && field instanceof Array && arraysEqual(fieldAndConstraint.field, field)) {
+          return true
+        }
+      }
+    }
+  }
+
+  return false
+}
+
+function arraysEqual(a1?: string[], a2?: string[]): boolean {
+  if (! a1 || ! a2) {
+    return false
+  }
+
+  if (a1.length != a2.length) {
+    return false
+  }
+
+  for (let i = 0; i < a1.length; i++) {
+    if (a2.indexOf(a1[i]) == -1) {
+      return false
+    }
+  }
+
+  return true
 }
