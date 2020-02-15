@@ -39,22 +39,22 @@ export default class Misfit {
   }
 
   static required(field: string, message?: string) {
-    return new Misfit(field, Required.name).setMessage(message)
+    return new Misfit(Required.name, field).setMessage(message)
   }
 
   static absent(field: string, message?: string) {
-    return new Misfit(field, Absent.name).setMessage(message)
+    return new Misfit(Absent.name, field).setMessage(message)
   }
 
   static unique(field: string, message?: string) {
-    return new Misfit(field, Unique.name).setMessage(message)
+    return new Misfit(Unique.name, field).setMessage(message)
   }
 
   static exists(field: string, message?: string) {
-    return new Misfit(field, Exists.name).setMessage(message)
+    return new Misfit(Exists.name, field).setMessage(message)
   }
 
   static typeOf(field: string, message?: string) {
-    return new Misfit(field, TypeOf.name).setMessage(message)
+    return new Misfit(TypeOf.name, field).setMessage(message)
   }
 }
