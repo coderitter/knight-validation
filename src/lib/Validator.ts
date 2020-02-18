@@ -1,4 +1,5 @@
 import Constraint from './Constraint'
+import fieldsEqual from './fieldsEqual'
 import Misfit from './Misfit'
 import QuickConstraint from './QuickConstraint'
 
@@ -63,7 +64,7 @@ export default class Validator {
     let fields: string[][] = []
 
     for (let fieldConstraint of this.fieldConstraints) {
-      if (fieldConstraint.fields != undefined && ! fields.some((fields: string[]) => arraysEqual(fields, fieldConstraint.fields))) {
+      if (fieldConstraint.fields != undefined && ! fields.some((fields: string[]) => fieldsEqual(fields, fieldConstraint.fields))) {
         fields.push(fieldConstraint.fields)
       }
     }
@@ -78,7 +79,7 @@ export default class Validator {
       if (field === fieldConstraint.field) {
         constraints.push(fieldConstraint.constraint)
       }
-      else if (field instanceof Array && fieldConstraint.fields && arraysEqual(field, fieldConstraint.fields)) {
+      else if (field instanceof Array && fieldConstraint.fields && fieldsEqual(field, fieldConstraint.fields)) {
         constraints.push(fieldConstraint.constraint)
       }
     }
@@ -93,7 +94,7 @@ export default class Validator {
       if (field === fieldConstraint.field) {
         fieldConstraints.push(fieldConstraint)
       }
-      else if (field instanceof Array && fieldConstraint.fields && arraysEqual(field, fieldConstraint.fields)) {
+      else if (field instanceof Array && fieldConstraint.fields && fieldsEqual(field, fieldConstraint.fields)) {
         fieldConstraints.push(fieldConstraint)
       }
     }
@@ -218,7 +219,7 @@ function containsFieldAndConstraint(fieldsAndConstraints: [string|string[]|{fiel
       }
       
       else if (fieldAndConstraint instanceof Array) {
-        if (field instanceof Array && arraysEqual(fieldAndConstraint, field)) {
+        if (field instanceof Array && fieldsEqual(fieldAndConstraint, field)) {
           return true
         }
       }
@@ -228,7 +229,7 @@ function containsFieldAndConstraint(fieldsAndConstraints: [string|string[]|{fiel
           return true
         }
       
-        if (fieldAndConstraint.field instanceof Array && field instanceof Array && arraysEqual(fieldAndConstraint.field, field)) {
+        if (fieldAndConstraint.field instanceof Array && field instanceof Array && fieldsEqual(fieldAndConstraint.field, field)) {
           return true
         }
       }
@@ -255,7 +256,7 @@ function containsFieldAndConstraint(fieldsAndConstraints: [string|string[]|{fiel
             return true
           }
         
-          if (fieldAndConstraint.field instanceof Array && field instanceof Array && arraysEqual(fieldAndConstraint.field, field)) {
+          if (fieldAndConstraint.field instanceof Array && field instanceof Array && fieldsEqual(fieldAndConstraint.field, field)) {
             return true
           }
         }          
@@ -267,7 +268,7 @@ function containsFieldAndConstraint(fieldsAndConstraints: [string|string[]|{fiel
               return true
             }
           
-            if (fieldAndConstraint.field instanceof Array && field instanceof Array && arraysEqual(fieldAndConstraint.field, field)) {
+            if (fieldAndConstraint.field instanceof Array && field instanceof Array && fieldsEqual(fieldAndConstraint.field, field)) {
               return true
             }
           }
@@ -277,22 +278,4 @@ function containsFieldAndConstraint(fieldsAndConstraints: [string|string[]|{fiel
   }
 
   return false
-}
-
-function arraysEqual(a1?: string[], a2?: string[]): boolean {
-  if (! a1 || ! a2) {
-    return false
-  }
-
-  if (a1.length != a2.length) {
-    return false
-  }
-
-  for (let i = 0; i < a1.length; i++) {
-    if (a2.indexOf(a1[i]) == -1) {
-      return false
-    }
-  }
-
-  return true
 }
