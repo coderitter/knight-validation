@@ -3,6 +3,7 @@ import Exists from './constraints/Exists'
 import Required from './constraints/Required'
 import TypeOf from './constraints/TypeOf'
 import Unique from './constraints/Unique'
+import fieldsEqual from './fieldsEqual'
 
 export default class Misfit {
 
@@ -36,6 +37,10 @@ export default class Misfit {
 
   isFieldCombination(): boolean {
     return this.fields != undefined
+  }
+
+  fieldsEqual(fields: string[]): boolean {
+    return fieldsEqual(this.fields, fields)
   }
 
   static required(field: string, message?: string) {
