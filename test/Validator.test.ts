@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
-import { Misfit, Required, Validator } from '../src'
+import { Absent, Exists, Misfit, Required, TypeOf, Unique, Validator } from '../src'
 import QuickConstraint from '../src/lib/QuickConstraint'
 
 describe('Validator', function() {
@@ -439,6 +439,84 @@ describe('Validator', function() {
         expect(misfits[0].name).to.equal('TestConstraint3')
         expect(misfits[1].fields).to.deep.equal(['c', 'd'])
         expect(misfits[1].name).to.equal('TestConstraint1')
+      })
+
+      it('should execute a Required constraint', async function() {
+        let validator = new Validator
+        validator.add(['a', 'b'], new Required)
+
+        let misfits = await validator.validate({})
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].name).to.equal('Required')
+
+        misfits = await validator.validate({a: 'a'})
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].name).to.equal('Required')
+
+        misfits = await validator.validate({a: 'a', b: 'b'})
+        expect(misfits.length).to.equal(0)
+      })
+
+      it('should execute an Absent constraint', async function() {
+        let validator = new Validator
+        validator.add(['a', 'b'], new Absent)
+
+        let misfits = await validator.validate({a: 'a'})
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].name).to.equal('Absent')
+
+        misfits = await validator.validate({a: 'a', b: 'b'})
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].name).to.equal('Absent')
+
+        misfits = await validator.validate({})
+        expect(misfits.length).to.equal(0)
+      })
+
+      it('should execute an TypeOf constraint', async function() {
+        let validator = new Validator
+        validator.add(['a', 'b'], new TypeOf('number'))
+
+        let misfits = await validator.validate({})
+        expect(misfits.length).to.equal(0)
+
+        misfits = await validator.validate({a: 'a'})
+        expect(misfits.length).to.equal(0)
+
+        misfits = await validator.validate({a: 'a', b: 1})
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].name).to.equal('TypeOf')
+
+        misfits = await validator.validate({a: 0, b: 1})
+        expect(misfits.length).to.equal(0)
+      })
+
+      it('should execute a Unique constraint', async function() {
+        let validator = new Validator
+        validator.add(['a', 'b'], new Unique(async (value: any, obj: any) => {
+          return obj.a != undefined && obj.b != undefined
+        }))
+
+        let misfits = await validator.validate({a: 'a'})
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].name).to.equal('Unique')
+
+        misfits = await validator.validate({a: 'a', b: 'b'})
+        expect(misfits.length).to.equal(0)
+      })
+
+      it('should execute an Exists constraint', async function() {
+        let validator = new Validator
+        validator.add(['a', 'b'], new Exists(async (value: any, obj: any) => {
+          return obj.a != undefined && obj.b != undefined
+        }))
+
+        let misfits = await validator.validate({a: 'a'})
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].name).to.equal('Exists')
+
+        misfits = await validator.validate({a: 'a', b: 'b'})
+        expect(misfits.length).to.equal(0)
       })
     })
   })
