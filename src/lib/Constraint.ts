@@ -18,7 +18,7 @@ export default abstract class Constraint {
     else if (field instanceof Array) {
       for (let fld of field) {
         let value = obj[fld]
-        let misfit = validateValue(value)
+        let misfit = await validateValue(value)
 
         if (misfit) {
           return misfit

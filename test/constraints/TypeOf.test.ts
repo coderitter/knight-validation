@@ -28,6 +28,19 @@ describe('constraints', function() {
           expect(misfit).to.be.instanceOf(Misfit)
           expect(misfit?.constraints).to.deep.equal(<TypeOfConstraints> { type: 'number' })
         })  
+
+        it('should return a misfit if the wrong class', async function() {
+          let typeOf = new TypeOf(Date)
+          let misfit = await typeOf.validate({ value: 1 }, 'value')
+          expect(misfit).to.be.instanceOf(Misfit)
+          expect(misfit?.constraints).to.deep.equal(<TypeOfConstraints> { type: 'Date' })
+        })  
+
+        it('should not return a misfit if the correct class', async function() {
+          let typeOf = new TypeOf(Date)
+          let misfit = await typeOf.validate({ value: new Date }, 'value')
+          expect(misfit).to.be.undefined
+        })  
       })
 
       describe('field combination', function() {
@@ -51,7 +64,20 @@ describe('constraints', function() {
           let misfit = await typeOf.validate({ a: '1', b: '2' }, ['a', 'b'])
           expect(misfit).to.be.instanceOf(Misfit)
           expect(misfit?.constraints).to.deep.equal(<TypeOfConstraints> { type: 'number' })
+        })
+
+        it('should return a misfit if the wrong class', async function() {
+          let typeOf = new TypeOf(Date)
+          let misfit = await typeOf.validate({ a: new Date, b: 1 }, ['a', 'b'])
+          expect(misfit).to.be.instanceOf(Misfit)
+          expect(misfit?.constraints).to.deep.equal(<TypeOfConstraints> { type: 'Date' })
         })  
+
+        it('should not return a misfit if the correct class', async function() {
+          let typeOf = new TypeOf(Date)
+          let misfit = await typeOf.validate({ a: new Date, b: new Date }, ['a', 'b'])
+          expect(misfit).to.be.undefined
+        })
       })
     })
   })
