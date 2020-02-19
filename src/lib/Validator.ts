@@ -1,7 +1,7 @@
 import Constraint from './Constraint'
 import fieldsEqual from './fieldsEqual'
 import Misfit from './Misfit'
-import QuickConstraint from './QuickConstraint'
+import QuickConstraint from './constraints/QuickConstraint'
 
 export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean,
@@ -126,11 +126,16 @@ export default class Validator {
           continue
         }
 
-        let misfit = await constraint.validate(object[field], object)
+        let misfit = await constraint.validate(object, field)
 
         if (misfit) {
-          misfittingFields.push(field)
           misfit.field = field
+
+          if (misfit.name === undefined) {
+            misfit.name = constraint.constraint.name
+          }
+
+          misfittingFields.push(field)
           misfits.push(misfit)
           break
         }    
@@ -177,10 +182,15 @@ export default class Validator {
           continue
         }
 
-        let misfit = await constraint.validate(undefined, object)
+        let misfit = await constraint.validate(object, fields)
 
         if (misfit) {
           misfit.fields = fields
+
+          if (misfit.name === undefined) {
+            misfit.name = constraint.constraint.name
+          }
+
           misfits.push(misfit)
           break
         }    

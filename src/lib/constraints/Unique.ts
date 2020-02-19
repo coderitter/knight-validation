@@ -1,4 +1,3 @@
-import { Required } from '../..'
 import Constraint from '../Constraint'
 import Misfit from '../Misfit'
 
@@ -6,17 +5,17 @@ export default class Unique extends Constraint {
 
   isUnique: (value: any, obj: any) => Promise<boolean>
 
-  constructor(isUnique: (value: any, obj: any) => Promise<boolean>) {
+  constructor(isUnique: (obj: any, field: string|string[]) => Promise<boolean>) {
     super()
     this.isUnique = isUnique
   }
 
-  async validate(value: any, obj?: any): Promise<Misfit|undefined> {
-    if (Required.missing(value)) {
+  async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
+    if (this.isFieldAbsent(obj, field)) {
       return
     }
 
-    if (! await this.isUnique(value, obj)) {
+    if (! await this.isUnique(obj, field)) {
       return new Misfit(this.name)
     }
   }

@@ -3,16 +3,25 @@ import Misfit from '../Misfit'
 
 export default class Required extends Constraint {
 
-  async validate(value: any): Promise<Misfit|undefined> {
-    if (Required.missing(value)) {
-      return new Misfit(this.name)
-    }
-  }
+  async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
+    if (typeof field == 'string') {
+      let value = obj[field]
 
-  static missing(value: any): boolean {
-    return value === undefined || 
-      value === null || 
-      value === '' || 
-      typeof value === 'number' && isNaN(value)
+      if (Constraint.absent(value)) {
+        return new Misfit
+      }
+    }
+    else if (field instanceof Array) {
+      for (let fld of field) {
+        let value = obj[fld]
+
+        if (Constraint.absent(value)) {
+          return new Misfit
+        }
+      }
+    }
+    else {
+      throw new Error('Parameter field was neither of type string nor instance of Array')
+    }
   }
 }
