@@ -147,8 +147,10 @@ If you want to reuse a constraint over and over again, create a new class for it
 import { Constraint } from 'mega-nice-validation'
 
 class YourConstraint extends Constraint {
+
   // Override the abstract method validate
   async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
+    
     // At first you want to check if the field is absent because in case of absense you do not want to validate because a field may be optional.
     if (this.isFieldAbsent(obj, field)) {
       return
