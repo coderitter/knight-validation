@@ -150,13 +150,20 @@ class YourConstraint extends Constraint {
 
   // Override the abstract method validate
   async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
-    
+
     // At first you want to check if the field is absent because in case of absense you do not want to validate because a field may be optional.
     if (this.isFieldAbsent(obj, field)) {
       return
     }
 
-    // Next you need to check if the field was a single or a combined one. Maybe you just implement on if the two variations.
+    // Next you need to check if the field was a single or a combined one. Maybe you just implement on of the two possibilities.
+
+    if (typeof field == 'string') {
+      // In case of a single field
+    }
+    else {
+      // In case of multiple fields
+    }
   }
 }
 ```
