@@ -100,15 +100,19 @@ misfits.length == 0 // There are no misfits even though the email field is requi
 #### Include rules
 
 ```typescript
-let misfits = validator.validate(user, { exclude: ['email'] }) // include all constraints regarding the email field. exlude all other fields
-let misfits = validator.validate(user, { exclude: [{ field: 'email', constraint: 'Required' }] }) // include only the required constraint of the email field. exclude all other constraints of the email field and of all other fields.
+// Include all constraints regarding the email field. Exlude all other fields.
+let misfits = validator.validate(user, { include: ['email'] })
+// Include only the required constraint of the email field. Exclude all other constraints of the email field, but include all other fields.
+let misfits = validator.validate(user, { include: [{ field: 'email', constraint: 'Required' }] })
 ```
 
 #### Exclude rules
 
 ```typescript
-let misfits = validator.validate(user, { exclude: ['email'] }) // exclude all constraints regarding the email field
-let misfits = validator.validate(user, { exclude: [{ field: 'email', constraint: 'Required' }] }) // exclude only the required constraint of the email field
+// Exclude all constraints regarding the email field
+let misfits = validator.validate(user, { exclude: ['email'] })
+// Exclude only the required constraint of the email field
+let misfits = validator.validate(user, { exclude: [{ field: 'email', constraint: 'Required' }] })
 ```
 
 ### Anonymous custom constraints
