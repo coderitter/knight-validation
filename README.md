@@ -8,8 +8,6 @@
 
 ### Constraints for single fields
 
-And here is a validator for that domain object.
-
 ```typescript
 import { Required, TypeOf, Unique, Validator } from 'mega-nice-validation'
 
@@ -27,7 +25,7 @@ class UserValidator extends Validator {
 }
 ```
 
-#### Constraints for multiple fields combined
+### Constraints for multiple fields
 
 ```typescript
 import { Required, TypeOf, Unique, Validator } from 'mega-nice-validation'
@@ -84,6 +82,26 @@ misfit.field == 'email' // The field where the misfit occured
 misfit.fields == ['firstName', 'lastName'] // If the constraint was for multiple fields then there is an array of those fields and the field property is empty
 misfit.constraints // It contains any information that is useful about why checking the constraint resulted in a misfit. (Optional)
 misift.message == 'The field email is required.' // A message. (Optional)
+```
+
+### Check only what is there
+
+You can validate only what is there. This means any constraint becomes optional.
+
+```typescript
+let user = new User
+user.email = undefined
+
+let misfits = validator.validate(user, { checkOnlyWhatIsThere: true })
+
+misfits.length == 0 // There are no misfits even though the email field is required
+```
+
+### Exclude rules
+
+```typescript
+let misfits = validator.validate(user, { exclude: ['email'] }) // exclude all constraints regarding the email field
+let misfits = validator.validate(user, { exclude: [{ field: 'email', constraint: 'Required' }] }) // exclude only the required constraint of the email field
 ```
 
 ### Anonymous custom constraints
@@ -146,7 +164,7 @@ class YourConstraint extends Constraint {
 }
 ```
 
-#### Constraints that are only checked if there is a condition met
+### Constraints that are only checked if there is a condition met
 
 ```typescript
 import { Required, Validator } from 'mega-nice-validation'
