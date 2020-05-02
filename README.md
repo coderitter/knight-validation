@@ -84,7 +84,7 @@ misfit.constraints // It contains any information that is useful about why check
 misift.message == 'The field email is required.' // A message. (Optional)
 ```
 
-### Check only what is there
+#### Check only what is there
 
 You can validate only what is there. This means any constraint becomes optional.
 
@@ -97,7 +97,7 @@ let misfits = validator.validate(user, { checkOnlyWhatIsThere: true })
 misfits.length == 0 // There are no misfits even though the email field is required
 ```
 
-### Exclude rules
+#### Exclude rules
 
 ```typescript
 let misfits = validator.validate(user, { exclude: ['email'] }) // exclude all constraints regarding the email field
