@@ -157,7 +157,6 @@ class YourConstraint extends Constraint {
     }
 
     // Next you need to check if the field was a single or a combined one. Maybe you just implement on of the two possibilities.
-
     if (typeof field == 'string') {
       // In case of a single field
     }
