@@ -97,6 +97,13 @@ let misfits = validator.validate(user, { checkOnlyWhatIsThere: true })
 misfits.length == 0 // There are no misfits even though the email field is required
 ```
 
+#### Include rules
+
+```typescript
+let misfits = validator.validate(user, { exclude: ['email'] }) // include all constraints regarding the email field. exlude all other fields
+let misfits = validator.validate(user, { exclude: [{ field: 'email', constraint: 'Required' }] }) // include only the required constraint of the email field. exclude all other constraints of the email field and of all other fields.
+```
+
 #### Exclude rules
 
 ```typescript
