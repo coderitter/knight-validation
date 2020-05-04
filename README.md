@@ -28,7 +28,7 @@ class UserValidator extends Validator {
 ### Constraints for multiple fields
 
 ```typescript
-import { Required, TypeOf, Unique, Validator } from 'mega-nice-validation'
+import { Validator } from 'mega-nice-validation'
 
 class UserValidator extends Validator {
   constructor(userDb: UserDb) {
@@ -95,15 +95,6 @@ user.email = undefined
 let misfits = validator.validate(user, { checkOnlyWhatIsThere: true })
 
 misfits.length == 0 // There are no misfits even though the email field is required
-```
-
-#### Include rules
-
-```typescript
-// Include all constraints regarding the email field. Exlude all other fields.
-let misfits = validator.validate(user, { include: ['email'] })
-// Include only the required constraint of the email field. Exclude all other constraints of the email field, but include all other fields.
-let misfits = validator.validate(user, { include: [{ field: 'email', constraint: 'Required' }] })
 ```
 
 #### Exclude rules
