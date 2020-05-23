@@ -5,8 +5,8 @@ import Misfit from './Misfit'
 
 export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean,
-  include?: [ string | string[] | { field: string|string[], constraint?: string|string[] }]
-  exclude?: [ string | string[] | { field: string|string[], constraint?: string|string[] }]
+  include?: (string | string[] | { field: string|string[], constraint?: string|string[] })[]
+  exclude?: (string | string[] | { field: string|string[], constraint?: string|string[] })[]
 }
 
 export default class Validator {
@@ -236,7 +236,7 @@ class FieldConstraint {
   }
 }
 
-function containsField(fieldsAndConstraints: [string|string[]|{field: string|string[], constraint?: string|string[]}], field: string|string[]): boolean {
+function containsField(fieldsAndConstraints: (string|string[]|{field: string|string[], constraint?: string|string[]})[], field: string|string[]): boolean {
   for (let fieldAndConstraint of fieldsAndConstraints) {
     if (typeof fieldAndConstraint == 'string') {
       if (fieldAndConstraint == field) {
@@ -258,7 +258,7 @@ function containsField(fieldsAndConstraints: [string|string[]|{field: string|str
   return false
 }
 
-function containsFieldWithoutConstraints(fieldsAndConstraints: [string|string[]|{field: string|string[], constraint?: string|string[]}], field: string|string[]): boolean {
+function containsFieldWithoutConstraints(fieldsAndConstraints: (string|string[]|{field: string|string[], constraint?: string|string[]})[], field: string|string[]): boolean {
   for (let fieldAndConstraint of fieldsAndConstraints) {
     if (typeof fieldAndConstraint == 'string') {
       if (fieldAndConstraint == field) {
@@ -280,7 +280,7 @@ function containsFieldWithoutConstraints(fieldsAndConstraints: [string|string[]|
   return false
 }
 
-function containsFieldAndConstraint(fieldsAndConstraints: [string|string[]|{field: string|string[], constraint?: string|string[]}], field: string|string[], constraint: string|Constraint|FieldConstraint): boolean {
+function containsFieldAndConstraint(fieldsAndConstraints: (string|string[]|{field: string|string[], constraint?: string|string[]})[], field: string|string[], constraint: string|Constraint|FieldConstraint): boolean {
   for (let fieldAndConstraint of fieldsAndConstraints) {
     if (typeof fieldAndConstraint == 'object' && 'field' in fieldAndConstraint && 'constraint' in fieldAndConstraint) {
 
