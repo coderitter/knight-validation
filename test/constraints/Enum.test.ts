@@ -4,6 +4,18 @@ import { Enum, Misfit, TypeOf } from '../../src'
 
 describe('constraints', function() {
   describe('Enum', function() {
+    describe('constructor', function() {
+      it('should accept an array of values', function() {
+        let e = new Enum(['a', 'b'])
+        expect(e.values).to.deep.equal(['a', 'b'])
+      })
+
+      it('should accept the values individually', function() {
+        let e = new Enum('a', 'b')
+        expect(e.values).to.deep.equal(['a', 'b'])
+      })
+    })
+
     describe('validate', function() {
       describe('single field', function() {
         it('should return undefined if correct type', async function() {

@@ -3,16 +3,25 @@ import Misfit from '../Misfit'
 
 export default class Enum extends Constraint {
 
-  enum: any[]
+  values: any[]
 
-  constructor(enumValues: any[]) {
+  constructor(values: any[])
+  constructor(...values: any[])
+
+  constructor(...values: any) {
     super()
-    this.enum = enumValues
+
+    if (values instanceof Array && values.length == 1 && values[0] instanceof Array) {
+      this.values = values[0]
+    }
+    else {
+      this.values = values
+    }
   }
 
   async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
     return this.defaultValidation(obj, field, async (value: any) => {
-      if (this.enum.indexOf(value) == -1) {
+      if (this.values.indexOf(value) == -1) {
         return new Misfit
       }
     })
