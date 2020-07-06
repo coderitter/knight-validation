@@ -14,9 +14,9 @@ export default class Validator {
   fieldConstraints: FieldConstraint[] = []
 
   add(field: string|string[], constraint: Constraint, condition?: (object: any) => Promise<boolean>): void
-  add(field: string|string[], constraintName: string, validate: (value: any, object: any) => Promise<Misfit|undefined>, condition?: (object: any) => Promise<boolean>): void
+  add(field: string|string[], constraintName: string, validate: (object: any, field: string|string[]) => Promise<Misfit|undefined>, condition?: (object: any) => Promise<boolean>): void
   
-  add(field: string|string[], constraintOrConstraintName: Constraint|string, conditionOrValidate?: ((object: any) => Promise<boolean>)|((value: any, object: any) => Promise<Misfit|undefined>), condition?: (object: any) => Promise<boolean>): void {
+  add(field: string|string[], constraintOrConstraintName: Constraint|string, conditionOrValidate?: ((object: any) => Promise<boolean>)|((object: any, field: string|string[]) => Promise<Misfit|undefined>), condition?: (object: any) => Promise<boolean>): void {
     let constraint
     
     if (typeof constraintOrConstraintName == 'string') {
