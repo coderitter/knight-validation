@@ -15,23 +15,34 @@ export default class Validator {
 
   add(field: string|string[], constraint: Constraint, condition?: (object: any) => Promise<boolean>): void
   add(field: string|string[], constraintName: string, validate: (object: any, field: string|string[]) => Promise<Misfit|undefined>, condition?: (object: any) => Promise<boolean>): void
+  add(validator: Validator): void
   
-  add(field: string|string[], constraintOrConstraintName: Constraint|string, conditionOrValidate?: ((object: any) => Promise<boolean>)|((object: any, field: string|string[]) => Promise<Misfit|undefined>), condition?: (object: any) => Promise<boolean>): void {
-    let constraint
-    
-    if (typeof constraintOrConstraintName == 'string') {
-      constraint = new QuickConstraint(constraintOrConstraintName, <any> conditionOrValidate)
-      condition = condition
-    }
-    else if (constraintOrConstraintName instanceof Constraint) {
-      constraint = constraintOrConstraintName
-      condition = <any> conditionOrValidate
+  add(fieldOrValidator: string|string[]|Validator, constraintOrConstraintName?: Constraint|string, conditionOrValidate?: ((object: any) => Promise<boolean>)|((object: any, field: string|string[]) => Promise<Misfit|undefined>), condition?: (object: any) => Promise<boolean>): void {
+    if (fieldOrValidator instanceof Validator) {
+      let validator = fieldOrValidator
+
+      for (let fieldConstraint of validator.fieldConstraints) {
+        this.fieldConstraints.push(fieldConstraint)
+      }
     }
     else {
-      throw new Error('Wrong parameters')
+      let field = fieldOrValidator
+      
+      let constraint
+      if (typeof constraintOrConstraintName == 'string') {
+        constraint = new QuickConstraint(constraintOrConstraintName, <any> conditionOrValidate)
+        condition = condition
+      }
+      else if (constraintOrConstraintName instanceof Constraint) {
+        constraint = constraintOrConstraintName
+        condition = <any> conditionOrValidate
+      }
+      else {
+        throw new Error('Wrong parameters')
+      }
+  
+      this.fieldConstraints.push(new FieldConstraint(field, constraint, condition))
     }
-
-    this.fieldConstraints.push(new FieldConstraint(field, constraint, condition))
   }
 
   get fields(): (string|string[])[] {

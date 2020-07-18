@@ -51,6 +51,24 @@ describe('Validator', function() {
       expect(constraints[0]).to.be.instanceOf(QuickConstraint)
       expect(constraints[0].name).to.equal('TestConstraint')      
     })
+
+    it.only('should accept another validator', function() {
+      let validator1 = new Validator
+      validator1.add('field1', new Required)
+      validator1.add('field1', new Absent)
+      validator1.add('field2', new Required)
+
+      let validator2 = new Validator
+      validator2.add(validator1)
+
+      expect(validator2.fieldConstraints.length).to.equal(3)
+      expect(validator2.fieldConstraints[0].field).to.equal('field1')
+      expect(validator2.fieldConstraints[0].constraint).to.be.instanceOf(Required)
+      expect(validator2.fieldConstraints[1].field).to.equal('field1')
+      expect(validator2.fieldConstraints[1].constraint).to.be.instanceOf(Absent)
+      expect(validator2.fieldConstraints[2].field).to.equal('field2')
+      expect(validator2.fieldConstraints[2].constraint).to.be.instanceOf(Required)
+    })
   })
 
   describe('validate', function() {
