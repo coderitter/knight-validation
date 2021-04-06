@@ -1,13 +1,12 @@
 {
-  "name": "mega-nice-validation",
-  "version": "7.1.0",
-  "description": "A mega nice validation lib",
+  "name": "knight-validation",
+  "version": "1.0.0",
+  "description": "A validation lib",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib/**/*"
   ],
-  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.2.7",
     "@types/mocha": "^5.2.7",
@@ -23,14 +22,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/c0deritter/mega-nice-validation.git"
+    "url": "git+https://github.com/c0deritter/knight-validation.git"
   },
   "keywords": [
     ""
   ],
   "author": "Coderitter GmbH",
   "bugs": {
-    "url": "https://github.com/c0deritter/mega-nice-validation/issues"
+    "url": "https://github.com/c0deritter/knight-validation/issues"
   },
-  "homepage": "https://github.com/c0deritter/mega-nice-validation#readme"
+  "homepage": "https://github.com/c0deritter/knight-validation#readme"
 }

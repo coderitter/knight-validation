@@ -1,15 +1,15 @@
-# Mega Nice Validation
+# Knight Validation by Coderitter
 
 ## Install
 
-`npm install mega-nice-validation`
+`npm install knight-validation`
 
 ## Overview
 
 ### Constraints for single fields
 
 ```typescript
-import { Required, TypeOf, Unique, Validator } from 'mega-nice-validation'
+import { Required, TypeOf, Unique, Validator } from 'knight-validation'
 
 class UserValidator extends Validator {
   constructor(userDb: UserDb) {
@@ -28,7 +28,7 @@ class UserValidator extends Validator {
 ### Constraints for multiple fields
 
 ```typescript
-import { Validator } from 'mega-nice-validation'
+import { Validator } from 'knight-validation'
 
 class UserValidator extends Validator {
   constructor(userDb: UserDb) {
@@ -41,21 +41,29 @@ class UserValidator extends Validator {
 ### Available constraints
 
 ```typescript
-new Absent // Check if a field is absent
+// Check if a field is absent
+new Absent
 
-new Enum('Moni', 'Lisa', 'Anna') // Check a field's value equals one of the three given strings
-new Enum(1, 3, 7) // Check if a field's value equals one of the three given numbers
+// Check a field's value equals one of the three given strings
+new Enum('Moni', 'Lisa', 'Anna')
+// Check if a field's value equals one of the three given numbers
+new Enum(1, 3, 7)
 
-new Exists(async (user: User) => { // The user object is the object which is currently validated
+new Exists(async (user: User) => {
+  // The user object is the object which is currently validated
   // Return true if your exists condition is met
 })
 
-new Required // Check if a field is there
+// Check if a field is there
+new Required
 
-new TypeOf('number') // Check if a field's value is of the given JavaScript type
-new TypeOf(Date) // Check if a field's value is an instance if the given class
+// Check if a field's value is of the given JavaScript type
+new TypeOf('number')
+// Check if a field's value is an instance if the given class
+new TypeOf(Date)
 
-new Unique(async (user: User) => { // The user object is the object which is currently validated
+new Unique(async (user: User) => {
+  // The user object is the object which is currently validated
   // Return true if your exists condition is met
 })
 ```
@@ -77,11 +85,20 @@ misfits.length == 1
 A misfit contains the following informations by default.
 
 ```typescript
-misfit.name == 'Required' // The name of the misfit which defaults to the name of the constraint which was not met
-misfit.field == 'email' // The field where the misfit occured
-misfit.fields == ['firstName', 'lastName'] // If the constraint was for multiple fields then there is an array of those fields and the field property is empty
-misfit.constraints // It contains any information that is useful about why checking the constraint resulted in a misfit. (Optional)
-misift.message == 'The field email is required.' // A message. (Optional)
+// The name of the misfit which defaults to the name of the constraint which was not met
+misfit.name == 'Required'
+
+// The field where the misfit occured
+misfit.field == 'email'
+
+// The fields where the misfit
+misfit.fields == ['firstName', 'lastName']
+
+// It contains any information that is useful about why checking the constraint resulted in a misfit (Optional)
+misfit.constraints
+
+// A message (Optional)
+misift.message == 'The field email is required.'
 ```
 
 #### Check only what is there
@@ -97,11 +114,27 @@ let misfits = validator.validate(user, { checkOnlyWhatIsThere: true })
 misfits.length == 0 // There are no misfits even though the email field is required
 ```
 
+### Constraints that are only checked if a condition is met
+
+```typescript
+import { Required, Validator } from 'knight-validation'
+
+class UserValidator extends Validator {
+  constructor(userDb: UserDb) {
+    super()
+
+    // lastName is only required if the firstName exists
+    this.add('lastName', new Required, async (user: User) => new Required().validateValue(user.firstName))
+  }
+}
+```
+
 #### Exclude rules
 
 ```typescript
 // Exclude all constraints regarding the email field
 let misfits = validator.validate(user, { exclude: ['email'] })
+
 // Exclude only the required constraint of the email field
 let misfits = validator.validate(user, { exclude: [{ field: 'email', constraint: 'Required' }] })
 ```
@@ -135,7 +168,7 @@ validator.add(['firstName', 'lastName'], 'Different', async (user: User) => {
 If you want to reuse a constraint over and over again, create a new class for it.
 
 ```typescript
-import { Constraint } from 'mega-nice-validation'
+import { Constraint } from 'knight-validation'
 
 class YourConstraint extends Constraint {
 
@@ -161,7 +194,7 @@ class YourConstraint extends Constraint {
 Another possibility is to use the `defaultValidation` method. It will do the check for absence and will implement the validation of combined fields.
 
 ```typescript
-import { Constraint } from 'mega-nice-validation'
+import { Constraint } from 'knight-validation'
 
 class YourConstraint extends Constraint {
   async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
@@ -170,21 +203,6 @@ class YourConstraint extends Constraint {
         return new Misfit
       }
     })
-  }
-}
-```
-
-### Constraints that are only checked if there is a condition met
-
-```typescript
-import { Required, Validator } from 'mega-nice-validation'
-
-class UserValidator extends Validator {
-  constructor(userDb: UserDb) {
-    super()
-
-    // lastName is only required if the firstName exists
-    this.add('lastName', new Required, async (user: User) => new Required().validateValue(user.firstName))
   }
 }
 ```

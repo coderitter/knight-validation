@@ -52,7 +52,7 @@ describe('Validator', function() {
       expect(constraints[0].name).to.equal('TestConstraint')      
     })
 
-    it.only('should accept another validator', function() {
+    it('should accept another validator', function() {
       let validator1 = new Validator
       validator1.add('field1', new Required)
       validator1.add('field1', new Absent)
