@@ -14,7 +14,8 @@ describe('Validator', function() {
       let constraints = validator.constraints('testField')
 
       expect(constraints.length).to.equal(1)
-      expect(constraints[0]).to.be.instanceOf(Required)
+      expect(constraints[0].constraint).to.be.instanceOf(Required)
+      expect(constraints[0].validator).to.be.undefined
     })
 
     it('should accept a field, a constraint name and a validate function', function() {
@@ -25,8 +26,9 @@ describe('Validator', function() {
       let constraints = validator.constraints('testField')
 
       expect(constraints.length).to.equal(1)
-      expect(constraints[0]).to.be.instanceOf(QuickConstraint)
-      expect(constraints[0].name).to.equal('TestConstraint')
+      expect(constraints[0].constraint).to.be.instanceOf(QuickConstraint)
+      expect(constraints[0].constraint?.name).to.equal('TestConstraint')
+      expect(constraints[0].validator).to.be.undefined
     })
 
     it('should accept a field combination and a constraint', function() {
@@ -37,7 +39,8 @@ describe('Validator', function() {
       let constraints = validator.constraints(['testField1', 'testField2'])
 
       expect(constraints.length).to.equal(1)
-      expect(constraints[0]).to.be.instanceOf(Required)
+      expect(constraints[0].constraint).to.be.instanceOf(Required)
+      expect(constraints[0].validator).to.be.undefined
     })
 
     it('should accept a field combination, a constraint name and a validate function', function() {
@@ -48,8 +51,19 @@ describe('Validator', function() {
       let constraints = validator.constraints(['testField1', 'testField2'])
 
       expect(constraints.length).to.equal(1)
-      expect(constraints[0]).to.be.instanceOf(QuickConstraint)
-      expect(constraints[0].name).to.equal('TestConstraint')      
+      expect(constraints[0].constraint).to.be.instanceOf(QuickConstraint)
+      expect(constraints[0].constraint?.name).to.equal('TestConstraint')
+      expect(constraints[0].validator).to.be.undefined
+    })
+
+    it('should accept another validator for a field', function() {
+      let validator = new Validator
+      validator.add('field1', new Validator)
+
+      let constraints = validator.constraints('field1')
+    
+      expect(constraints[0].constraint).to.be.undefined
+      expect(constraints[0].validator).to.be.not.undefined
     })
 
     it('should accept another validator', function() {
@@ -309,6 +323,21 @@ describe('Validator', function() {
         expect(misfits[0].name).to.equal('TestConstraint3')
         expect(misfits[1].field).to.equal('b')
         expect(misfits[1].name).to.equal('TestConstraint1')
+      })
+
+      it('should validate an object field with the given validator', async function() {
+        let fieldValidator = new Validator
+        fieldValidator.add('field11', 'TestConstraint1', async () => undefined)
+        fieldValidator.add('field12', 'TestConstraint2', async () => new Misfit)
+
+        let validator = new Validator
+        validator.add('field1', fieldValidator)
+
+        let misfits = await validator.validate({})
+
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].field).to.equal('field1.field12')
+        expect(misfits[0].name).to.equal('TestConstraint2')
       })
     })
   

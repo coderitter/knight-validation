@@ -15,27 +15,33 @@ export default class Validator {
 
   add(field: string|string[], constraint: Constraint, condition?: (object: any) => Promise<boolean>): void
   add(field: string|string[], constraintName: string, validate: (object: any, field: string|string[]) => Promise<Misfit|undefined>, condition?: (object: any) => Promise<boolean>): void
+  add(field: string|string[], validator: Validator, condition?: (object: any) => Promise<boolean>): void
   add(validator: Validator): void
   
-  add(fieldOrValidator: string|string[]|Validator, constraintOrConstraintName?: Constraint|string, conditionOrValidate?: ((object: any) => Promise<boolean>)|((object: any, field: string|string[]) => Promise<Misfit|undefined>), condition?: (object: any) => Promise<boolean>): void {
-    if (fieldOrValidator instanceof Validator) {
-      let validator = fieldOrValidator
+  add(arg0: any, arg1?: any, arg2?: any, arg3?: any): void {
+    if (arg0 instanceof Validator) {
+      let validator = arg0
 
       for (let fieldConstraint of validator.fieldConstraints) {
         this.fieldConstraints.push(fieldConstraint)
       }
     }
     else {
-      let field = fieldOrValidator
-      
+      let field = arg0
       let constraint
-      if (typeof constraintOrConstraintName == 'string') {
-        constraint = new QuickConstraint(constraintOrConstraintName, <any> conditionOrValidate)
-        condition = condition
+      let condition
+
+      if (typeof arg1 == 'string') {
+        constraint = new QuickConstraint(arg1, <any> arg2)
+        condition = arg3
       }
-      else if (constraintOrConstraintName instanceof Constraint) {
-        constraint = constraintOrConstraintName
-        condition = <any> conditionOrValidate
+      else if (arg1 instanceof Constraint) {
+        constraint = arg1
+        condition = arg2
+      }
+      else if (arg1 instanceof Validator) {
+        constraint = arg1
+        condition = arg2
       }
       else {
         throw new Error('Wrong parameters')
@@ -84,22 +90,7 @@ export default class Validator {
     return fields
   }
 
-  constraints(field: string|string[]): Constraint[] {
-    let constraints: Constraint[] = []
-    
-    for (let fieldConstraint of this.fieldConstraints) {
-      if (field === fieldConstraint.field) {
-        constraints.push(fieldConstraint.constraint)
-      }
-      else if (field instanceof Array && fieldConstraint.fields && fieldsEqual(field, fieldConstraint.fields)) {
-        constraints.push(fieldConstraint.constraint)
-      }
-    }
-
-    return constraints
-  }
-
-  fieldConstraintsForField(field: string|string[]): FieldConstraint[] {
+  constraints(field: string|string[]): FieldConstraint[] {
     let fieldConstraints: FieldConstraint[] = []
     
     for (let fieldConstraint of this.fieldConstraints) {
@@ -131,7 +122,7 @@ export default class Validator {
         continue
       }
       
-      let constraints = this.fieldConstraintsForField(field)
+      let constraints = this.constraints(field)
 
       for (let constraint of constraints) {
         if (options && options.include instanceof Array && ! (containsFieldWithoutConstraints(options.include, field) || containsFieldAndConstraint(options.include, field, constraint))) {
@@ -146,19 +137,36 @@ export default class Validator {
           continue
         }
 
-        let misfit = await constraint.validate(object, field)
+        if (constraint.constraint != undefined) {
+          let misfit = await constraint.validateConstraint(object, field)
 
-        if (misfit) {
-          misfit.field = field
+          if (misfit) {
+            misfit.field = field
+  
+            if (misfit.name === undefined) {
+              misfit.name = constraint.constraint.name
+            }
+  
+            misfittingFields.push(field)
+            misfits.push(misfit)
+            break
+          }
+        }
+        else if (constraint.validator != undefined) {
+          let fieldValue = object[field]
 
-          if (misfit.name === undefined) {
-            misfit.name = constraint.constraint.name
+          if (fieldValue == undefined) {
+            fieldValue = {}
           }
 
-          misfittingFields.push(field)
-          misfits.push(misfit)
-          break
-        }    
+          let subMisfits = await constraint.validateValidator(fieldValue)
+
+          for (let misfit of subMisfits) {
+            misfit.field = field + '.' + misfit.field
+          }
+
+          misfits.push(...subMisfits)
+        }
       }
     }
 
@@ -195,7 +203,7 @@ export default class Validator {
         continue
       }
 
-      let constraints = this.fieldConstraintsForField(fields)
+      let constraints = this.constraints(fields)
 
       for (let constraint of constraints) {
         if (options && options.include instanceof Array && ! (containsFieldWithoutConstraints(options.include, fields) || containsFieldAndConstraint(options.include, fields, constraint))) {
@@ -210,18 +218,20 @@ export default class Validator {
           continue
         }
 
-        let misfit = await constraint.validate(object, fields)
+        if (constraint.constraint != undefined) {
+          let misfit = await constraint.validateConstraint(object, fields)
 
-        if (misfit) {
-          misfit.fields = fields
-
-          if (misfit.name === undefined) {
-            misfit.name = constraint.constraint.name
+          if (misfit) {
+            misfit.fields = fields
+  
+            if (misfit.name === undefined) {
+              misfit.name = constraint.constraint.name
+            }
+  
+            misfits.push(misfit)
+            break
           }
-
-          misfits.push(misfit)
-          break
-        }    
+        }
       }
     }
 
@@ -232,18 +242,32 @@ export default class Validator {
 class FieldConstraint {
   field?: string
   fields?: string[]
-  constraint!: Constraint
+  constraint?: Constraint
+  validator?: Validator
   condition?: (object: any) => Promise<boolean>
 
-  constructor(field: string|string[], constraint: Constraint, condition?: (object: any) => Promise<boolean>) {
+  constructor(field: string|string[], constraintOrValidator: Constraint|Validator, condition?: (object: any) => Promise<boolean>) {
     this.field = typeof field == 'string' ? field : undefined
     this.fields = field instanceof Array ? field : undefined
-    this.constraint = constraint
+    this.constraint = constraintOrValidator instanceof Constraint ? constraintOrValidator : undefined
+    this.validator = constraintOrValidator instanceof Validator ? constraintOrValidator : undefined
     this.condition = condition
   }
 
-  async validate(value: any, object: any): Promise<Misfit|undefined> {
-    return await this.constraint.validate(value, object)
+  async validateConstraint(value: any, object: any): Promise<Misfit|undefined> {
+    if (this.constraint == undefined) {
+      throw new Error('Could not validate constraint because it is not set')
+    }
+
+    return this.constraint.validate(value, object)
+  }
+
+  async validateValidator(value: any): Promise<Misfit[]> {
+    if (this.validator == undefined) {
+      throw new Error('Could not validate with validator because it is not set')
+    }
+
+    return this.validator.validate(value)
   }
 }
 
@@ -344,7 +368,7 @@ function constraintNamesEqual(constraint1: string|Constraint|FieldConstraint, co
     constraintName1 = constraint1.name
   }
   else if (constraint1 instanceof FieldConstraint) {
-    constraintName1 = constraint1.constraint.name
+    constraintName1 = constraint1.constraint?.name
   }
   else {
     throw new Error('Unexpected constraint type')
@@ -357,7 +381,7 @@ function constraintNamesEqual(constraint1: string|Constraint|FieldConstraint, co
     constraintName2 = constraint2.name
   }
   else if (constraint2 instanceof FieldConstraint) {
-    constraintName2 = constraint2.constraint.name
+    constraintName2 = constraint2.constraint?.name
   }
   else {
     throw new Error('Unexpected constraint type')
