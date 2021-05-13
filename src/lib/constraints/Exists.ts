@@ -3,11 +3,11 @@ import Misfit from '../Misfit'
 
 export default class Exists extends Constraint {
 
-  isExists: (value: any, obj: any) => Promise<boolean>
+  doesExist: (value: any, obj: any) => Promise<boolean>
 
-  constructor(isExists: (obj: any, field: string|string[]) => Promise<boolean>) {
+  constructor(doesExist: (obj: any, field: string|string[]) => Promise<boolean>) {
     super()
-    this.isExists = isExists
+    this.doesExist = doesExist
   }
 
   async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
@@ -15,7 +15,7 @@ export default class Exists extends Constraint {
       return
     }
 
-    if (! await this.isExists(obj, field)) {
+    if (! await this.doesExist(obj, field)) {
       return new Misfit
     }
   }
