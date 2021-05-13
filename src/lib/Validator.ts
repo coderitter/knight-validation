@@ -11,7 +11,12 @@ export interface ValidatorOptions {
 
 export default class Validator {
 
+  options?: ValidatorOptions
   fieldConstraints: FieldConstraint[] = []
+  
+  constructor(options?: ValidatorOptions) {
+    this.options = options
+  }
 
   add(field: string|string[], constraint: Constraint, condition?: (object: any) => Promise<boolean>): void
   add(field: string|string[], constraintName: string, validate: (object: any, field: string|string[]) => Promise<Misfit|undefined>, condition?: (object: any) => Promise<boolean>): void
@@ -106,6 +111,7 @@ export default class Validator {
   }
 
   async validate(object: any, options?: ValidatorOptions): Promise<Misfit[]> {
+    options = options || this.options
     let misfits: Misfit[] = []
     let misfittingFields: string[] = []
 
