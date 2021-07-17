@@ -15,14 +15,14 @@ export default class TypeOf extends Constraint {
       if (typeof this.valueType == 'string') {
         if (typeof value !== this.valueType) {
           let misfit = new Misfit
-          misfit.constraints = <TypeOfConstraints> { type: this.valueType }
+          misfit.values = <TypeOfValues> { actualType: typeof value, expectedType: this.valueType }
           return misfit
         }  
       }
       else {
         if (! (value instanceof this.valueType)) {
           let misfit = new Misfit
-          misfit.constraints = <TypeOfConstraints> { type: this.valueType.name }
+          misfit.values = <TypeOfValues> { actualType: typeof value, expectedType: this.valueType.name }
           return misfit
         }
       }
@@ -32,6 +32,7 @@ export default class TypeOf extends Constraint {
   }
 }
 
-export interface TypeOfConstraints {
-  type: string
+export interface TypeOfValues {
+  expectedType: string
+  actualType: string
 }

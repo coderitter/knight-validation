@@ -26,7 +26,7 @@ describe('constraints', function() {
           let unique = new Unique(async (obj: any) => obj.value === 1)
           let misfit = await unique.validate({ value: 2 }, 'value')
           expect(misfit).to.be.instanceOf(Misfit)
-          expect(misfit?.name).to.equal('Unique')
+          expect(misfit?.constraint).to.equal('Unique')
         })  
       })
 
@@ -50,7 +50,7 @@ describe('constraints', function() {
           let unique = new Unique(async (obj: any) => obj.a === 1 && obj.b === 2)
           let misfit = await unique.validate({ a: 2, b: 4}, ['a', 'b'])
           expect(misfit).to.be.instanceOf(Misfit)
-          expect(misfit?.name).to.equal('Unique')
+          expect(misfit?.constraint).to.equal('Unique')
         })  
       })
     })

@@ -149,8 +149,8 @@ export default class Validator {
           if (misfit) {
             misfit.field = field
   
-            if (misfit.name === undefined) {
-              misfit.name = constraint.constraint.name
+            if (misfit.constraint === undefined) {
+              misfit.constraint = constraint.constraint.name
             }
   
             misfittingFields.push(field)
@@ -230,8 +230,8 @@ export default class Validator {
           if (misfit) {
             misfit.fields = fields
   
-            if (misfit.name === undefined) {
-              misfit.name = constraint.constraint.name
+            if (misfit.constraint === undefined) {
+              misfit.constraint = constraint.constraint.name
             }
   
             misfits.push(misfit)

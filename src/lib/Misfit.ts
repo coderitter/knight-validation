@@ -7,14 +7,14 @@ import fieldsEqual from './fieldsEqual'
 
 export default class Misfit {
 
-  name!: string
+  constraint!: string
   field!: string
   fields!: string[]
-  constraints?: any
+  values?: any
   message?: string
 
-  constructor(name?: string, field?: string|string[], constraints?: object) {
-    this.name = <any> name
+  constructor(constraint?: string, field?: string|string[], values?: any) {
+    this.constraint = <any> constraint
     
     if (typeof field == 'string') {
       this.field = field
@@ -23,7 +23,7 @@ export default class Misfit {
       this.fields = field
     }
 
-    this.constraints = constraints
+    this.values = values
   }
 
   setMessage(message: string|undefined): this {
@@ -35,7 +35,7 @@ export default class Misfit {
     return this.field != undefined
   }
 
-  isFieldCombination(): boolean {
+  isMultipleField(): boolean {
     return this.fields != undefined
   }
 
