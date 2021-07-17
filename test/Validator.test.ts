@@ -325,7 +325,7 @@ describe('Validator', function() {
         expect(misfits[1].name).to.equal('TestConstraint1')
       })
 
-      it.only('should validate an object field with the given validator', async function() {
+      it('should validate an object field with the given validator', async function() {
         let fieldValidator = new Validator
         fieldValidator.add('field11', 'TestConstraint1', async () => undefined)
         fieldValidator.add('field12', 'TestConstraint2', async () => new Misfit)
@@ -340,7 +340,7 @@ describe('Validator', function() {
         expect(misfits[0].name).to.equal('TestConstraint2')
       })
 
-      it.only('should validate an object field does not have an object value', async function() {
+      it('should validate an object field does not have an object value', async function() {
         let fieldValidator = new Validator
         fieldValidator.add('field11', 'TestConstraint1', async () => undefined)
         fieldValidator.add('field12', 'TestConstraint2', async () => new Misfit)
@@ -355,7 +355,7 @@ describe('Validator', function() {
         expect(misfits[0].name).to.equal('TestConstraint2')
       })
 
-      it.only('should not validate an object field if it is undefined or null', async function() {
+      it('should not validate an object field if it is undefined or null', async function() {
         let fieldValidator = new Validator
         fieldValidator.add('field11', 'TestConstraint1', async () => undefined)
         fieldValidator.add('field12', 'TestConstraint2', async () => new Misfit)
