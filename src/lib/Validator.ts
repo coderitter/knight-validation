@@ -162,7 +162,7 @@ export default class Validator {
           let fieldValue = object[field]
 
           if (fieldValue == undefined) {
-            fieldValue = {}
+            continue
           }
 
           let subMisfits = await constraint.validateValidator(fieldValue)
