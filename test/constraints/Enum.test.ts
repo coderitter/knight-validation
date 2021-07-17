@@ -14,6 +14,21 @@ describe('constraints', function() {
         let e = new Enum('a', 'b')
         expect(e.values).to.deep.equal(['a', 'b'])
       })
+
+      it('should accept the values of an TypeScript enum using string values', function() {
+        let e = new Enum(StringEnum)
+        expect(e.values).to.deep.equal(['A', 'B'])
+      })
+
+      it('should accept the values of an TypeScript enum using number values', function() {
+        let e = new Enum(NumberEnum)
+        expect(e.values).to.deep.equal([1, 2])
+      })
+
+      it('should accept the values of an TypeScript enum using mixed values', function() {
+        let e = new Enum(MixedEnum)
+        expect(e.values).to.deep.equal(['A', 2])
+      })
     })
 
     describe('validate', function() {
@@ -37,7 +52,44 @@ describe('constraints', function() {
           let typeOf = new Enum(['a', 'b'])
           let misfit = await typeOf.validate({ value: '1' }, 'value')
           expect(misfit).to.be.instanceOf(Misfit)
-        })  
+        })
+
+        it('should return a misfit if the value is not contained in a TypeScript enum using string values', async function() {
+          let typeOf = new Enum(StringEnum)
+          let misfit = await typeOf.validate({ value: 'C'}, 'value')
+          expect(misfit).to.be.instanceOf(Misfit)
+        })
+
+        it('should not return a misfit if the value is contained in a TypeScript enum using string values', async function() {
+          let typeOf = new Enum(StringEnum)
+          let misfit = await typeOf.validate({ value: 'A'}, 'value')
+          expect(misfit).to.be.undefined
+        })
+
+        it('should return a misfit if the value is not contained in a TypeScript enum using number values', async function() {
+          let typeOf = new Enum(NumberEnum)
+          expect(await typeOf.validate({ value: '3'}, 'value')).to.be.instanceOf(Misfit)
+          expect(await typeOf.validate({ value: 'a'}, 'value')).to.be.instanceOf(Misfit)
+        })
+
+        it('should not return a misfit if the value is contained in a TypeScript enum using number values', async function() {
+          let typeOf = new Enum(NumberEnum)
+          let misfit = await typeOf.validate({ value: 1}, 'value')
+          expect(misfit).to.be.undefined
+        })
+
+        it('should return a misfit if the value is not contained in a TypeScript enum using mixed values', async function() {
+          let typeOf = new Enum(MixedEnum)
+          expect(await typeOf.validate({ value: '3'}, 'value')).to.be.instanceOf(Misfit)
+          expect(await typeOf.validate({ value: 'a'}, 'value')).to.be.instanceOf(Misfit)
+          expect(await typeOf.validate({ value: 'C'}, 'value')).to.be.instanceOf(Misfit)
+        })
+
+        it('should not return a misfit if the value is contained in a TypeScript enum using mixed values', async function() {
+          let typeOf = new Enum(MixedEnum)
+          expect(await typeOf.validate({ value: 'A'}, 'value')).to.be.undefined
+          expect(await typeOf.validate({ value: 2}, 'value')).to.be.undefined
+        })
       })
 
       describe('field combination', function() {
@@ -65,3 +117,15 @@ describe('constraints', function() {
     })
   })
 })
+
+enum StringEnum {
+  a = 'A', b = 'B'
+}
+
+enum NumberEnum {
+  a = 1, b
+}
+
+enum MixedEnum {
+  a = 'A', b = 2
+}

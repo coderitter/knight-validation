@@ -40,7 +40,7 @@ describe('constraints', function() {
           let typeOf = new TypeOf(Date)
           let misfit = await typeOf.validate({ value: new Date }, 'value')
           expect(misfit).to.be.undefined
-        })  
+        })
       })
 
       describe('field combination', function() {
