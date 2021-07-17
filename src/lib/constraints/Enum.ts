@@ -3,19 +3,31 @@ import Misfit from '../Misfit'
 
 export default class Enum extends Constraint {
 
-  values: any[]
+  values: any[] = []
 
   constructor(values: any[])
   constructor(...values: any[])
+  constructor(values: object)
 
   constructor(...values: any) {
     super()
 
-    if (values instanceof Array && values.length == 1 && values[0] instanceof Array) {
-      this.values = values[0]
-    }
-    else {
-      this.values = values
+    for (let value of values) {
+      if (value instanceof Array) {
+        this.values.push(...value)
+      }
+
+      else if (typeof value == 'object') {
+        for (let key in value) {
+          if (isNaN(parseInt(key, 10))) {
+            this.values.push(value[key])
+          }
+        }  
+      }
+
+      else {
+        this.values.push(value)
+      }
     }
   }
 
