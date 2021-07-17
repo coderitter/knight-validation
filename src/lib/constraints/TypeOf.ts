@@ -21,8 +21,13 @@ export default class TypeOf extends Constraint {
       }
       else {
         if (! (value instanceof this.valueType)) {
+          let typeOfValue = typeof value
+          if (typeOfValue == 'object') {
+            typeOfValue = value.constructor.name
+          }
+
           let misfit = new Misfit
-          misfit.values = <TypeOfValues> { actualType: typeof value, expectedType: this.valueType.name }
+          misfit.values = <TypeOfValues> { actualType: typeOfValue, expectedType: this.valueType.name }
           return misfit
         }
       }

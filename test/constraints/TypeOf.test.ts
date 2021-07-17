@@ -33,7 +33,7 @@ describe('constraints', function() {
           let typeOf = new TypeOf(Date)
           let misfit = await typeOf.validate({ value: {} }, 'value')
           expect(misfit).to.be.instanceOf(Misfit)
-          expect(misfit?.values).to.deep.equal(<TypeOfValues> { actualType: 'object', expectedType: 'Date' })
+          expect(misfit?.values).to.deep.equal(<TypeOfValues> { actualType: 'Object', expectedType: 'Date' })
         })  
 
         it('should not return a misfit if the correct class', async function() {
@@ -70,7 +70,7 @@ describe('constraints', function() {
           let typeOf = new TypeOf(Date)
           let misfit = await typeOf.validate({ a: new Date, b: {} }, ['a', 'b'])
           expect(misfit).to.be.instanceOf(Misfit)
-          expect(misfit?.values).to.deep.equal(<TypeOfValues> { actualType: 'object', expectedType: 'Date' })
+          expect(misfit?.values).to.deep.equal(<TypeOfValues> { actualType: 'Object', expectedType: 'Date' })
         })  
 
         it('should not return a misfit if the correct class', async function() {
