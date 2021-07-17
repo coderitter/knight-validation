@@ -5,7 +5,9 @@ export default class TypeOf extends Constraint {
 
   valueType: string|(new (...params: any[]) => any)
 
-  constructor(valueType: string|(new (...params: any[]) => any)) {
+  constructor(valueType: string)
+  constructor(valueType: (new (...params: any[]) => any))
+  constructor(valueType: any) {
     super()
     this.valueType = valueType
   }
