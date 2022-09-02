@@ -12,22 +12,22 @@ describe('constraints', function() {
           expect(misfit).to.be.undefined
         })
     
-        it('should not return a misfit on null', async function() {
+        it('should return a misfit on null', async function() {
           let absent = new Absent
           let misfit = await absent.validate({ value: null }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.instanceOf(Misfit)
         })
     
-        it('should not return a misfit on empty string', async function() {
+        it('should return a misfit on empty string', async function() {
           let absent = new Absent
           let misfit = await absent.validate({ value: '' }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.instanceOf(Misfit)
         })
     
-        it('should not return a misfit on NaN', async function() {
+        it('should return a misfit on NaN', async function() {
           let absent = new Absent
           let misfit = await absent.validate({ value: NaN }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.instanceOf(Misfit)
         })
     
         it('should return a misfit on number', async function() {
@@ -62,22 +62,22 @@ describe('constraints', function() {
           expect(misfit).to.be.undefined
         })
     
-        it('should not return a misfit on null', async function() {
+        it('should return a misfit on null', async function() {
           let absent = new Absent
           let misfit = await absent.validate({ a: null, b: null }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.instanceOf(Misfit)
         })
     
-        it('should not return a misfit on empty string', async function() {
+        it('should return a misfit on empty string', async function() {
           let absent = new Absent
           let misfit = await absent.validate({ a: '', b: '' }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.instanceOf(Misfit)
         })
     
-        it('should not return a misfit on NaN', async function() {
+        it('should return a misfit on NaN', async function() {
           let absent = new Absent
           let misfit = await absent.validate({ a: NaN, b: NaN }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.instanceOf(Misfit)
         })
     
         it('should return a misfit on number', async function() {
@@ -107,5 +107,3 @@ describe('constraints', function() {
     })
   })
 })
-
-class EmptyClass {}

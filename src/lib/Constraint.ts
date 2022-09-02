@@ -7,7 +7,7 @@ export default abstract class Constraint {
   abstract validate(obj: any, field: string|string[]): Promise<Misfit|undefined>
 
   protected async defaultValidation(obj: any, field: string|string[], validateValue: (value: any) => Promise<Misfit|undefined>): Promise<Misfit|undefined> {
-    if (this.isFieldAbsent(obj, field)) {
+    if (this.isFieldAbsent(obj, field)) {
       return
     }
 
@@ -44,7 +44,7 @@ export default abstract class Constraint {
 
       if (Constraint.absent(value)) {
         return true
-      }  
+      }
     }
     else if (field instanceof Array) {
       for (let fld of field) {
@@ -63,9 +63,6 @@ export default abstract class Constraint {
   }
 
   static absent(value: any): boolean {
-    return value === undefined || 
-      value === null || 
-      value === '' || 
-      typeof value === 'number' && isNaN(value)
+    return value === undefined
   }
 }

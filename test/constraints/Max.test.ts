@@ -32,13 +32,13 @@ describe('constraints', function() {
     
         it('should return a misfit if an array is longer then the maximum', async function() {
           let max = new Max(5)
-          let misfit = await max.validate({ value: [1, 2, 3, 4, 5, 6] }, 'value')
+          let misfit = await max.validate({ value: [1, 2, 3, 4, 5, 6] }, 'value')
           expect(misfit).to.be.instanceOf(Misfit)
         })
     
         it('should not return a misfit if an array is shorter than the maximum', async function() {
           let max = new Max(5)
-          let misfit = await max.validate({ value: [1, 2, 3, 4, 5] }, 'value')
+          let misfit = await max.validate({ value: [1, 2, 3, 4, 5] }, 'value')
           expect(misfit).to.be.undefined
         })
     
@@ -79,13 +79,13 @@ describe('constraints', function() {
     
         it('should return a misfit if one array is longer then the maximum', async function() {
           let max = new Max(5)
-          let misfit = await max.validate({ value1: [1, 2, 3, 4, 5, 6], value2: [1, 2, 3, 4, 5] }, ['value1', 'value2'])
+          let misfit = await max.validate({ value1: [1, 2, 3, 4, 5, 6], value2: [1, 2, 3, 4, 5] }, ['value1', 'value2'])
           expect(misfit).to.be.instanceOf(Misfit)
         })
     
         it('should not return a misfit if all arrays are shorter than the maximum', async function() {
           let max = new Max(5)
-          let misfit = await max.validate({ value1: [1, 2, 3, 4, 5],  value2: [1, 2, 3, 4] }, ['value1', 'value2'])
+          let misfit = await max.validate({ value1: [1, 2, 3, 4, 5],  value2: [1, 2, 3, 4] }, ['value1', 'value2'])
           expect(misfit).to.be.undefined
         })
     

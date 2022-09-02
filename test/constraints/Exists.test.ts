@@ -17,15 +17,14 @@ describe('constraints', function() {
           let exists = new Exists(async (obj: any) => obj.value === 1)
   
           expect(await exists.validate({ value: undefined }, 'value')).to.be.undefined
-          expect(await exists.validate({ value: null }, 'value')).to.be.undefined
-          expect(await exists.validate({ value: '' }, 'value')).to.be.undefined
-          expect(await exists.validate({ value: NaN }, 'value')).to.be.undefined
         })
   
         it('should return a misfit if not exists', async function() {
           let exists = new Exists(async (obj: any) => obj.value === 1)
-          let misfit = await exists.validate({ value: 2 }, 'value')
-          expect(misfit).to.be.instanceOf(Misfit)
+          expect(await exists.validate({ value: 2 }, 'value')).to.be.instanceOf(Misfit)
+          expect(await exists.validate({ value: null }, 'value')).to.be.instanceOf(Misfit)
+          expect(await exists.validate({ value: '' }, 'value')).to.be.instanceOf(Misfit)
+          expect(await exists.validate({ value: NaN }, 'value')).to.be.instanceOf(Misfit)
         })  
       })
 
@@ -40,15 +39,14 @@ describe('constraints', function() {
           let exists = new Exists(async (obj: any) => obj.a === 0 && obj.b === 1)
   
           expect(await exists.validate({ a: undefined, b: undefined }, ['a', 'b'])).to.be.undefined
-          expect(await exists.validate({ a: null, b: null }, ['a', 'b'])).to.be.undefined
-          expect(await exists.validate({ a: '', b: '' }, ['a', 'b'])).to.be.undefined
-          expect(await exists.validate({ a: NaN, b: NaN }, ['a', 'b'])).to.be.undefined
         })
   
         it('should return a misfit if not exists', async function() {
           let exists = new Exists(async (obj: any) => obj.a === 0 && obj.b === 1)
-          let misfit = await exists.validate({ a: 1, b: 2 }, ['a', 'b'])
-          expect(misfit).to.be.instanceOf(Misfit)
+          expect(await exists.validate({ a: 1, b: 2 }, ['a', 'b'])).to.be.instanceOf(Misfit)
+          expect(await exists.validate({ a: null, b: null }, ['a', 'b'])).to.be.instanceOf(Misfit)
+          expect(await exists.validate({ a: '', b: '' }, ['a', 'b'])).to.be.instanceOf(Misfit)
+          expect(await exists.validate({ a: NaN, b: NaN }, ['a', 'b'])).to.be.instanceOf(Misfit)
         })  
       })
     })
