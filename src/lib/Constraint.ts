@@ -4,11 +4,11 @@ export abstract class Constraint<T = any, MisfitValuesType = any> {
 
   name: string = this.constructor.name
 
-  abstract validate(obj: T, field: string|string[]): Promise<Misfit<MisfitValuesType>|undefined>
+  abstract validate(obj: T, property: string|string[]): Promise<Misfit<MisfitValuesType>|undefined>
 
-  protected async defaultValidation(obj: T, field: string|string[], validateValue: (value: any) => Promise<Misfit<MisfitValuesType>|undefined>, doNotValidateIfUndefined = true): Promise<Misfit<MisfitValuesType>|undefined> {
-    if (typeof field == 'string') {
-      let value = (obj as any)[field]
+  protected async defaultValidation(obj: T, property: string|string[], validateValue: (value: any) => Promise<Misfit<MisfitValuesType>|undefined>, doNotValidateIfUndefined = true): Promise<Misfit<MisfitValuesType>|undefined> {
+    if (typeof property == 'string') {
+      let value = (obj as any)[property]
 
       if (doNotValidateIfUndefined && value === undefined) {
         return
@@ -21,11 +21,11 @@ export abstract class Constraint<T = any, MisfitValuesType = any> {
 
       return misfit
     }
-    else if (field instanceof Array) {
+    else if (property instanceof Array) {
       let misfit
       let everyValueAbsent = true
 
-      for (let fld of field) {
+      for (let fld of property) {
         let value = (obj as any)[fld]
 
         if (doNotValidateIfUndefined && value === undefined) {
@@ -48,7 +48,7 @@ export abstract class Constraint<T = any, MisfitValuesType = any> {
       }
     }
     else {
-      throw new Error('Parameter field was neither of type string nor instance of Array')
+      throw new Error('Parameter property was neither of type string nor instance of Array')
     }
   }
 }

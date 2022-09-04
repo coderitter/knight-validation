@@ -1,45 +1,39 @@
-import { fieldsEqual } from './fieldsEqual'
-
 export class Misfit<ValuesType = any> {
 
   constraint!: string
-  field!: string
-  fields!: string[]
+  property!: string
+  properties!: string[]
   values?: ValuesType
   message?: string
 
-  constructor(name?: string, field?: string|string[], values?: ValuesType, message?: string) {
+  constructor(name?: string, property?: string|string[], values?: ValuesType, message?: string) {
     this.constraint = <any> name
     
-    if (typeof field == 'string') {
-      this.field = field
+    if (typeof property == 'string') {
+      this.property = property
     }
-    else if (field instanceof Array) {
-      this.fields = field
+    else if (property instanceof Array) {
+      this.properties = property
     }
 
     this.values = values
     this.message = message
   }
 
-  setField(field: string|string[]) {
-    if (typeof field == 'string') {
-      this.field = field
+  setProperty(property: string|string[]) {
+    if (typeof property == 'string') {
+      this.property = property
     }
-    else if (field instanceof Array) {
-      this.fields = field
+    else if (property instanceof Array) {
+      this.properties = property
     }
   }
 
-  isSingleField(): boolean {
-    return this.field != undefined
+  isSinglePropery(): boolean {
+    return this.property != undefined
   }
 
-  isFieldCombination(): boolean {
-    return this.fields != undefined
-  }
-
-  fieldsEqual(fields: string[]): boolean {
-    return fieldsEqual(this.fields, fields)
+  isMultipleProperties(): boolean {
+    return this.properties != undefined
   }
 }

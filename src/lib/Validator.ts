@@ -1,38 +1,38 @@
 import { Constraint } from './Constraint'
 import { QuickConstraint } from './constraints/QuickConstraint'
-import { fieldsEqual } from './fieldsEqual'
+import { arePropertiesEqual } from './tools'
 import { Misfit } from './Misfit'
 
 export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean,
-  include?: (string | string[] | { field: string|string[], constraint?: string|string[] })[]
-  exclude?: (string | string[] | { field: string|string[], constraint?: string|string[] })[]
+  include?: (string | string[] | { property: string|string[], constraint?: string|string[] })[]
+  exclude?: (string | string[] | { property: string|string[], constraint?: string|string[] })[]
 }
 
 export class Validator<T = any> {
 
   options?: ValidatorOptions
-  fieldConstraints: FieldConstraint[] = []
+  propertyConstraints: PropertyConstraint[] = []
   
   constructor(options?: ValidatorOptions) {
     this.options = options
   }
 
-  add(field: string|string[], constraint: Constraint<T>, condition?: (object: any) => Promise<boolean>): void
-  add(field: string|string[], constraintName: string, validate: (object: any, field: string|string[]) => Promise<Misfit|undefined>, condition?: (object: any) => Promise<boolean>): void
-  add(field: string|string[], validator: Validator, condition?: (object: any) => Promise<boolean>): void
+  add(property: string|string[], constraint: Constraint<T>, condition?: (object: any) => Promise<boolean>): void
+  add(property: string|string[], constraintName: string, validate: (object: any, property: string|string[]) => Promise<Misfit|undefined>, condition?: (object: any) => Promise<boolean>): void
+  add(property: string|string[], validator: Validator, condition?: (object: any) => Promise<boolean>): void
   add(validator: Validator): void
   
   add(arg0: any, arg1?: any, arg2?: any, arg3?: any): void {
     if (arg0 instanceof Validator) {
       let validator = arg0
 
-      for (let fieldConstraint of validator.fieldConstraints) {
-        this.fieldConstraints.push(fieldConstraint)
+      for (let propertyConstraint of validator.propertyConstraints) {
+        this.propertyConstraints.push(propertyConstraint)
       }
     }
     else {
-      let field = arg0
+      let property = arg0
       let constraint
       let condition
 
@@ -52,90 +52,90 @@ export class Validator<T = any> {
         throw new Error('Wrong parameters')
       }
   
-      this.fieldConstraints.push(new FieldConstraint(field, constraint, condition))
+      this.propertyConstraints.push(new PropertyConstraint(property, constraint, condition))
     }
   }
 
-  get fields(): (string|string[])[] {
-    let fields: (string|string[])[] = []
+  get properties(): (string|string[])[] {
+    let properties: (string|string[])[] = []
 
-    for (let fieldConstraint of this.fieldConstraints) {
-      if (fieldConstraint.field != undefined) {
-        fields.push(fieldConstraint.field)
+    for (let propertyConstraint of this.propertyConstraints) {
+      if (propertyConstraint.property != undefined) {
+        properties.push(propertyConstraint.property)
       }
-      else if (fieldConstraint.fields != undefined) {
-        fields.push(fieldConstraint.fields)
-      }
-    }
-
-    return fields
-  }
-
-  get singleFields(): string[] {
-    let fields: string[] = []
-
-    for (let fieldConstraint of this.fieldConstraints) {
-      if (fieldConstraint.field != undefined && fields.indexOf(fieldConstraint.field) == -1) {
-        fields.push(fieldConstraint.field)
+      else if (propertyConstraint.properties != undefined) {
+        properties.push(propertyConstraint.properties)
       }
     }
 
-    return fields
+    return properties
   }
 
-  get combinedFields(): string[][] {
-    let fields: string[][] = []
+  get singleProperties(): string[] {
+    let properties: string[] = []
 
-    for (let fieldConstraint of this.fieldConstraints) {
-      if (fieldConstraint.fields != undefined && ! fields.some((fields: string[]) => fieldsEqual(fields, fieldConstraint.fields))) {
-        fields.push(fieldConstraint.fields)
+    for (let propertyConstraint of this.propertyConstraints) {
+      if (propertyConstraint.property != undefined && properties.indexOf(propertyConstraint.property) == -1) {
+        properties.push(propertyConstraint.property)
       }
     }
 
-    return fields
+    return properties
   }
 
-  constraints(field: string|string[]): FieldConstraint[] {
-    let fieldConstraints: FieldConstraint[] = []
+  get combinedProperties(): string[][] {
+    let properties: string[][] = []
+
+    for (let propertyConstraint of this.propertyConstraints) {
+      if (propertyConstraint.properties != undefined && ! properties.some((properties: string[]) => arePropertiesEqual(properties, propertyConstraint.properties))) {
+        properties.push(propertyConstraint.properties)
+      }
+    }
+
+    return properties
+  }
+
+  constraints(property: string|string[]): PropertyConstraint[] {
+    let propertyConstraints: PropertyConstraint[] = []
     
-    for (let fieldConstraint of this.fieldConstraints) {
-      if (field === fieldConstraint.field) {
-        fieldConstraints.push(fieldConstraint)
+    for (let propertyConstraint of this.propertyConstraints) {
+      if (property === propertyConstraint.property) {
+        propertyConstraints.push(propertyConstraint)
       }
-      else if (field instanceof Array && fieldConstraint.fields && fieldsEqual(field, fieldConstraint.fields)) {
-        fieldConstraints.push(fieldConstraint)
+      else if (property instanceof Array && propertyConstraint.properties && arePropertiesEqual(property, propertyConstraint.properties)) {
+        propertyConstraints.push(propertyConstraint)
       }
     }
 
-    return fieldConstraints
+    return propertyConstraints
   }
 
   async validate(object: any, options?: ValidatorOptions): Promise<Misfit[]> {
     options = options || this.options
     let misfits: Misfit[] = []
-    let misfittingFields: string[] = []
+    let misfittingProperties: string[] = []
 
-    for (let field of this.singleFields) {
-      if (options && options.include instanceof Array && ! containsField(options.include, field)) {
+    for (let property of this.singleProperties) {
+      if (options && options.include instanceof Array && ! containsProperty(options.include, property)) {
         continue
       }
 
-      if (options && options.exclude instanceof Array && containsFieldWithoutConstraints(options.exclude, field)) {
+      if (options && options.exclude instanceof Array && containsPropertyWithoutConstraints(options.exclude, property)) {
         continue
       }
 
-      if (object[field] === undefined && options && options.checkOnlyWhatIsThere) {
+      if (object[property] === undefined && options && options.checkOnlyWhatIsThere) {
         continue
       }
       
-      let constraints = this.constraints(field)
+      let constraints = this.constraints(property)
 
       for (let constraint of constraints) {
-        if (options && options.include instanceof Array && ! (containsFieldWithoutConstraints(options.include, field) || containsFieldAndConstraint(options.include, field, constraint))) {
+        if (options && options.include instanceof Array && ! (containsPropertyWithoutConstraints(options.include, property) || containsPropertyAndConstraint(options.include, property, constraint))) {
           continue
         }
 
-        if (options && options.exclude instanceof Array && containsFieldAndConstraint(options.exclude, field, constraint)) {
+        if (options && options.exclude instanceof Array && containsPropertyAndConstraint(options.exclude, property, constraint)) {
           continue
         }
     
@@ -144,31 +144,31 @@ export class Validator<T = any> {
         }
 
         if (constraint.constraint != undefined) {
-          let misfit = await constraint.validateConstraint(object, field)
+          let misfit = await constraint.validateConstraint(object, property)
 
           if (misfit) {
-            misfit.field = field
+            misfit.property = property
   
             if (misfit.constraint === undefined) {
               misfit.constraint = constraint.constraint.name
             }
   
-            misfittingFields.push(field)
+            misfittingProperties.push(property)
             misfits.push(misfit)
             break
           }
         }
         else if (constraint.validator != undefined) {
-          let fieldValue = object[field]
+          let propertyValue = object[property]
 
-          if (fieldValue == undefined) {
+          if (propertyValue == undefined) {
             continue
           }
 
-          let subMisfits = await constraint.validateValidator(fieldValue)
+          let subMisfits = await constraint.validateValidator(propertyValue)
 
           for (let misfit of subMisfits) {
-            misfit.field = field + '.' + misfit.field
+            misfit.property = property + '.' + misfit.property
           }
 
           misfits.push(...subMisfits)
@@ -176,47 +176,47 @@ export class Validator<T = any> {
       }
     }
 
-    for (let fields of this.combinedFields) {
-      if (options && options.include instanceof Array && ! containsField(options.include, fields)) {
+    for (let properties of this.combinedProperties) {
+      if (options && options.include instanceof Array && ! containsProperty(options.include, properties)) {
         continue
       }
 
-      if (options && options.exclude instanceof Array && containsFieldWithoutConstraints(options.exclude, fields)) {
+      if (options && options.exclude instanceof Array && containsPropertyWithoutConstraints(options.exclude, properties)) {
         continue
       }
 
-      let oneOfTheFieldsAlreadyHasAMisfit = false
-      for (let field of fields) {
-        if (misfittingFields.indexOf(field) > -1) {
-          oneOfTheFieldsAlreadyHasAMisfit = true
+      let oneOfThePropertiesAlreadyHasAMisfit = false
+      for (let property of properties) {
+        if (misfittingProperties.indexOf(property) > -1) {
+          oneOfThePropertiesAlreadyHasAMisfit = true
           break
         }
       }
 
-      if (oneOfTheFieldsAlreadyHasAMisfit) {
+      if (oneOfThePropertiesAlreadyHasAMisfit) {
         continue
       }
 
-      let atLeastOneOfTheFieldsMissingInObject = false
-      for (let field of fields) {
-        if (object[field] === undefined) {
-          atLeastOneOfTheFieldsMissingInObject = true
+      let atLeastOneOfThePropertiesMissingInObject = false
+      for (let property of properties) {
+        if (object[property] === undefined) {
+          atLeastOneOfThePropertiesMissingInObject = true
           break
         }
       }
 
-      if (atLeastOneOfTheFieldsMissingInObject && options && options.checkOnlyWhatIsThere) {
+      if (atLeastOneOfThePropertiesMissingInObject && options && options.checkOnlyWhatIsThere) {
         continue
       }
 
-      let constraints = this.constraints(fields)
+      let constraints = this.constraints(properties)
 
       for (let constraint of constraints) {
-        if (options && options.include instanceof Array && ! (containsFieldWithoutConstraints(options.include, fields) || containsFieldAndConstraint(options.include, fields, constraint))) {
+        if (options && options.include instanceof Array && ! (containsPropertyWithoutConstraints(options.include, properties) || containsPropertyAndConstraint(options.include, properties, constraint))) {
           continue
         }
   
-        if (options && options.exclude instanceof Array && containsFieldAndConstraint(options.exclude, fields, constraint)) {
+        if (options && options.exclude instanceof Array && containsPropertyAndConstraint(options.exclude, properties, constraint)) {
           continue
         }
   
@@ -225,10 +225,10 @@ export class Validator<T = any> {
         }
 
         if (constraint.constraint != undefined) {
-          let misfit = await constraint.validateConstraint(object, fields)
+          let misfit = await constraint.validateConstraint(object, properties)
 
           if (misfit) {
-            misfit.fields = fields
+            misfit.properties = properties
   
             if (misfit.constraint === undefined) {
               misfit.constraint = constraint.constraint.name
@@ -245,16 +245,16 @@ export class Validator<T = any> {
   }
 }
 
-class FieldConstraint {
-  field?: string
-  fields?: string[]
+class PropertyConstraint {
+  property?: string
+  properties?: string[]
   constraint?: Constraint
   validator?: Validator
   condition?: (object: any) => Promise<boolean>
 
-  constructor(field: string|string[], constraintOrValidator: Constraint|Validator, condition?: (object: any) => Promise<boolean>) {
-    this.field = typeof field == 'string' ? field : undefined
-    this.fields = field instanceof Array ? field : undefined
+  constructor(property: string|string[], constraintOrValidator: Constraint|Validator, condition?: (object: any) => Promise<boolean>) {
+    this.property = typeof property == 'string' ? property : undefined
+    this.properties = property instanceof Array ? property : undefined
     this.constraint = constraintOrValidator instanceof Constraint ? constraintOrValidator : undefined
     this.validator = constraintOrValidator instanceof Validator ? constraintOrValidator : undefined
     this.condition = condition
@@ -277,20 +277,20 @@ class FieldConstraint {
   }
 }
 
-function containsField(fieldsAndConstraints: (string|string[]|{field: string|string[], constraint?: string|string[]})[], field: string|string[]): boolean {
-  for (let fieldAndConstraint of fieldsAndConstraints) {
-    if (typeof fieldAndConstraint == 'string') {
-      if (fieldAndConstraint == field) {
+function containsProperty(propertiesAndConstraints: (string|string[]|{property: string|string[], constraint?: string|string[]})[], property: string|string[]): boolean {
+  for (let propertyAndConstraint of propertiesAndConstraints) {
+    if (typeof propertyAndConstraint == 'string') {
+      if (propertyAndConstraint == property) {
         return true
       }
     }
-    else if (fieldAndConstraint instanceof Array) {
-      if (field instanceof Array && fieldsEqual(fieldAndConstraint, field)) {
+    else if (propertyAndConstraint instanceof Array) {
+      if (property instanceof Array && arePropertiesEqual(propertyAndConstraint, property)) {
         return true
       }
     }
-    else if (typeof fieldAndConstraint == 'object' && 'field' in fieldAndConstraint) {
-      if (containsField([fieldAndConstraint.field], field)) {
+    else if (typeof propertyAndConstraint == 'object' && 'property' in propertyAndConstraint) {
+      if (containsProperty([propertyAndConstraint.property], property)) {
         return true
       }
     }
@@ -299,21 +299,21 @@ function containsField(fieldsAndConstraints: (string|string[]|{field: string|str
   return false
 }
 
-function containsFieldWithoutConstraints(fieldsAndConstraints: (string|string[]|{field: string|string[], constraint?: string|string[]})[], field: string|string[]): boolean {
-  for (let fieldAndConstraint of fieldsAndConstraints) {
-    if (typeof fieldAndConstraint == 'string') {
-      if (fieldAndConstraint == field) {
+function containsPropertyWithoutConstraints(propertiesAndConstraints: (string|string[]|{property: string|string[], constraint?: string|string[]})[], property: string|string[]): boolean {
+  for (let propertyAndConstraint of propertiesAndConstraints) {
+    if (typeof propertyAndConstraint == 'string') {
+      if (propertyAndConstraint == property) {
         return true
       }
     }
-    else if (fieldAndConstraint instanceof Array) {
-      if (field instanceof Array && fieldsEqual(fieldAndConstraint, field)) {
+    else if (propertyAndConstraint instanceof Array) {
+      if (property instanceof Array && arePropertiesEqual(propertyAndConstraint, property)) {
         return true
       }
     }
-    else if (typeof fieldAndConstraint == 'object' && 'field' in fieldAndConstraint) {
-      if (containsField([fieldAndConstraint.field], field)) {
-        return fieldAndConstraint.constraint == undefined
+    else if (typeof propertyAndConstraint == 'object' && 'property' in propertyAndConstraint) {
+      if (containsProperty([propertyAndConstraint.property], property)) {
+        return propertyAndConstraint.constraint == undefined
       }
     }
   }
@@ -321,29 +321,29 @@ function containsFieldWithoutConstraints(fieldsAndConstraints: (string|string[]|
   return false
 }
 
-function containsFieldAndConstraint(fieldsAndConstraints: (string|string[]|{field: string|string[], constraint?: string|string[]})[], field: string|string[], constraint: string|Constraint|FieldConstraint): boolean {
-  for (let fieldAndConstraint of fieldsAndConstraints) {
-    if (typeof fieldAndConstraint == 'object' && 'field' in fieldAndConstraint && 'constraint' in fieldAndConstraint) {
+function containsPropertyAndConstraint(propertiesAndConstraints: (string|string[]|{property: string|string[], constraint?: string|string[]})[], property: string|string[], constraint: string|Constraint|PropertyConstraint): boolean {
+  for (let propertyAndConstraint of propertiesAndConstraints) {
+    if (typeof propertyAndConstraint == 'object' && 'property' in propertyAndConstraint && 'constraint' in propertyAndConstraint) {
 
-      if (typeof fieldAndConstraint.constraint == 'string') {
-        if (constraintNamesEqual(fieldAndConstraint.constraint, constraint)) {
-          if (typeof fieldAndConstraint.field == 'string' && fieldAndConstraint.field === field) {
+      if (typeof propertyAndConstraint.constraint == 'string') {
+        if (constraintNamesEqual(propertyAndConstraint.constraint, constraint)) {
+          if (typeof propertyAndConstraint.property == 'string' && propertyAndConstraint.property === property) {
             return true
           }
         
-          if (fieldAndConstraint.field instanceof Array && field instanceof Array && fieldsEqual(fieldAndConstraint.field, field)) {
+          if (propertyAndConstraint.property instanceof Array && property instanceof Array && arePropertiesEqual(propertyAndConstraint.property, property)) {
             return true
           }
         }          
       }
-      else if (fieldAndConstraint.constraint instanceof Array) {
-        for (let constraintName of fieldAndConstraint.constraint) {
+      else if (propertyAndConstraint.constraint instanceof Array) {
+        for (let constraintName of propertyAndConstraint.constraint) {
           if (constraintNamesEqual(constraintName, constraint)) {
-            if (typeof fieldAndConstraint.field == 'string' && fieldAndConstraint.field === field) {
+            if (typeof propertyAndConstraint.property == 'string' && propertyAndConstraint.property === property) {
               return true
             }
           
-            if (fieldAndConstraint.field instanceof Array && field instanceof Array && fieldsEqual(fieldAndConstraint.field, field)) {
+            if (propertyAndConstraint.property instanceof Array && property instanceof Array && arePropertiesEqual(propertyAndConstraint.property, property)) {
               return true
             }
           }
@@ -355,7 +355,7 @@ function containsFieldAndConstraint(fieldsAndConstraints: (string|string[]|{fiel
   return false
 }
 
-function constraintNamesEqual(constraint1: string|Constraint|FieldConstraint, constraint2: string|Constraint|FieldConstraint): boolean {
+function constraintNamesEqual(constraint1: string|Constraint|PropertyConstraint, constraint2: string|Constraint|PropertyConstraint): boolean {
   if (constraint1 === constraint2) {
     return true
   }
@@ -373,7 +373,7 @@ function constraintNamesEqual(constraint1: string|Constraint|FieldConstraint, co
   else if (constraint1 instanceof Constraint) {
     constraintName1 = constraint1.name
   }
-  else if (constraint1 instanceof FieldConstraint) {
+  else if (constraint1 instanceof PropertyConstraint) {
     constraintName1 = constraint1.constraint?.name
   }
   else {
@@ -386,7 +386,7 @@ function constraintNamesEqual(constraint1: string|Constraint|FieldConstraint, co
   else if (constraint2 instanceof Constraint) {
     constraintName2 = constraint2.name
   }
-  else if (constraint2 instanceof FieldConstraint) {
+  else if (constraint2 instanceof PropertyConstraint) {
     constraintName2 = constraint2.constraint?.name
   }
   else {

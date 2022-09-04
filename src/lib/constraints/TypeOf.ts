@@ -15,8 +15,8 @@ export class TypeOf<T = any> extends Constraint<T, TypeOfMisfitValues> {
     this.valueTypes = valueTypes
   }
 
-  async validate(obj: T, field: string|string[]): Promise<Misfit<TypeOfMisfitValues>|undefined> {
-    return this.defaultValidation(obj, field, async (value: any) => {
+  async validate(obj: T, property: string|string[]): Promise<Misfit<TypeOfMisfitValues>|undefined> {
+    return this.defaultValidation(obj, property, async (value: any) => {
       for (let valueType of this.valueTypes) {
         if (typeof valueType == 'string') {
           if (typeof value === valueType) {

@@ -5,7 +5,7 @@ import { Bounds, Misfit } from '../../src'
 describe('constraints', function() {
   describe('Bounds', function() {
     describe('validate', function() {
-      describe('single field', function() {
+      describe('single property', function() {
         it('should return a misfit if a number is not greater than', async function() {
           let max = new Bounds({ greaterThan: 5 })
           let misfit = await max.validate({ value: 5 }, 'value')
@@ -65,7 +65,7 @@ describe('constraints', function() {
         })
       })
 
-      describe('field combination', function() {
+      describe('property combination', function() {
         it('should return a misfit if a number is not greater than', async function() {
           let max = new Bounds({ greaterThan: 5 })
           let misfit = await max.validate({ value1: 6, value2: 5 }, [ 'value1', 'value2' ])

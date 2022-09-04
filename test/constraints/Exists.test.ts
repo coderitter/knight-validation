@@ -5,7 +5,7 @@ import { Exists, Misfit } from '../../src'
 describe('constraints', function() {
   describe('Exists', function() {
     describe('validate', function() {
-      describe('single field', function() {
+      describe('single property', function() {
         it('should return undefined if exists', async function() {
           let exists = new Exists(async (obj: any) => obj.value === 1)
           let misfit = await exists.validate({ value: 1 }, 'value')
@@ -27,7 +27,7 @@ describe('constraints', function() {
         })  
       })
 
-      describe('field combination', function() {
+      describe('property combination', function() {
         it('should return undefined if exists', async function() {
           let exists = new Exists(async (obj: any) => obj.a === 0 && obj.b === 1)
           let misfit = await exists.validate({ a: 0, b: 1 }, ['a', 'b'])

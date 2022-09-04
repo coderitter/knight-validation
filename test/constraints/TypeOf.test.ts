@@ -5,7 +5,7 @@ import { Misfit, TypeOf, TypeOfMisfitValues } from '../../src'
 describe('constraints', function() {
   describe('TypeOf', function() {
     describe('validate', function() {
-      describe('single field', function() {
+      describe('single property', function() {
         it('should return undefined if correct type', async function() {
           let typeOf = new TypeOf('number')
           let misfit = await typeOf.validate({ value: 1 }, 'value')
@@ -56,7 +56,7 @@ describe('constraints', function() {
         })
       })
 
-      describe('field combination', function() {
+      describe('property combination', function() {
         it('should return undefined if correct type', async function() {
           let typeOf = new TypeOf('number')
           let misfit = await typeOf.validate({ a: 1, b: 2 }, ['a', 'b'])

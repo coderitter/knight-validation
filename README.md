@@ -6,7 +6,7 @@
 
 ## Overview
 
-### Constraints for single fields
+### Constraints for single properties
 
 ```typescript
 import { Required, TypeOf, Unique, Validator } from 'knight-validation'
@@ -25,7 +25,7 @@ class UserValidator extends Validator {
 }
 ```
 
-### Constraints for multiple fields
+### Constraints for multiple properties
 
 ```typescript
 import { Validator } from 'knight-validation'
@@ -41,12 +41,12 @@ class UserValidator extends Validator {
 ### Available constraints
 
 ```typescript
-// Check if a field is absent
+// Check if a property is absent
 new Absent
 
-// Check a field's value equals one of the three given strings
+// Check a property's value equals one of the three given strings
 new Enum('Moni', 'Lisa', 'Anna')
-// Check if a field's value equals one of the three given numbers
+// Check if a property's value equals one of the three given numbers
 new Enum(1, 3, 7)
 
 new Exists(async (user: User) => {
@@ -54,12 +54,12 @@ new Exists(async (user: User) => {
   // Return true if your exists condition is met
 })
 
-// Check if a field is there
+// Check if a property is there
 new Required
 
-// Check if a field's value is of the given JavaScript type
+// Check if a property's value is of the given JavaScript type
 new TypeOf('number')
-// Check if a field's value is an instance if the given class
+// Check if a property's value is an instance if the given class
 new TypeOf(Date)
 
 new Unique(async (user: User) => {
@@ -70,7 +70,7 @@ new Unique(async (user: User) => {
 
 ### Validation
 
-Validating an object returns an array of misfits which is empty if there are not any. The validator goes through all constraints for one field and stops the validation on the first misfit. Afterwards it goes on to the next field.
+Validating an object returns an array of misfits which is empty if there are not any. The validator goes through all constraints for one property and stops the validation on the first misfit. Afterwards it goes on to the next property.
 
 ```typescript
 let user = new User
@@ -86,19 +86,19 @@ A misfit contains the following informations by default.
 
 ```typescript
 // The name of the misfit which defaults to the name of the constraint which was not met
-misfit.name == 'Required'
+misfit.constraint == 'Required'
 
-// The field where the misfit occured
-misfit.field == 'email'
+// The property where the misfit occured
+misfit.property == 'email'
 
-// The fields where the misfit
-misfit.fields == ['firstName', 'lastName']
+// The properties where the misfit occured
+misfit.properties == ['firstName', 'lastName']
 
 // It contains any information that is useful about why checking the constraint resulted in a misfit (Optional)
-misfit.constraints
+misfit.value
 
 // A message (Optional)
-misift.message == 'The field email is required.'
+misift.message == 'The property email is required.'
 ```
 
 #### Check only what is there
@@ -111,7 +111,7 @@ user.email = undefined
 
 let misfits = validator.validate(user, { checkOnlyWhatIsThere: true })
 
-misfits.length == 0 // There are no misfits even though the email field is required
+misfits.length == 0 // There are no misfits even though the email property is required
 ```
 
 ### Constraints that are only checked if a condition is met
@@ -132,11 +132,11 @@ class UserValidator extends Validator {
 #### Exclude rules
 
 ```typescript
-// Exclude all constraints regarding the email field
+// Exclude all constraints regarding the email property
 let misfits = validator.validate(user, { exclude: ['email'] })
 
-// Exclude only the required constraint of the email field
-let misfits = validator.validate(user, { exclude: [{ field: 'email', constraint: 'Required' }] })
+// Exclude only the required constraint of the email property
+let misfits = validator.validate(user, { exclude: [{ property: 'email', constraint: 'Required' }] })
 ```
 
 ### Anonymous custom constraints
@@ -150,7 +150,7 @@ validator.add(['firstName', 'lastName'], 'Different', async (user: User) => {
   if (user.firstName == user.lastName) {
     let misfit = new Misfit
 
-    // You can skip setting a name and the field(s) for the misfit. These will be set automatically.
+    // You can skip setting a name and the property(s) for the misfit. These will be set automatically.
     
     // We give it some information here on what went wrong. What you put in here depends on your needs.
     misfit.constraints = {
@@ -173,32 +173,32 @@ import { Constraint } from 'knight-validation'
 class YourConstraint extends Constraint {
 
   // Override the abstract method validate
-  async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
+  async validate(obj: any, property: string|string[]): Promise<Misfit|undefined> {
 
-    // At first you want to check if the field is absent because in case of absense you do not want to validate because a field may be optional.
-    if (this.isFieldAbsent(obj, field)) {
+    // At first you want to check if the property is absent because in case of absense you do not want to validate because a property may be optional.
+    if (this.isFieldAbsent(obj, property)) {
       return
     }
 
-    // Next you need to check if the field was a single or a combined one. Maybe you just implement on of the two possibilities.
-    if (typeof field == 'string') {
-      // In case of a single field
+    // Next you need to check if the property was a single or a combined one. Maybe you just implement on of the two possibilities.
+    if (typeof property == 'string') {
+      // In case of a single property
     }
     else {
-      // In case of multiple fields
+      // In case of multiple properties
     }
   }
 }
 ```
 
-Another possibility is to use the `defaultValidation` method. It will do the check for absence and will implement the validation of combined fields.
+Another possibility is to use the `defaultValidation` method. It will do the check for absence and will implement the validation of combined properties.
 
 ```typescript
 import { Constraint } from 'knight-validation'
 
 class YourConstraint extends Constraint {
-  async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
-    return this.defaultValidation(obj, field, async (value: any) => {
+  async validate(obj: any, property: string|string[]): Promise<Misfit|undefined> {
+    return this.defaultValidation(obj, property, async (value: any) => {
       if (value == 1) {  // Validate the value here
         return new Misfit
       }

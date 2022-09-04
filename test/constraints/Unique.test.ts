@@ -5,7 +5,7 @@ import { Misfit, Unique } from '../../src'
 describe('constraints', function() {
   describe('Unqiue', function() {
     describe('validate', function() {
-      describe('single field', function() {
+      describe('single property', function() {
         it('should return undefined if unique', async function() {
           let unique = new Unique(async (obj: any) => obj.value === 1)
           let misfit = await unique.validate({ value: 1 }, 'value')
@@ -31,7 +31,7 @@ describe('constraints', function() {
         })  
       })
 
-      describe('field combination', function() {
+      describe('property combination', function() {
         it('should return undefined if unique', async function() {
           let unique = new Unique(async (obj: any) => obj.a === 1 && obj.b === 2)
           let misfit = await unique.validate({ a: 1, b: 2 }, ['a', 'b'])

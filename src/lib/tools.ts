@@ -1,4 +1,4 @@
-export function fieldsEqual(a1?: string[], a2?: string[]): boolean {
+export function arePropertiesEqual(a1?: string[], a2?: string[]): boolean {
   if (! a1 || ! a2) {
     return false
   }

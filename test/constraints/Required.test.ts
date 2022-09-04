@@ -5,7 +5,7 @@ import { Misfit, Required } from '../../src'
 describe('constraints', function() {
   describe('Required', function() {
     describe('validate', function() {
-      describe('singe field', function() {
+      describe('singe property', function() {
         it('should return a misfit on undefined', async function() {
           let required = new Required
           let misfit = await required.validate({ value: undefined }, 'value')
@@ -55,7 +55,7 @@ describe('constraints', function() {
         })
       })
 
-      describe('field combination', function() {
+      describe('property combination', function() {
         it('should return a misfit on undefined', async function() {
           let required = new Required
           let misfit = await required.validate({ a: undefined, b: undefined }, ['a', 'b'])

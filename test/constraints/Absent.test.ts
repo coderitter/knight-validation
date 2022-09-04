@@ -5,7 +5,7 @@ import { Absent, Misfit } from '../../src'
 describe('constraints', function() {
   describe('Absent', function() {
     describe('validate', function() {
-      describe('single field', function() {
+      describe('single property', function() {
         it('should not return a misfit on undefined', async function() {
           let absent = new Absent
           let misfit = await absent.validate({ value: undefined }, 'value')
@@ -55,7 +55,7 @@ describe('constraints', function() {
         })  
       })
 
-      describe('field combination', function() {
+      describe('property combination', function() {
         it('should not return a misfit on undefined', async function() {
           let absent = new Absent
           let misfit = await absent.validate({ a: undefined, b: undefined }, ['a', 'b'])

@@ -32,7 +32,7 @@ describe('constraints', function() {
     })
 
     describe('validate', function() {
-      describe('single field', function() {
+      describe('single property', function() {
         it('should return undefined if correct type', async function() {
           let typeOf = new Enum(['a', 'b'])
           let misfit = await typeOf.validate({ value: 'a' }, 'value')
@@ -91,7 +91,7 @@ describe('constraints', function() {
         })
       })
 
-      describe('field combination', function() {
+      describe('property combination', function() {
         it('should return undefined if correct type', async function() {
           let typeOf = new Enum(['a', 'b'])
           let misfit = await typeOf.validate({ a: 'a', b: 'b' }, ['a', 'b'])

@@ -7,17 +7,17 @@ export interface UniqueMisfitValues {
 
 export class Unique<T = any> extends Constraint<T, UniqueMisfitValues> {
 
-  isUnique: (obj: T, field: string|string[]) => Promise<boolean>
+  isUnique: (obj: T, property: string|string[]) => Promise<boolean>
 
-  constructor(isUnique: (obj: T, field: string|string[]) => Promise<boolean>) {
+  constructor(isUnique: (obj: T, property: string|string[]) => Promise<boolean>) {
     super()
     this.isUnique = isUnique
   }
 
-  async validate(obj: T, field: string|string[]): Promise<Misfit<UniqueMisfitValues>|undefined> {
-    return this.defaultValidation(obj, field, async (value: any) => {
-      if (! await this.isUnique(obj, field)) {
-        return new Misfit(this.name, field, { notUniqueValue: value })
+  async validate(obj: T, property: string|string[]): Promise<Misfit<UniqueMisfitValues>|undefined> {
+    return this.defaultValidation(obj, property, async (value: any) => {
+      if (! await this.isUnique(obj, property)) {
+        return new Misfit(this.name, property, { notUniqueValue: value })
       }  
     })
   }

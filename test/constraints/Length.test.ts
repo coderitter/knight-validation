@@ -5,7 +5,7 @@ import { Length, Misfit } from '../../src'
 describe('constraints', function() {
   describe('Max', function() {
     describe('validate', function() {
-      describe('single field', function() {
+      describe('single property', function() {
         it('should return a misfit if the length of a string is below the minimum', async function() {
           let max = new Length({ min: 5 })
           let misfit = await max.validate({ value: '1234' }, 'value')
@@ -87,7 +87,7 @@ describe('constraints', function() {
         })
       })
 
-      describe('field combination', function() {
+      describe('property combination', function() {
         it('should return a misfit if the length of a string is below the minimum', async function() {
           let max = new Length({ min: 5 })
           let misfit = await max.validate({ value1: '12345', value2: [ 1, 2, 3, 4 ] }, [ 'value1', 'value2' ])
