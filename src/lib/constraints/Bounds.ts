@@ -21,7 +21,7 @@ export class Bounds<T = any> extends Constraint<T, BoundsMisfitValues> {
     Object.assign(this, constraints)
   }
 
-  async validate(obj: T, property: string|string[]): Promise<Misfit<BoundsMisfitValues>|undefined> {
+  async validate(obj: T, property: string|string[]): Promise<Misfit<BoundsMisfitValues>|null> {
     return this.defaultValidation(obj, property, async value => {
       if (typeof value == 'number' && ! isNaN(value)) {
         if (this.lesserThan != undefined && value >= this.lesserThan) {
@@ -40,6 +40,8 @@ export class Bounds<T = any> extends Constraint<T, BoundsMisfitValues> {
           return this._createMisfit(property, value)
         }
       }
+
+      return null
     })
   }
 

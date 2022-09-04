@@ -19,7 +19,7 @@ export class Length<T = any> extends Constraint<T, LengthMisfitValues> {
     Object.assign(this, constraints)
   }
 
-  async validate(obj: T, property: string|string[]): Promise<Misfit<LengthMisfitValues>|undefined> {
+  async validate(obj: T, property: string|string[]): Promise<Misfit<LengthMisfitValues>|null> {
     return this.defaultValidation(obj, property, async value => {
       if (typeof value == 'string' || value instanceof Array) {
         if (this.min != undefined && value.length < this.min) {
@@ -34,6 +34,8 @@ export class Length<T = any> extends Constraint<T, LengthMisfitValues> {
           return this._createMisfit(property, value.length)
         }
       }
+
+      return null
     })
   }
 

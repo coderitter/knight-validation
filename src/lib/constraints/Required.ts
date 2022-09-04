@@ -3,11 +3,13 @@ import { Misfit } from '../Misfit'
 
 export class Required<T = any> extends Constraint<T, void> {
 
-  async validate(obj: T, property: string|string[]): Promise<Misfit<void>|undefined> {
+  async validate(obj: T, property: string|string[]): Promise<Misfit<void>|null> {
     return this.defaultValidation(obj, property, async (value: any) => {
       if (value === undefined) {
         return new Misfit
       }
+
+      return null
     }, false)
   }
 }

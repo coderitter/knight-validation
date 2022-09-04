@@ -9,7 +9,7 @@ describe('constraints', function() {
         it('should not return a misfit on undefined', async function() {
           let absent = new Absent
           let misfit = await absent.validate({ value: undefined }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should return a misfit on null', async function() {
@@ -59,7 +59,7 @@ describe('constraints', function() {
         it('should not return a misfit on undefined', async function() {
           let absent = new Absent
           let misfit = await absent.validate({ a: undefined, b: undefined }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should return a misfit on null', async function() {

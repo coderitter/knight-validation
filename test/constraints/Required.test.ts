@@ -15,43 +15,43 @@ describe('constraints', function() {
         it('should not return a misfit on null', async function() {
           let required = new Required
           let misfit = await required.validate({ value: null }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should not return a misfit on empty string', async function() {
           let required = new Required
           let misfit = await required.validate({ value: '' }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should not return a misfit on NaN', async function() {
           let required = new Required
           let misfit = await required.validate({ value: NaN }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should not return a misfit on number', async function() {
           let required = new Required
           let misfit = await required.validate({ value: 1 }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should not return a misfit on boolean', async function() {
           let required = new Required
-          expect(await required.validate({ value: true }, 'value')).to.be.undefined
-          expect(await required.validate({ value: false }, 'value')).to.be.undefined
+          expect(await required.validate({ value: true }, 'value')).to.be.null
+          expect(await required.validate({ value: false }, 'value')).to.be.null
         })
     
         it('should not return a misfit on string', async function() {
           let required = new Required
           let misfit = await required.validate({ value: 'a' }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should not return a misfit on object', async function() {
           let required = new Required
           let misfit = await required.validate({ value: {} }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
       })
 
@@ -65,43 +65,43 @@ describe('constraints', function() {
         it('should not return a misfit on null', async function() {
           let required = new Required
           let misfit = await required.validate({ a: null, b: null }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should not return a misfit on empty string', async function() {
           let required = new Required
           let misfit = await required.validate({ a: '', b: '' }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should not return a misfit on NaN', async function() {
           let required = new Required
           let misfit = await required.validate({ a: NaN, b: NaN }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should not return a misfit on number', async function() {
           let required = new Required
           let misfit = await required.validate({ a: 1, b: 2 }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should not return a misfit on boolean', async function() {
           let required = new Required
-          expect(await required.validate({ a: true, b: true }, ['a', 'b'])).to.be.undefined
-          expect(await required.validate({ a: false, b: false }, ['a', 'b'])).to.be.undefined
+          expect(await required.validate({ a: true, b: true }, ['a', 'b'])).to.be.null
+          expect(await required.validate({ a: false, b: false }, ['a', 'b'])).to.be.null
         })
     
         it('should not return a misfit on string', async function() {
           let required = new Required
           let misfit = await required.validate({ a: 'a', b: 'b' }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
     
         it('should not return a misfit on object', async function() {
           let required = new Required
           let misfit = await required.validate({ a: {}, b: {} }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })  
       })
     })

@@ -9,13 +9,13 @@ describe('constraints', function() {
         it('should return undefined if exists', async function() {
           let exists = new Exists(async (obj: any) => obj.value === 1)
           let misfit = await exists.validate({ value: 1 }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
   
         it('should return undefined if the value is missing', async function() {
           let exists = new Exists(async (obj: any) => obj.value === 1)
   
-          expect(await exists.validate({ value: undefined }, 'value')).to.be.undefined
+          expect(await exists.validate({ value: undefined }, 'value')).to.be.null
         })
   
         it('should return a misfit if not exists', async function() {
@@ -31,13 +31,13 @@ describe('constraints', function() {
         it('should return undefined if exists', async function() {
           let exists = new Exists(async (obj: any) => obj.a === 0 && obj.b === 1)
           let misfit = await exists.validate({ a: 0, b: 1 }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
   
         it('should return undefined if the value is missing', async function() {
           let exists = new Exists(async (obj: any) => obj.a === 0 && obj.b === 1)
   
-          expect(await exists.validate({ a: undefined, b: undefined }, ['a', 'b'])).to.be.undefined
+          expect(await exists.validate({ a: undefined, b: undefined }, ['a', 'b'])).to.be.null
         })
   
         it('should return a misfit if not exists', async function() {

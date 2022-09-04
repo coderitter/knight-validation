@@ -20,7 +20,7 @@ describe('Validator', function() {
     it('should accept a property, a constraint name and a validate function', function() {
       let validator = new Validator
       
-      validator.add('testField', 'TestConstraint', async () => undefined)
+      validator.add('testField', 'TestConstraint', async () => null)
 
       let constraints = validator.constraints('testField')
 
@@ -45,7 +45,7 @@ describe('Validator', function() {
     it('should accept a property combination, a constraint name and a validate function', function() {
       let validator = new Validator
       
-      validator.add(['testField1', 'testField2'], 'TestConstraint', async () => undefined)
+      validator.add(['testField1', 'testField2'], 'TestConstraint', async () => null)
 
       let constraints = validator.constraints(['testField1', 'testField2'])
 
@@ -99,7 +99,7 @@ describe('Validator', function() {
   
       it('should have a not misfit if it was not a misfit', async function() {
         let validator = new Validator
-        validator.add('a', 'TestConstraint', async () => undefined)
+        validator.add('a', 'TestConstraint', async () => null)
   
         let misfits = await validator.validate({})
   
@@ -159,7 +159,7 @@ describe('Validator', function() {
   
       it('should check all constraints for a property ', async function () {
         let validator = new Validator
-        validator.add('a', 'TestConstraint', async () => undefined)
+        validator.add('a', 'TestConstraint', async () => null)
         validator.add('a', 'TestConstraint', async () => new Misfit('M2'))
   
         let misfits = await validator.validate({})
@@ -326,7 +326,7 @@ describe('Validator', function() {
 
       it('should validate an object property with the given validator', async function() {
         let propertyValidator = new Validator
-        propertyValidator.add('property11', 'TestConstraint1', async () => undefined)
+        propertyValidator.add('property11', 'TestConstraint1', async () => null)
         propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
 
         let validator = new Validator
@@ -341,7 +341,7 @@ describe('Validator', function() {
 
       it('should validate an object property does not have an object value', async function() {
         let propertyValidator = new Validator
-        propertyValidator.add('property11', 'TestConstraint1', async () => undefined)
+        propertyValidator.add('property11', 'TestConstraint1', async () => null)
         propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
 
         let validator = new Validator
@@ -356,7 +356,7 @@ describe('Validator', function() {
 
       it('should not validate an object property if it is undefined or null', async function() {
         let propertyValidator = new Validator
-        propertyValidator.add('property11', 'TestConstraint1', async () => undefined)
+        propertyValidator.add('property11', 'TestConstraint1', async () => null)
         propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
 
         let validator = new Validator
@@ -382,7 +382,7 @@ describe('Validator', function() {
   
       it('should have a not misfit if it was not a misfit', async function() {
         let validator = new Validator
-        validator.add(['a', 'b'], 'TestConstraint', async () => undefined)
+        validator.add(['a', 'b'], 'TestConstraint', async () => null)
   
         let misfits = await validator.validate({})
   
@@ -442,7 +442,7 @@ describe('Validator', function() {
   
       it('should check all constraints for a property ', async function () {
         let validator = new Validator
-        validator.add(['a', 'b'], 'TestConstraint', async () => undefined)
+        validator.add(['a', 'b'], 'TestConstraint', async () => null)
         validator.add(['b', 'a'], 'TestConstraint', async () => new Misfit('M2'))
   
         let misfits = await validator.validate({})

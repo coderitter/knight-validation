@@ -19,7 +19,7 @@ export class Validator<T = any> {
   }
 
   add(property: string|string[], constraint: Constraint<T>, condition?: (object: any) => Promise<boolean>): void
-  add(property: string|string[], constraintName: string, validate: (object: any, property: string|string[]) => Promise<Misfit|undefined>, condition?: (object: any) => Promise<boolean>): void
+  add(property: string|string[], constraintName: string, validate: (object: any, property: string|string[]) => Promise<Misfit|null>, condition?: (object: any) => Promise<boolean>): void
   add(property: string|string[], validator: Validator, condition?: (object: any) => Promise<boolean>): void
   add(validator: Validator): void
   
@@ -260,7 +260,7 @@ class PropertyConstraint {
     this.condition = condition
   }
 
-  async validateConstraint(value: any, object: any): Promise<Misfit|undefined> {
+  async validateConstraint(value: any, object: any): Promise<Misfit|null> {
     if (this.constraint == undefined) {
       throw new Error('Could not validate constraint because it is not set')
     }

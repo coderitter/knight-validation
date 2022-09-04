@@ -36,7 +36,7 @@ export class Enum<T = any> extends Constraint<T, EnumMisfitValues> {
     }
   }
 
-  async validate(obj: T, property: string|string[]): Promise<Misfit<EnumMisfitValues>|undefined> {
+  async validate(obj: T, property: string|string[]): Promise<Misfit<EnumMisfitValues>|null> {
     return this.defaultValidation(obj, property, async (value: any) => {
       if (this.values.indexOf(value) == -1) {
         return new Misfit<EnumMisfitValues>(this.name, property, {
@@ -44,6 +44,8 @@ export class Enum<T = any> extends Constraint<T, EnumMisfitValues> {
           values: this.values
         })
       }
+
+      return null
     })
   }
 }

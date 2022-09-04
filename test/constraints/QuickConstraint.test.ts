@@ -9,10 +9,10 @@ describe('QuickConstraint', function() {
         return new Misfit('M1')
       })
 
-      let result = await constraint.validate({ a: 'a' }, 'a')
+      let misfit = await constraint.validate({ a: 'a' }, 'a')
 
-      expect(result).to.be.not.undefined
-      expect(result?.constraint).to.equal('M1')
+      expect(misfit).to.be.instanceOf(Misfit)
+      expect(misfit?.constraint).to.equal('M1')
     })
 
     it('should give the misfit the name of the constraint if the misfit has no name', async function() {
@@ -20,10 +20,10 @@ describe('QuickConstraint', function() {
         return new Misfit('TestConstraint')
       })
 
-      let result = await constraint.validate({ a: 'a' }, 'a')
+      let misfit = await constraint.validate({ a: 'a' }, 'a')
 
-      expect(result).to.be.not.undefined
-      expect(result?.constraint).to.equal('TestConstraint')
+      expect(misfit).to.be.instanceOf(Misfit)
+      expect(misfit?.constraint).to.equal('TestConstraint')
     })
   })
 })

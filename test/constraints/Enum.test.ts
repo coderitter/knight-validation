@@ -36,13 +36,13 @@ describe('constraints', function() {
         it('should return undefined if correct type', async function() {
           let typeOf = new Enum(['a', 'b'])
           let misfit = await typeOf.validate({ value: 'a' }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
   
         it('should return undefined the value is undefined', async function() {
           let typeOf = new Enum(['a', 'b'])
   
-          expect(await typeOf.validate({ value: undefined }, 'value')).to.be.undefined
+          expect(await typeOf.validate({ value: undefined }, 'value')).to.be.null
         })
   
         it('should return a misfit if wrong type', async function() {
@@ -62,7 +62,7 @@ describe('constraints', function() {
         it('should not return a misfit if the value is contained in a TypeScript enum using string values', async function() {
           let typeOf = new Enum(StringEnum)
           let misfit = await typeOf.validate({ value: 'A'}, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
 
         it('should return a misfit if the value is not contained in a TypeScript enum using number values', async function() {
@@ -74,7 +74,7 @@ describe('constraints', function() {
         it('should not return a misfit if the value is contained in a TypeScript enum using number values', async function() {
           let typeOf = new Enum(NumberEnum)
           let misfit = await typeOf.validate({ value: 1}, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
 
         it('should return a misfit if the value is not contained in a TypeScript enum using mixed values', async function() {
@@ -86,8 +86,8 @@ describe('constraints', function() {
 
         it('should not return a misfit if the value is contained in a TypeScript enum using mixed values', async function() {
           let typeOf = new Enum(MixedEnum)
-          expect(await typeOf.validate({ value: 'A'}, 'value')).to.be.undefined
-          expect(await typeOf.validate({ value: 2}, 'value')).to.be.undefined
+          expect(await typeOf.validate({ value: 'A'}, 'value')).to.be.null
+          expect(await typeOf.validate({ value: 2}, 'value')).to.be.null
         })
       })
 
@@ -95,12 +95,12 @@ describe('constraints', function() {
         it('should return undefined if correct type', async function() {
           let typeOf = new Enum(['a', 'b'])
           let misfit = await typeOf.validate({ a: 'a', b: 'b' }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
   
         it('should return undefined the value is undefined', async function() {
           let typeOf = new TypeOf('number')
-          expect(await typeOf.validate({ a: undefined, b: undefined }, ['a', 'b'])).to.be.undefined
+          expect(await typeOf.validate({ a: undefined, b: undefined }, ['a', 'b'])).to.be.null
         })
   
         it('should return a misfit if wrong type', async function() {

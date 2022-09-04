@@ -15,21 +15,21 @@ export class TypeOf<T = any> extends Constraint<T, TypeOfMisfitValues> {
     this.valueTypes = valueTypes
   }
 
-  async validate(obj: T, property: string|string[]): Promise<Misfit<TypeOfMisfitValues>|undefined> {
+  async validate(obj: T, property: string|string[]): Promise<Misfit<TypeOfMisfitValues>|null> {
     return this.defaultValidation(obj, property, async (value: any) => {
       for (let valueType of this.valueTypes) {
         if (typeof valueType == 'string') {
           if (typeof value === valueType) {
-            return 
+            return null
           }  
         }
         else if (valueType === null) {
           if (value === null) {
-            return 
+            return null
           }
         }
         else if (value instanceof valueType) {
-          return
+          return null
         }
       }
 

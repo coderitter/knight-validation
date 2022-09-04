@@ -9,13 +9,13 @@ describe('constraints', function() {
         it('should return undefined if unique', async function() {
           let unique = new Unique(async (obj: any) => obj.value === 1)
           let misfit = await unique.validate({ value: 1 }, 'value')
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
   
         it('should return undefined if the value is undefined', async function() {
           let unique = new Unique(async (obj: any) => obj.value === 1)
   
-          expect(await unique.validate({ value: undefined }, 'value')).to.be.undefined
+          expect(await unique.validate({ value: undefined }, 'value')).to.be.null
         })
   
         it('should return a misfit if not unique', async function() {
@@ -35,13 +35,13 @@ describe('constraints', function() {
         it('should return undefined if unique', async function() {
           let unique = new Unique(async (obj: any) => obj.a === 1 && obj.b === 2)
           let misfit = await unique.validate({ a: 1, b: 2 }, ['a', 'b'])
-          expect(misfit).to.be.undefined
+          expect(misfit).to.be.null
         })
   
         it('should return undefined if the value is undefined', async function() {
           let unique = new Unique(async (obj: any) => obj.a === 1 && obj.b === 2)
   
-          expect(await unique.validate({ a: undefined, b: undefined }, ['a', 'b'])).to.be.undefined
+          expect(await unique.validate({ a: undefined, b: undefined }, ['a', 'b'])).to.be.null
         })
   
         it('should return a misfit if not unique', async function() {
