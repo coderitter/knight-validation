@@ -66,7 +66,6 @@ describe('constraints', function() {
   
         it('should return undefined the value is undefined', async function() {
           let typeOf = new TypeOf('number')
-  
           expect(await typeOf.validate({ a: undefined, b: undefined }, ['a', 'b'])).to.be.undefined
         })
   

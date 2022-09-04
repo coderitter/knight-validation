@@ -111,7 +111,7 @@ export default class Validator {
   }
 
   async validate(object: any, options?: ValidatorOptions): Promise<Misfit[]> {
-    options = options || this.options
+    options = options || this.options
     let misfits: Misfit[] = []
     let misfittingFields: string[] = []
 

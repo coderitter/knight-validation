@@ -13,7 +13,7 @@ export default class Misfit {
   constraints?: any
   message?: string
 
-  constructor(name?: string, field?: string|string[], constraints?: object) {
+  constructor(name?: string, field?: string|string[], constraints?: object, message?: string) {
     this.name = <any> name
     
     if (typeof field == 'string') {
@@ -24,6 +24,7 @@ export default class Misfit {
     }
 
     this.constraints = constraints
+    this.message = message
   }
 
   setMessage(message: string|undefined): this {
