@@ -10,7 +10,7 @@ describe('Validator', function() {
       
       validator.add('testField', constraint)
       
-      let constraints = validator.constraints('testField')
+      let constraints = validator.getConstraints('testField')
 
       expect(constraints.length).to.equal(1)
       expect(constraints[0].constraint).to.be.instanceOf(Required)
@@ -22,7 +22,7 @@ describe('Validator', function() {
       
       validator.add('testField', 'TestConstraint', async () => null)
 
-      let constraints = validator.constraints('testField')
+      let constraints = validator.getConstraints('testField')
 
       expect(constraints.length).to.equal(1)
       expect(constraints[0].constraint).to.be.instanceOf(QuickConstraint)
@@ -35,7 +35,7 @@ describe('Validator', function() {
       
       validator.add(['testField1', 'testField2'], new Required)
 
-      let constraints = validator.constraints(['testField1', 'testField2'])
+      let constraints = validator.getConstraints(['testField1', 'testField2'])
 
       expect(constraints.length).to.equal(1)
       expect(constraints[0].constraint).to.be.instanceOf(Required)
@@ -47,7 +47,7 @@ describe('Validator', function() {
       
       validator.add(['testField1', 'testField2'], 'TestConstraint', async () => null)
 
-      let constraints = validator.constraints(['testField1', 'testField2'])
+      let constraints = validator.getConstraints(['testField1', 'testField2'])
 
       expect(constraints.length).to.equal(1)
       expect(constraints[0].constraint).to.be.instanceOf(QuickConstraint)
@@ -59,7 +59,7 @@ describe('Validator', function() {
       let validator = new Validator
       validator.add('property1', new Validator)
 
-      let constraints = validator.constraints('property1')
+      let constraints = validator.getConstraints('property1')
     
       expect(constraints[0].constraint).to.be.undefined
       expect(constraints[0].validator).to.be.not.undefined

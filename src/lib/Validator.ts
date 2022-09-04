@@ -9,7 +9,7 @@ export interface ValidatorOptions {
   exclude?: (string | string[] | { properties: string|string[], constraint?: string|string[] })[]
 }
 
-export class Validator<T = any> {
+export class Validator<T> {
 
   options?: ValidatorOptions
   propertyConstraints: PropertyConstraint[] = []
@@ -18,10 +18,10 @@ export class Validator<T = any> {
     this.options = options
   }
 
-  add(properties: string|string[], constraint: Constraint<T>, condition?: (object: any) => Promise<boolean>): void
-  add(properties: string|string[], constraintName: string, validate: (object: any, properties: string|string[]) => Promise<Misfit|null>, condition?: (object: any) => Promise<boolean>): void
-  add(properties: string|string[], validator: Validator, condition?: (object: any) => Promise<boolean>): void
-  add(validator: Validator): void
+  add(properties: string|string[], constraint: Constraint<T>, condition?: (object: T) => Promise<boolean>): void
+  add(properties: string|string[], constraintName: string, validate: (object: T, properties: string|string[]) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
+  add(properties: string|string[], validator: Validator<unknown>, condition?: (object: T) => Promise<boolean>): void
+  add(validator: Validator<unknown>): void
   
   add(arg0: any, arg1?: any, arg2?: any, arg3?: any): void {
     if (arg0 instanceof Validator) {
@@ -249,10 +249,10 @@ class PropertyConstraint {
   property?: string
   properties?: string[]
   constraint?: Constraint
-  validator?: Validator
+  validator?: Validator<unknown>
   condition?: (object: any) => Promise<boolean>
 
-  constructor(property: string|string[], constraintOrValidator: Constraint|Validator, condition?: (object: any) => Promise<boolean>) {
+  constructor(property: string|string[], constraintOrValidator: Constraint|Validator<unknown>, condition?: (object: any) => Promise<boolean>) {
     this.property = typeof property == 'string' ? property : undefined
     this.properties = property instanceof Array ? property : undefined
     this.constraint = constraintOrValidator instanceof Constraint ? constraintOrValidator : undefined
