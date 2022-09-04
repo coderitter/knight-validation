@@ -9,14 +9,14 @@ import { fieldsEqual } from './fieldsEqual'
 
 export class Misfit {
 
-  name!: string
+  constraint!: string
   field!: string
   fields!: string[]
-  constraints?: any
+  values?: any
   message?: string
 
-  constructor(name?: string, field?: string|string[], constraints?: object, message?: string) {
-    this.name = <any> name
+  constructor(name?: string, field?: string|string[], values?: object, message?: string) {
+    this.constraint = <any> name
     
     if (typeof field == 'string') {
       this.field = field
@@ -25,7 +25,7 @@ export class Misfit {
       this.fields = field
     }
 
-    this.constraints = constraints
+    this.values = values
     this.message = message
   }
 

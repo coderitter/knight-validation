@@ -34,7 +34,7 @@ export class Enum extends Constraint {
   async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
     return this.defaultValidation(obj, field, async (value: any) => {
       if (this.values.indexOf(value) == -1) {
-        return new Misfit
+        return new Misfit('Enum', field, { ...this, actual: value })
       }
     })
   }

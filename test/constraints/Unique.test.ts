@@ -23,7 +23,7 @@ describe('constraints', function() {
 
           let misfit = await unique.validate({ value: 2 }, 'value')
           expect(misfit).to.be.instanceOf(Misfit)
-          expect(misfit?.name).to.equal('Unique')
+          expect(misfit?.constraint).to.equal('Unique')
 
           expect(await unique.validate({ value: null }, 'value')).to.be.instanceOf(Misfit)
           expect(await unique.validate({ value: '' }, 'value')).to.be.instanceOf(Misfit)
@@ -49,7 +49,7 @@ describe('constraints', function() {
 
           let misfit = await unique.validate({ a: 2, b: 4}, ['a', 'b'])
           expect(misfit).to.be.instanceOf(Misfit)
-          expect(misfit?.name).to.equal('Unique')
+          expect(misfit?.constraint).to.equal('Unique')
 
           expect(await unique.validate({ a: null, b: null }, ['a', 'b'])).to.be.instanceOf(Misfit)
           expect(await unique.validate({ a: '', b: '' }, ['a', 'b'])).to.be.instanceOf(Misfit)

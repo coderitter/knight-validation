@@ -12,7 +12,7 @@ describe('QuickConstraint', function() {
       let result = await constraint.validate({ a: 'a' }, 'a')
 
       expect(result).to.be.not.undefined
-      expect(result?.name).to.equal('M1')
+      expect(result?.constraint).to.equal('M1')
     })
 
     it('should give the misfit the name of the constraint if the misfit has no name', async function() {
@@ -23,7 +23,7 @@ describe('QuickConstraint', function() {
       let result = await constraint.validate({ a: 'a' }, 'a')
 
       expect(result).to.be.not.undefined
-      expect(result?.name).to.equal('TestConstraint')
+      expect(result?.constraint).to.equal('TestConstraint')
     })
   })
 })

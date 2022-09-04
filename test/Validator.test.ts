@@ -94,7 +94,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('TestConstraint1')
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
   
       it('should have a not misfit if it was not a misfit', async function() {
@@ -141,7 +141,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M1')
+        expect(misfits[0].constraint).to.equal('M1')
       })
   
       it('should check the constraints in the order given', async function () {
@@ -153,7 +153,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M1')
+        expect(misfits[0].constraint).to.equal('M1')
         expect(misfits[0].field).to.equal('a')
       })
   
@@ -166,7 +166,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M2')
+        expect(misfits[0].constraint).to.equal('M2')
         expect(misfits[0].field).to.equal('a')
       })
   
@@ -179,7 +179,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M1')
+        expect(misfits[0].constraint).to.equal('M1')
         expect(misfits[0].field).to.equal('a')
       })  
   
@@ -192,7 +192,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M1')
+        expect(misfits[0].constraint).to.equal('M1')
         expect(misfits[0].field).to.equal('a')
       })
   
@@ -224,7 +224,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].field).to.equal('a')
-        expect(misfits[0].name).to.equal('TestConstraint1')
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
   
       it('should include a field if the option is set even as object with missing constraint property', async function() {
@@ -237,7 +237,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].field).to.equal('a')
-        expect(misfits[0].name).to.equal('TestConstraint1')
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
   
       it('should include a certain constraint if the option is set', async function() {
@@ -250,7 +250,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].field).to.equal('a')
-        expect(misfits[0].name).to.equal('TestConstraint2')
+        expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
   
       it('should include certain constraints if the option is set', async function() {
@@ -264,7 +264,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].field).to.equal('a')
-        expect(misfits[0].name).to.equal('TestConstraint2')
+        expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
 
       it('should exclude a field if the option is set', async function() {
@@ -277,7 +277,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].field).to.equal('b')
-        expect(misfits[0].name).to.equal('TestConstraint1')
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
   
       it('should exclude a field if the option is set even as object with missing constraint property', async function() {
@@ -290,7 +290,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].field).to.equal('b')
-        expect(misfits[0].name).to.equal('TestConstraint1')
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
   
       it('should exclude a certain constraint if the option is set', async function() {
@@ -303,9 +303,9 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(2)
         expect(misfits[0].field).to.equal('a')
-        expect(misfits[0].name).to.equal('TestConstraint2')
+        expect(misfits[0].constraint).to.equal('TestConstraint2')
         expect(misfits[1].field).to.equal('b')
-        expect(misfits[1].name).to.equal('TestConstraint1')
+        expect(misfits[1].constraint).to.equal('TestConstraint1')
       })
   
       it('should exclude certain constraints if the option is set', async function() {
@@ -319,9 +319,9 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(2)
         expect(misfits[0].field).to.equal('a')
-        expect(misfits[0].name).to.equal('TestConstraint3')
+        expect(misfits[0].constraint).to.equal('TestConstraint3')
         expect(misfits[1].field).to.equal('b')
-        expect(misfits[1].name).to.equal('TestConstraint1')
+        expect(misfits[1].constraint).to.equal('TestConstraint1')
       })
 
       it('should validate an object field with the given validator', async function() {
@@ -336,7 +336,7 @@ describe('Validator', function() {
 
         expect(misfits.length).to.equal(1)
         expect(misfits[0].field).to.equal('field1.field12')
-        expect(misfits[0].name).to.equal('TestConstraint2')
+        expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
 
       it('should validate an object field does not have an object value', async function() {
@@ -351,7 +351,7 @@ describe('Validator', function() {
 
         expect(misfits.length).to.equal(1)
         expect(misfits[0].field).to.equal('field1.field12')
-        expect(misfits[0].name).to.equal('TestConstraint2')
+        expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
 
       it('should not validate an object field if it is undefined or null', async function() {
@@ -377,7 +377,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M1')
+        expect(misfits[0].constraint).to.equal('M1')
       })
   
       it('should have a not misfit if it was not a misfit', async function() {
@@ -424,7 +424,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M1')
+        expect(misfits[0].constraint).to.equal('M1')
       })
   
       it('should check the constraints in the order given', async function () {
@@ -436,7 +436,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M1')
+        expect(misfits[0].constraint).to.equal('M1')
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
       })
   
@@ -449,7 +449,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M2')
+        expect(misfits[0].constraint).to.equal('M2')
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
       })
   
@@ -463,7 +463,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M1')
+        expect(misfits[0].constraint).to.equal('M1')
         expect(misfits[0].field).to.equal('a')
       })
   
@@ -476,7 +476,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M1')
+        expect(misfits[0].constraint).to.equal('M1')
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
       })  
   
@@ -489,7 +489,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('M1')
+        expect(misfits[0].constraint).to.equal('M1')
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
       })
   
@@ -521,7 +521,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
-        expect(misfits[0].name).to.equal('TestConstraint1')
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
       
       it('should include a field if the option is set even as object with missing constraint property', async function() {
@@ -534,7 +534,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
-        expect(misfits[0].name).to.equal('TestConstraint1')
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
   
       it('should include a certain constraint if the option is set', async function() {
@@ -547,7 +547,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
-        expect(misfits[0].name).to.equal('TestConstraint2')
+        expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
   
       it('should include certain constraints if the option is set', async function() {
@@ -561,7 +561,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
-        expect(misfits[0].name).to.equal('TestConstraint2')
+        expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
   
       it('should include a field if the option is set', async function() {
@@ -574,7 +574,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].fields).to.deep.equal(['c', 'd'])
-        expect(misfits[0].name).to.equal('TestConstraint1')
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
       
       it('should exclude a field if the option is set even as object with missing constraint property', async function() {
@@ -587,7 +587,7 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].fields).to.deep.equal(['c', 'd'])
-        expect(misfits[0].name).to.equal('TestConstraint1')
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
   
       it('should exclude a certain constraint if the option is set', async function() {
@@ -600,9 +600,9 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(2)
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
-        expect(misfits[0].name).to.equal('TestConstraint2')
+        expect(misfits[0].constraint).to.equal('TestConstraint2')
         expect(misfits[1].fields).to.deep.equal(['c', 'd'])
-        expect(misfits[1].name).to.equal('TestConstraint1')
+        expect(misfits[1].constraint).to.equal('TestConstraint1')
       })
   
       it('should exclude certain constraints if the option is set', async function() {
@@ -616,9 +616,9 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(2)
         expect(misfits[0].fields).to.deep.equal(['a', 'b'])
-        expect(misfits[0].name).to.equal('TestConstraint3')
+        expect(misfits[0].constraint).to.equal('TestConstraint3')
         expect(misfits[1].fields).to.deep.equal(['c', 'd'])
-        expect(misfits[1].name).to.equal('TestConstraint1')
+        expect(misfits[1].constraint).to.equal('TestConstraint1')
       })
   
       it('should execute a Required constraint', async function() {
@@ -627,11 +627,11 @@ describe('Validator', function() {
   
         let misfits = await validator.validate({})
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('Required')
+        expect(misfits[0].constraint).to.equal('Required')
   
         misfits = await validator.validate({a: 'a'})
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('Required')
+        expect(misfits[0].constraint).to.equal('Required')
   
         misfits = await validator.validate({a: 'a', b: 'b'})
         expect(misfits.length).to.equal(0)
@@ -643,11 +643,11 @@ describe('Validator', function() {
   
         let misfits = await validator.validate({a: 'a'})
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('Absent')
+        expect(misfits[0].constraint).to.equal('Absent')
   
         misfits = await validator.validate({a: 'a', b: 'b'})
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('Absent')
+        expect(misfits[0].constraint).to.equal('Absent')
   
         misfits = await validator.validate({})
         expect(misfits.length).to.equal(0)
@@ -662,11 +662,11 @@ describe('Validator', function() {
   
         misfits = await validator.validate({a: 'a'})
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('TypeOf')
+        expect(misfits[0].constraint).to.equal('TypeOf')
   
         misfits = await validator.validate({a: 'a', b: 1})
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('TypeOf')
+        expect(misfits[0].constraint).to.equal('TypeOf')
   
         misfits = await validator.validate({a: 0, b: 1})
         expect(misfits.length).to.equal(0)
@@ -680,7 +680,7 @@ describe('Validator', function() {
   
         let misfits = await validator.validate({a: 'a', b: 'b'})
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('Unique')
+        expect(misfits[0].constraint).to.equal('Unique')
   
         misfits = await validator.validate({})
         expect(misfits.length).to.equal(0)
@@ -697,7 +697,7 @@ describe('Validator', function() {
         
         misfits = await validator.validate({a: 'a'})
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].name).to.equal('Exists')
+        expect(misfits[0].constraint).to.equal('Exists')
       })
     })  
   })

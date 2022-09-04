@@ -16,15 +16,15 @@ export class Length extends Constraint {
     return this.defaultValidation(obj, field, async value => {
       if (typeof value == 'string' || value instanceof Array) {
         if (this.min != undefined && value.length < this.min) {
-          return new Misfit('Length', field, { ...this, actual: value.length }, `Length of '${field}' is less than ${this.min}`)
+          return new Misfit('Length', field, { ...this, actual: value.length })
         }
 
         if (this.max != undefined && value.length > this.max) {
-          return new Misfit('Length', field, { ...this, actual: value.length }, `Length of '${field}' is greater than ${this.max}`)
+          return new Misfit('Length', field, { ...this, actual: value.length })
         }
 
         if (this.exact != undefined && value.length != this.exact) {
-          return new Misfit('Length', field, { ...this, actual: value.length }, `Length of '${field}' is not exact ${this.exact}`)
+          return new Misfit('Length', field, { ...this, actual: value.length })
         }
       }
     })

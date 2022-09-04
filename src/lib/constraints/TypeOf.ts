@@ -29,14 +29,14 @@ export class TypeOf extends Constraint {
       }
 
       let misfit = new Misfit
-      misfit.constraints = <TypeOfConstraints> { types: [] }
+      misfit.values = <TypeOfConstraints> { types: [] }
 
       for (let valueType of this.valueTypes) {
         if (typeof valueType == 'string' || valueType === null) {
-          misfit.constraints.types.push(valueType)
+          misfit.values.types.push(valueType)
         }
         else {
-          misfit.constraints.types.push(valueType.name)
+          misfit.values.types.push(valueType.name)
         }
       }
 

@@ -13,7 +13,7 @@ export class Unique extends Constraint {
   async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
     return this.defaultValidation(obj, field, async (value: any) => {
       if (! await this.isUnique(obj, field)) {
-        return new Misfit(this.name)
+        return new Misfit
       }  
     })
   }
