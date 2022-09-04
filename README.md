@@ -176,7 +176,7 @@ class YourConstraint extends Constraint {
   async validate(obj: any, property: string|string[]): Promise<Misfit|undefined> {
 
     // At first you want to check if the property is absent because in case of absense you do not want to validate because a property may be optional.
-    if (this.isFieldAbsent(obj, property)) {
+    if (this.isPropertyAbsent(obj, property)) {
       return
     }
 

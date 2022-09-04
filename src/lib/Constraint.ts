@@ -4,51 +4,57 @@ export abstract class Constraint<T = any, MisfitValuesType = any> {
 
   name: string = this.constructor.name
 
-  abstract validate(obj: T, property: string|string[]): Promise<Misfit<MisfitValuesType>|undefined>
+  abstract validate(obj: T, properties: string|string[]): Promise<Misfit<MisfitValuesType>|undefined>
 
-  protected async defaultValidation(obj: T, property: string|string[], validateValue: (value: any) => Promise<Misfit<MisfitValuesType>|undefined>, doNotValidateIfUndefined = true): Promise<Misfit<MisfitValuesType>|undefined> {
-    if (typeof property == 'string') {
-      let value = (obj as any)[property]
-
-      if (doNotValidateIfUndefined && value === undefined) {
-        return
-      }
-    
-      let misfit = await validateValue(value)
-      if (misfit && misfit.constraint == undefined) {
-        misfit.constraint = this.name
-      }
-
-      return misfit
+  protected async defaultValidation(obj: T, properties: string|string[], validateValue: (value: any) => Promise<Misfit<MisfitValuesType>|undefined>, doNotValidateIfUndefined = true): Promise<Misfit<MisfitValuesType>|undefined> {
+    if (doNotValidateIfUndefined && this.isPropertyAbsent(obj, properties)) {
+      return 
     }
-    else if (property instanceof Array) {
-      let misfit
-      let everyValueAbsent = true
 
-      for (let fld of property) {
-        let value = (obj as any)[fld]
+    let misfit
+
+    if (typeof properties == 'string') {
+      let value = (obj as any)[properties]
+      misfit = await validateValue(value)
+    }
+    else if (properties instanceof Array) {
+      for (let property of properties) {
+        let value = (obj as any)[property]
 
         if (doNotValidateIfUndefined && value === undefined) {
           continue
         }
 
-        everyValueAbsent = false
+        misfit = await validateValue(value)
 
-        if (! misfit) {
-          misfit = await validateValue(value)
+        if (misfit) {
+          break
         }
-      }
-
-      if (! everyValueAbsent) {
-        if (misfit && misfit.constraint == undefined) {
-          misfit.constraint = this.name
-        }
-
-        return misfit
       }
     }
     else {
       throw new Error('Parameter property was neither of type string nor instance of Array')
+    }
+
+    if (misfit && misfit.constraint == undefined) {
+      misfit.constraint = this.name
+    }
+
+    return misfit
+  }
+
+  isPropertyAbsent(obj: T, properties: string|string[]): boolean {
+    if (typeof properties == 'string') {
+      return (obj as any)[properties] === undefined
+    }
+    else {
+      for (let property of properties) {
+        if ((obj as any)[property] !== undefined) {
+          return false
+        }
+      }
+
+      return true
     }
   }
 }
