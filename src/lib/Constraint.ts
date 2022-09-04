@@ -1,12 +1,12 @@
 import { Misfit } from './Misfit'
 
-export abstract class Constraint {
+export abstract class Constraint<MisfitValuesType = any> {
 
   name: string = this.constructor.name
 
-  abstract validate(obj: any, field: string|string[]): Promise<Misfit|undefined>
+  abstract validate(obj: any, field: string|string[]): Promise<Misfit<MisfitValuesType>|undefined>
 
-  protected async defaultValidation(obj: any, field: string|string[], validateValue: (value: any) => Promise<Misfit|undefined>, doNotValidateIfUndefined = true): Promise<Misfit|undefined> {
+  protected async defaultValidation(obj: any, field: string|string[], validateValue: (value: any) => Promise<Misfit<MisfitValuesType>|undefined>, doNotValidateIfUndefined = true): Promise<Misfit<MisfitValuesType>|undefined> {
     if (typeof field == 'string') {
       let value = obj[field]
 

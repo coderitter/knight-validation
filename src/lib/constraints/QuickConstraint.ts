@@ -1,7 +1,7 @@
 import { Constraint } from '../Constraint'
 import { Misfit } from '../Misfit'
 
-export class QuickConstraint extends Constraint {
+export class QuickConstraint extends Constraint<any> {
 
   validateFn: (obj: any, field: string|string[]) => Promise<Misfit|undefined>
 

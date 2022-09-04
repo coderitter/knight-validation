@@ -1,7 +1,12 @@
 import { Constraint } from '../Constraint'
 import { Misfit } from '../Misfit'
 
-export class TypeOf extends Constraint {
+export interface TypeOfMisfitValues {
+  types: (string|null)[]
+  actual: string|null
+}
+
+export class TypeOf extends Constraint<TypeOfMisfitValues> {
 
   valueTypes: (string|null|(new (...params: any[]) => any))[]
 
@@ -10,7 +15,7 @@ export class TypeOf extends Constraint {
     this.valueTypes = valueTypes
   }
 
-  async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
+  async validate(obj: any, field: string|string[]): Promise<Misfit<TypeOfMisfitValues>|undefined> {
     return this.defaultValidation(obj, field, async (value: any) => {
       for (let valueType of this.valueTypes) {
         if (typeof valueType == 'string') {
@@ -28,12 +33,30 @@ export class TypeOf extends Constraint {
         }
       }
 
-      let misfit = new Misfit
-      misfit.values = <TypeOfConstraints> { types: [] }
+      let actualType: string|null
+
+      if (typeof value =='object' && value !== null) {
+        actualType = value.constructor.name
+      }
+      else if (value === null) {
+        actualType = null
+      }
+      else {
+        actualType = typeof value
+      }
+
+      let misfit = new Misfit<TypeOfMisfitValues>()
+      misfit.values = {
+        actual: actualType,
+        types: []
+      }
 
       for (let valueType of this.valueTypes) {
-        if (typeof valueType == 'string' || valueType === null) {
+        if (typeof valueType == 'string') {
           misfit.values.types.push(valueType)
+        }
+        else if (valueType === null) {
+          misfit.values.types.push(null)
         }
         else {
           misfit.values.types.push(valueType.name)
@@ -43,8 +66,4 @@ export class TypeOf extends Constraint {
       return misfit
     })
   }
-}
-
-export interface TypeOfConstraints {
-  types: string[]
 }

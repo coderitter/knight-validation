@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
-import { Misfit, TypeOf, TypeOfConstraints } from '../../src'
+import { Misfit, TypeOf, TypeOfMisfitValues } from '../../src'
 
 describe('constraints', function() {
   describe('TypeOf', function() {
@@ -22,7 +22,7 @@ describe('constraints', function() {
           let typeOf = new TypeOf('number')
           let misfit = await typeOf.validate({ value: '1' }, 'value')
           expect(misfit).to.be.instanceOf(Misfit)
-          expect(misfit?.values).to.deep.equal(<TypeOfConstraints> { types: ['number'] })
+          expect(misfit?.values).to.deep.equal({ types: ['number'], actual: 'string' } as TypeOfMisfitValues)
 
           expect(await typeOf.validate({ value: null }, 'value')).to.be.instanceOf(Misfit)
           expect(await typeOf.validate({ value: '' }, 'value')).to.be.instanceOf(Misfit)
@@ -33,7 +33,7 @@ describe('constraints', function() {
           let typeOf = new TypeOf(Date)
           let misfit = await typeOf.validate({ value: 1 }, 'value')
           expect(misfit).to.be.instanceOf(Misfit)
-          expect(misfit?.values).to.deep.equal(<TypeOfConstraints> { types: ['Date'] })
+          expect(misfit?.values).to.deep.equal({ types: ['Date'], actual: 'number' } as TypeOfMisfitValues)
         })  
 
         it('should not return a misfit if the correct class', async function() {
@@ -52,7 +52,7 @@ describe('constraints', function() {
           let typeOf = new TypeOf('number', null, Date)
           let misfit = await typeOf.validate({ value: false }, 'value')
           expect(misfit).to.be.instanceOf(Misfit)
-          expect(misfit?.values).to.deep.equal(<TypeOfConstraints> { types: ['number', null, 'Date'] })
+          expect(misfit?.values).to.deep.equal({ types: ['number', null, 'Date'], actual: 'boolean' } as TypeOfMisfitValues)
         })
       })
 
@@ -72,7 +72,7 @@ describe('constraints', function() {
           let typeOf = new TypeOf('number')
           let misfit = await typeOf.validate({ a: '1', b: '2' }, ['a', 'b'])
           expect(misfit).to.be.instanceOf(Misfit)
-          expect(misfit?.values).to.deep.equal(<TypeOfConstraints> { types: ['number'] })
+          expect(misfit?.values).to.deep.equal({ types: ['number'], actual: 'string' } as TypeOfMisfitValues)
 
           expect(await typeOf.validate({ a: null, b: null }, ['a', 'b'])).to.be.instanceOf(Misfit)
           expect(await typeOf.validate({ a: '', b: '' }, ['a', 'b'])).to.be.instanceOf(Misfit)
@@ -83,7 +83,7 @@ describe('constraints', function() {
           let typeOf = new TypeOf(Date)
           let misfit = await typeOf.validate({ a: new Date, b: 1 }, ['a', 'b'])
           expect(misfit).to.be.instanceOf(Misfit)
-          expect(misfit?.values).to.deep.equal(<TypeOfConstraints> { types: ['Date'] })
+          expect(misfit?.values).to.deep.equal({ types: ['Date'], actual: 'number' } as TypeOfMisfitValues)
         })  
 
         it('should not return a misfit if the correct class', async function() {

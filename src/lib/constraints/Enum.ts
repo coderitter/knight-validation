@@ -1,7 +1,12 @@
 import { Constraint } from '../Constraint'
 import { Misfit } from '../Misfit'
 
-export class Enum extends Constraint {
+export interface EnumMisfitValues {
+  actual: any
+  values: any[]
+}
+
+export class Enum extends Constraint<EnumMisfitValues> {
 
   values: any[] = []
 
@@ -31,10 +36,13 @@ export class Enum extends Constraint {
     }
   }
 
-  async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
+  async validate(obj: any, field: string|string[]): Promise<Misfit<EnumMisfitValues>|undefined> {
     return this.defaultValidation(obj, field, async (value: any) => {
       if (this.values.indexOf(value) == -1) {
-        return new Misfit('Enum', field, { ...this, actual: value })
+        return new Misfit<EnumMisfitValues>(this.name, field, {
+          actual: value,
+          values: this.values
+        })
       }
     })
   }
