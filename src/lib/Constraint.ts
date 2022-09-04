@@ -14,7 +14,12 @@ export abstract class Constraint {
         return
       }
     
-      return validateValue(value)
+      let misfit = await validateValue(value)
+      if (misfit && misfit.constraint == undefined) {
+        misfit.constraint = this.name
+      }
+
+      return misfit
     }
     else if (field instanceof Array) {
       let misfit
@@ -35,6 +40,10 @@ export abstract class Constraint {
       }
 
       if (! everyValueAbsent) {
+        if (misfit && misfit.constraint == undefined) {
+          misfit.constraint = this.name
+        }
+
         return misfit
       }
     }
