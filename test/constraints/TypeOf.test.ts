@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
-import { Misfit } from '../../src'
-import TypeOf, { TypeOfConstraints } from '../../src/lib/constraints/TypeOf'
+import { Misfit, TypeOf, TypeOfConstraints } from '../../src'
 
 describe('constraints', function() {
   describe('TypeOf', function() {

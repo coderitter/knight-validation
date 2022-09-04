@@ -6,63 +6,40 @@ export abstract class Constraint {
 
   abstract validate(obj: any, field: string|string[]): Promise<Misfit|undefined>
 
-  protected async defaultValidation(obj: any, field: string|string[], validateValue: (value: any) => Promise<Misfit|undefined>): Promise<Misfit|undefined> {
-    if (this.isFieldAbsent(obj, field)) {
-      return
-    }
-
+  protected async defaultValidation(obj: any, field: string|string[], validateValue: (value: any) => Promise<Misfit|undefined>, doNotValidateIfUndefined = true): Promise<Misfit|undefined> {
     if (typeof field == 'string') {
       let value = obj[field]
+
+      if (doNotValidateIfUndefined && value === undefined) {
+        return
+      }
+    
       return validateValue(value)
     }
     else if (field instanceof Array) {
+      let misfit
+      let everyValueAbsent = true
+
       for (let fld of field) {
         let value = obj[fld]
-        let misfit = await validateValue(value)
 
-        if (misfit) {
-          return misfit
+        if (doNotValidateIfUndefined && value === undefined) {
+          continue
         }
+
+        everyValueAbsent = false
+
+        if (! misfit) {
+          misfit = await validateValue(value)
+        }
+      }
+
+      if (! everyValueAbsent) {
+        return misfit
       }
     }
     else {
       throw new Error('Parameter field was neither of type string nor instance of Array')
     }
-  }
-
-  async validateValue(value: any): Promise<Misfit|undefined> {
-    let misfit = await this.validate({ value: value }, 'value')
-
-    if (misfit) {
-      return misfit
-    }
-  }
-
-  isFieldAbsent(obj: any, field: string|string[]): boolean {
-    if (typeof field == 'string') {
-      let value = obj[field]
-
-      if (Constraint.absent(value)) {
-        return true
-      }
-    }
-    else if (field instanceof Array) {
-      for (let fld of field) {
-        let value = obj[fld]
-
-        if (Constraint.absent(value)) {
-          return true
-        }
-      }
-    }
-    else {
-      throw new Error('Parameter field was neither of type string nor instance of Array')
-    }
-
-    return false
-  }
-
-  static absent(value: any): boolean {
-    return value === undefined
   }
 }

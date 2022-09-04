@@ -9,7 +9,6 @@ export class Length extends Constraint {
 
   constructor(constraints: Partial<Length>) {
     super()
-
     Object.assign(this, constraints)
   }
 

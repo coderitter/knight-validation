@@ -9,7 +9,7 @@ export interface ValidatorOptions {
   exclude?: (string | string[] | { field: string|string[], constraint?: string|string[] })[]
 }
 
-export default class Validator {
+export class Validator {
 
   options?: ValidatorOptions
   fieldConstraints: FieldConstraint[] = []
