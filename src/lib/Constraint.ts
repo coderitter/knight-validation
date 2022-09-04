@@ -40,7 +40,7 @@ export abstract class Constraint<T = any, MisfitValuesType = any> {
       misfit.constraint = this.name
     }
 
-    if (misfit && (misfit.property == undefined || misfit.properties == undefined)) {
+    if (misfit && (! misfit.properties || misfit.properties.length == 0)) {
       misfit.setProperties(properties)
     }
 

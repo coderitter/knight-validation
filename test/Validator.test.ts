@@ -115,8 +115,7 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].property).to.equal('a')
-        expect(misfits[0].properties).to.be.undefined
+        expect(misfits[0].properties).to.deep.equal(['a'])
       })
   
       it('should collect misfits for different properties', async function() {
@@ -128,8 +127,8 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(2)
-        expect(misfits[0].property).to.equal('a')
-        expect(misfits[1].property).to.equal('b')
+        expect(misfits[0].properties).to.deep.equal(['a'])
+        expect(misfits[1].properties).to.deep.equal(['b'])
       })
   
       it('should consider only one constraint if more are given', async function () {
@@ -154,7 +153,7 @@ describe('Validator', function() {
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
         expect(misfits[0].constraint).to.equal('M1')
-        expect(misfits[0].property).to.equal('a')
+        expect(misfits[0].properties).to.deep.equal(['a'])
       })
   
       it('should check all constraints for a property ', async function () {
@@ -167,7 +166,7 @@ describe('Validator', function() {
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
         expect(misfits[0].constraint).to.equal('M2')
-        expect(misfits[0].property).to.equal('a')
+        expect(misfits[0].properties).to.deep.equal(['a'])
       })
   
       it('should check the constraints only for properties existent on the object if the option is set', async function() {
@@ -180,7 +179,7 @@ describe('Validator', function() {
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
         expect(misfits[0].constraint).to.equal('M1')
-        expect(misfits[0].property).to.equal('a')
+        expect(misfits[0].properties).to.deep.equal(['a'])
       })  
   
       it('should check the constraints for properties that are null even if the options to check only what is there is set', async function() {
@@ -193,7 +192,7 @@ describe('Validator', function() {
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
         expect(misfits[0].constraint).to.equal('M1')
-        expect(misfits[0].property).to.equal('a')
+        expect(misfits[0].properties).to.deep.equal(['a'])
       })
   
       it('should only check a constraint if the given condition is met', async function() {
@@ -223,7 +222,7 @@ describe('Validator', function() {
         let misfits = await validator.validate({a: 'a', b: 'b'}, {include: ['a']})
   
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].property).to.equal('a')
+        expect(misfits[0].properties).to.deep.equal(['a'])
         expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
   
@@ -233,10 +232,10 @@ describe('Validator', function() {
         validator.add('a', 'TestConstraint2', async () => new Misfit)
         validator.add('b', 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{ property: 'a' }]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{ properties: 'a' }]})
   
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].property).to.equal('a')
+        expect(misfits[0].properties).to.deep.equal(['a'])
         expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
   
@@ -246,10 +245,10 @@ describe('Validator', function() {
         validator.add('a', 'TestConstraint2', async () => new Misfit)
         validator.add('b', 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{property: 'a', constraint: 'TestConstraint2'}]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{ properties: 'a', constraint: 'TestConstraint2'} ]})
   
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].property).to.equal('a')
+        expect(misfits[0].properties).to.deep.equal(['a'])
         expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
   
@@ -260,10 +259,10 @@ describe('Validator', function() {
         validator.add('a', 'TestConstraint3', async () => new Misfit)
         validator.add('b', 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{property: 'a', constraint: ['TestConstraint3', 'TestConstraint2']}]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{ properties: 'a', constraint: ['TestConstraint3', 'TestConstraint2']}] })
   
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].property).to.equal('a')
+        expect(misfits[0].properties).to.deep.equal(['a'])
         expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
 
@@ -276,7 +275,7 @@ describe('Validator', function() {
         let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: ['a']})
   
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].property).to.equal('b')
+        expect(misfits[0].properties).to.deep.equal(['b'])
         expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
   
@@ -286,10 +285,10 @@ describe('Validator', function() {
         validator.add('a', 'TestConstraint2', async () => new Misfit)
         validator.add('b', 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{ property: 'a' }]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{ properties: 'a' }]})
   
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].property).to.equal('b')
+        expect(misfits[0].properties).to.deep.equal(['b'])
         expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
   
@@ -299,12 +298,12 @@ describe('Validator', function() {
         validator.add('a', 'TestConstraint2', async () => new Misfit)
         validator.add('b', 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{property: 'a', constraint: 'TestConstraint1'}]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{ properties: 'a', constraint: 'TestConstraint1'} ]})
   
         expect(misfits.length).to.equal(2)
-        expect(misfits[0].property).to.equal('a')
+        expect(misfits[0].properties).to.deep.equal(['a'])
         expect(misfits[0].constraint).to.equal('TestConstraint2')
-        expect(misfits[1].property).to.equal('b')
+        expect(misfits[1].properties).to.deep.equal(['b'])
         expect(misfits[1].constraint).to.equal('TestConstraint1')
       })
   
@@ -315,12 +314,12 @@ describe('Validator', function() {
         validator.add('a', 'TestConstraint3', async () => new Misfit)
         validator.add('b', 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{property: 'a', constraint: ['TestConstraint1', 'TestConstraint2']}]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{ properties: 'a', constraint: ['TestConstraint1', 'TestConstraint2']}] })
   
         expect(misfits.length).to.equal(2)
-        expect(misfits[0].property).to.equal('a')
+        expect(misfits[0].properties).to.deep.equal(['a'])
         expect(misfits[0].constraint).to.equal('TestConstraint3')
-        expect(misfits[1].property).to.equal('b')
+        expect(misfits[1].properties).to.deep.equal(['b'])
         expect(misfits[1].constraint).to.equal('TestConstraint1')
       })
 
@@ -335,7 +334,7 @@ describe('Validator', function() {
         let misfits = await validator.validate({ property1: {}})
 
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].property).to.equal('property1.property12')
+        expect(misfits[0].properties).to.deep.equal(['property1.property12'])
         expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
 
@@ -350,7 +349,7 @@ describe('Validator', function() {
         let misfits = await validator.validate({ property1: 1 })
 
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].property).to.equal('property1.property12')
+        expect(misfits[0].properties).to.deep.equal(['property1.property12'])
         expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
 
@@ -398,7 +397,6 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
-        expect(misfits[0].property).to.be.undefined
         expect(misfits[0].properties).to.deep.equal(['a', 'b'])
       })
   
@@ -464,7 +462,7 @@ describe('Validator', function() {
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
         expect(misfits[0].constraint).to.equal('M1')
-        expect(misfits[0].property).to.equal('a')
+        expect(misfits[0].properties).to.deep.equal(['a'])
       })
   
       it('should check the constraints only for properties existent on the object if the option is set', async function() {
@@ -530,7 +528,7 @@ describe('Validator', function() {
         validator.add(['a', 'b'], 'TestConstraint2', async () => new Misfit)
         validator.add(['c', 'd'], 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{ property: ['a', 'b'] }]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{ properties: ['a', 'b'] }]})
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].properties).to.deep.equal(['a', 'b'])
@@ -543,7 +541,7 @@ describe('Validator', function() {
         validator.add(['a', 'b'], 'TestConstraint2', async () => new Misfit)
         validator.add(['c', 'd'], 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{property: ['a', 'b'], constraint: 'TestConstraint2'}]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{ properties: ['a', 'b'], constraint: 'TestConstraint2'}] })
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].properties).to.deep.equal(['a', 'b'])
@@ -557,7 +555,7 @@ describe('Validator', function() {
         validator.add(['a', 'b'], 'TestConstraint3', async () => new Misfit)
         validator.add(['c', 'd'], 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{property: ['a', 'b'], constraint: ['TestConstraint3', 'TestConstraint2']}]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {include: [{ properties: ['a', 'b'], constraint: ['TestConstraint3', 'TestConstraint2']}] })
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].properties).to.deep.equal(['a', 'b'])
@@ -583,7 +581,7 @@ describe('Validator', function() {
         validator.add(['a', 'b'], 'TestConstraint2', async () => new Misfit)
         validator.add(['c', 'd'], 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{ property: ['a', 'b'] }]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{ properties: ['a', 'b'] }]})
   
         expect(misfits.length).to.equal(1)
         expect(misfits[0].properties).to.deep.equal(['c', 'd'])
@@ -596,7 +594,7 @@ describe('Validator', function() {
         validator.add(['a', 'b'], 'TestConstraint2', async () => new Misfit)
         validator.add(['c', 'd'], 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{property: ['a', 'b'], constraint: 'TestConstraint1'}]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{ properties: ['a', 'b'], constraint: 'TestConstraint1'}] })
   
         expect(misfits.length).to.equal(2)
         expect(misfits[0].properties).to.deep.equal(['a', 'b'])
@@ -612,7 +610,7 @@ describe('Validator', function() {
         validator.add(['a', 'b'], 'TestConstraint3', async () => new Misfit)
         validator.add(['c', 'd'], 'TestConstraint1', async () => new Misfit)
   
-        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{property: ['a', 'b'], constraint: ['TestConstraint1', 'TestConstraint2']}]})
+        let misfits = await validator.validate({a: 'a', b: 'b'}, {exclude: [{ properties: ['a', 'b'], constraint: ['TestConstraint1', 'TestConstraint2']}] })
   
         expect(misfits.length).to.equal(2)
         expect(misfits[0].properties).to.deep.equal(['a', 'b'])

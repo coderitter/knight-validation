@@ -147,7 +147,7 @@ export class Validator<T = any> {
           let misfit = await constraint.validateConstraint(object, property)
 
           if (misfit) {
-            misfit.property = property
+            misfit.setProperties(property)
   
             if (misfit.constraint === undefined) {
               misfit.constraint = constraint.constraint.name
@@ -168,7 +168,7 @@ export class Validator<T = any> {
           let subMisfits = await constraint.validateValidator(propertyValue)
 
           for (let misfit of subMisfits) {
-            misfit.property = property + '.' + misfit.property
+            misfit.addPrefix(property + '.')
           }
 
           misfits.push(...subMisfits)

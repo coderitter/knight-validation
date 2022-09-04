@@ -1,8 +1,7 @@
 export class Misfit<ValuesType = any> {
 
   constraint!: string
-  property!: string
-  properties!: string[]
+  properties: string[] = []
   values?: ValuesType
   message?: string
 
@@ -10,7 +9,7 @@ export class Misfit<ValuesType = any> {
     this.constraint = <any> name
     
     if (typeof properties == 'string') {
-      this.property = properties
+      this.properties = [ properties ]
     }
     else if (properties instanceof Array) {
       this.properties = properties
@@ -22,18 +21,24 @@ export class Misfit<ValuesType = any> {
 
   setProperties(property: string|string[]) {
     if (typeof property == 'string') {
-      this.property = property
+      this.properties = [ property ]
     }
     else if (property instanceof Array) {
       this.properties = property
     }
   }
 
+  addPrefix(prefix: string) {
+    for (let i = 0; i < this.properties.length; i++) {
+      this.properties[i] = prefix + this.properties[i]
+    }
+  }
+
   isSinglePropery(): boolean {
-    return this.property != undefined
+    return this.properties && this.properties.length == 1
   }
 
   isMultipleProperties(): boolean {
-    return this.properties != undefined
+    return this.properties && this.properties.length > 1
   }
 }
