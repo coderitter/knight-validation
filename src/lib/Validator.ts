@@ -95,7 +95,7 @@ export class Validator<T = any> {
     return properties
   }
 
-  constraints(property: string|string[]): PropertyConstraint[] {
+  getConstraints(property: string|string[]): PropertyConstraint[] {
     let propertyConstraints: PropertyConstraint[] = []
     
     for (let propertyConstraint of this.propertyConstraints) {
@@ -128,7 +128,7 @@ export class Validator<T = any> {
         continue
       }
       
-      let constraints = this.constraints(property)
+      let constraints = this.getConstraints(property)
 
       for (let constraint of constraints) {
         if (options && options.include instanceof Array && ! (containsPropertyWithoutConstraints(options.include, property) || containsPropertyAndConstraint(options.include, property, constraint))) {
@@ -209,7 +209,7 @@ export class Validator<T = any> {
         continue
       }
 
-      let constraints = this.constraints(properties)
+      let constraints = this.getConstraints(properties)
 
       for (let constraint of constraints) {
         if (options && options.include instanceof Array && ! (containsPropertyWithoutConstraints(options.include, properties) || containsPropertyAndConstraint(options.include, properties, constraint))) {
