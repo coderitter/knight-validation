@@ -8,123 +8,81 @@ describe('constraints', function() {
       describe('single property', function() {
         it('should return a misfit if the length of a string is below the minimum', async function() {
           let max = new Length({ min: 5 })
-          let misfit = await max.validate({ value: '1234' }, 'value')
+          let misfit = await max.validate('1234')
           expect(misfit).to.be.instanceOf(Misfit)
         })
     
         it('should not return a misfit if the length of a string is above the minimum', async function() {
           let max = new Length({ min: 5 })
-          let misfit = await max.validate({ value: '12345' }, 'value')
+          let misfit = await max.validate('12345')
           expect(misfit).to.be.null
         })
     
         it('should return a misfit if the length of a string is above the maximum', async function() {
           let max = new Length({ max: 5 })
-          let misfit = await max.validate({ value: '123456' }, 'value')
+          let misfit = await max.validate('123456')
           expect(misfit).to.be.instanceOf(Misfit)
         })
     
         it('should not return a misfit  if the length of a string is below the maximum', async function() {
           let max = new Length({ max: 5 })
-          let misfit = await max.validate({ value: '12345' }, 'value')
+          let misfit = await max.validate('12345')
           expect(misfit).to.be.null
         })
     
         it('should return a misfit if the length of a string is not exact', async function() {
           let max = new Length({ exact: 5 })
           
-          let misfit = await max.validate({ value: '1234' }, 'value')
+          let misfit = await max.validate('1234')
           expect(misfit).to.be.instanceOf(Misfit)
           
-          misfit = await max.validate({ value: '123456' }, 'value')
+          misfit = await max.validate('123456')
           expect(misfit).to.be.instanceOf(Misfit)
         })
     
         it('should not return a misfit  if the length of a string is exact', async function() {
           let max = new Length({ max: 5 })
-          let misfit = await max.validate({ value: '12345' }, 'value')
+          let misfit = await max.validate('12345')
           expect(misfit).to.be.null
         })
 
         it('should return a misfit if the length of an array is below the minimum', async function() {
           let max = new Length({ min: 5 })
-          let misfit = await max.validate({ value: [ 1, 2, 3, 4 ] }, 'value')
+          let misfit = await max.validate([ 1, 2, 3, 4 ])
           expect(misfit).to.be.instanceOf(Misfit)
         })
     
         it('should not return a misfit if the length of an array is above the minimum', async function() {
           let max = new Length({ min: 5 })
-          let misfit = await max.validate({ value: [ 1, 2, 3, 4, 5 ] }, 'value')
+          let misfit = await max.validate([ 1, 2, 3, 4, 5 ])
           expect(misfit).to.be.null
         })
     
         it('should return a misfit if the length of an array is above the maximum', async function() {
           let max = new Length({ max: 5 })
-          let misfit = await max.validate({ value: [ 1, 2, 3, 4, 5, 6 ] }, 'value')
+          let misfit = await max.validate([ 1, 2, 3, 4, 5, 6 ])
           expect(misfit).to.be.instanceOf(Misfit)
         })
     
         it('should not return a misfit  if the length of an array is below the maximum', async function() {
           let max = new Length({ max: 5 })
-          let misfit = await max.validate({ value: [ 1, 2, 3, 4, 5 ] }, 'value')
+          let misfit = await max.validate([ 1, 2, 3, 4, 5 ])
           expect(misfit).to.be.null
         })
     
         it('should return a misfit if the length of an array is not exact', async function() {
           let max = new Length({ exact: 5 })
           
-          let misfit = await max.validate({ value: [ 1, 2, 3, 4 ] }, 'value')
+          let misfit = await max.validate([ 1, 2, 3, 4 ])
           expect(misfit).to.be.instanceOf(Misfit)
           
-          misfit = await max.validate({ value: [ 1, 2, 3, 4, 5, 6 ] }, 'value')
+          misfit = await max.validate([ 1, 2, 3, 4, 5, 6 ])
           expect(misfit).to.be.instanceOf(Misfit)
         })
     
         it('should not return a misfit  if the length of an array is exact', async function() {
           let max = new Length({ max: 5 })
-          let misfit = await max.validate({ value: [ 1, 2, 3, 4, 5 ] }, 'value')
-          expect(misfit).to.be.null
-        })
-      })
-
-      describe('property combination', function() {
-        it('should return a misfit if the length of a string is below the minimum', async function() {
-          let max = new Length({ min: 5 })
-          let misfit = await max.validate({ value1: '12345', value2: [ 1, 2, 3, 4 ] }, [ 'value1', 'value2' ])
-          expect(misfit).to.be.instanceOf(Misfit)
-        })
-    
-        it('should not return a misfit if the length of a string is above the minimum', async function() {
-          let max = new Length({ min: 5 })
-          let misfit = await max.validate({ value1: '12345', value2: [ 1, 2, 3, 4, 5 ] }, [ 'value1', 'value2' ])
-          expect(misfit).to.be.null
-        })
-    
-        it('should return a misfit if the length of a string is above the maximum', async function() {
-          let max = new Length({ max: 5 })
-          let misfit = await max.validate({ value1: '12345', value2: [ 1, 2, 3, 4, 5, 6 ] }, [ 'value1', 'value2' ])
-          expect(misfit).to.be.instanceOf(Misfit)
-        })
-    
-        it('should not return a misfit  if the length of a string is below the maximum', async function() {
-          let max = new Length({ max: 5 })
-          let misfit = await max.validate({ value1: '12345', value2: [ 1, 2, 3, 4, 5 ] }, [ 'value1', 'value2' ])
-          expect(misfit).to.be.null
-        })
-    
-        it('should return a misfit if the length of a string is not exact', async function() {
-          let max = new Length({ exact: 5 })
-          
-          let misfit = await max.validate({ value1: '12345', value2: [ 1, 2, 3, 4 ] }, [ 'value1', 'value2' ])
-          expect(misfit).to.be.instanceOf(Misfit)
-          
-          misfit = await max.validate({ value1: '12345', value2: [ 1, 2, 3, 4, 5, 6 ] }, [ 'value1', 'value2' ])
-          expect(misfit).to.be.instanceOf(Misfit)
-        })
-    
-        it('should not return a misfit  if the length of a string is exact', async function() {
-          let max = new Length({ max: 5 })
-          let misfit = await max.validate({ value1: '12345', value2: [ 1, 2, 3, 4, 5 ] }, [ 'value1', 'value2' ])
+          let misfit = await max.validate([ 1, 2, 3, 4, 5 ])
           expect(misfit).to.be.null
         })
       })

@@ -5,18 +5,9 @@ export class Misfit<ValuesType = any> {
   values?: ValuesType
   message?: string
 
-  constructor(name?: string, properties?: string|string[], values?: ValuesType, message?: string) {
-    this.constraint = <any> name
-    
-    if (typeof properties == 'string') {
-      this.properties = [ properties ]
-    }
-    else if (properties instanceof Array) {
-      this.properties = properties
-    }
-
+  constructor(constraint?: string, values?: ValuesType) {
+    this.constraint = <any> constraint
     this.values = values
-    this.message = message
   }
 
   setProperties(property: string|string[]) {

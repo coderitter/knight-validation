@@ -5,24 +5,24 @@ export interface ExistsMisfitValues {
   notExistingValue: any
 }
 
-export class Exists<T = any> extends Constraint<T, ExistsMisfitValues> {
+export class Exists extends Constraint<any, ExistsMisfitValues> {
 
-  doesExist: (obj: T, properties: string|string[]) => Promise<boolean>
+  doesExist: (value: any) => Promise<boolean>
 
-  constructor(doesExist: (obj: T, properties: string|string[]) => Promise<boolean>) {
+  constructor(doesExist: (value: any) => Promise<boolean>) {
     super()
     this.doesExist = doesExist
   }
 
-  async validate(obj: T, properties: string|string[]): Promise<Misfit<ExistsMisfitValues>|null> {
-    return this.defaultValidation(obj, properties, async (value: any) => {
-      if (! await this.doesExist(obj, properties)) {
-        return new Misfit(this.name, properties, {
+  async validate(value: any): Promise<Misfit<ExistsMisfitValues>|null> {
+    if (value !== undefined) {
+      if (! await this.doesExist(value)) {
+        return new Misfit(this.name, {
           notExistingValue: value
         })
-      }
+      }  
+    }
 
-      return null
-    })
+    return null
   }
 }

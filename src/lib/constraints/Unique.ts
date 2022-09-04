@@ -5,22 +5,24 @@ export interface UniqueMisfitValues {
   notUniqueValue: any
 }
 
-export class Unique<T = any> extends Constraint<T, UniqueMisfitValues> {
+export class Unique extends Constraint<any, UniqueMisfitValues> {
 
-  isUnique: (obj: T, properties: string|string[]) => Promise<boolean>
+  isUnique: (value: any) => Promise<boolean>
 
-  constructor(isUnique: (obj: T, properties: string|string[]) => Promise<boolean>) {
+  constructor(isUnique: (value: any) => Promise<boolean>) {
     super()
     this.isUnique = isUnique
   }
 
-  async validate(obj: T, properties: string|string[]): Promise<Misfit<UniqueMisfitValues>|null> {
-    return this.defaultValidation(obj, properties, async (value: any) => {
-      if (! await this.isUnique(obj, properties)) {
-        return new Misfit(this.name, properties, { notUniqueValue: value })
-      }
-
+  async validate(value: any): Promise<Misfit<UniqueMisfitValues>|null> {
+    if (value === undefined) {
       return null
-    })
+    }
+
+    if (! await this.isUnique(value)) {
+      return new Misfit(this.name, { notUniqueValue: value })
+    }
+
+    return null
   }
 }

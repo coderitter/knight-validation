@@ -1,397 +1,155 @@
 import { Constraint } from './Constraint'
-import { QuickConstraint } from './constraints/QuickConstraint'
-import { arePropertiesEqual } from './tools'
 import { Misfit } from './Misfit'
+import { QuickConstraint } from './QuickConstraint'
 
 export interface ValidatorOptions {
-  checkOnlyWhatIsThere?: boolean,
-  include?: (string | string[] | { properties: string|string[], constraint?: string|string[] })[]
-  exclude?: (string | string[] | { properties: string|string[], constraint?: string|string[] })[]
+  checkOnlyWhatIsThere?: boolean
+}
+
+interface ValidatorEntry {
+  properties: string[]
+  constraint?: Constraint
+  validator?: Validator<any>
+  condition?: (object: any) => Promise<boolean>
 }
 
 export class Validator<T> {
 
   options?: ValidatorOptions
-  propertyConstraints: PropertyConstraint[] = []
+  entries: ValidatorEntry[] = []
   
   constructor(options?: ValidatorOptions) {
     this.options = options
   }
 
-  add(properties: string|string[], constraint: Constraint<T>, condition?: (object: T) => Promise<boolean>): void
-  add(properties: string|string[], constraintName: string, validate: (object: T, properties: string|string[]) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
-  add(properties: string|string[], validator: Validator<unknown>, condition?: (object: T) => Promise<boolean>): void
-  add(validator: Validator<unknown>): void
+  add(properties: string, constraint: Constraint, condition?: (object: T) => Promise<boolean>): void
+  add(properties: string, constraintName: string, validate: (value: any) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
+  add(properties: string[], constraintName: string, validate: (object: T) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
+  add(property: string, validator: Validator<any>, condition?: (object: T) => Promise<boolean>): void
+  add(validator: Validator<any>): void
   
-  add(arg0: any, arg1?: any, arg2?: any, arg3?: any): void {
-    if (arg0 instanceof Validator) {
-      let validator = arg0
+  add(...args: any[]): void {
+    if (args[0] instanceof Validator) {
+      let validator = args[0]
 
-      for (let propertyConstraint of validator.propertyConstraints) {
-        this.propertyConstraints.push(propertyConstraint)
+      for (let propertyConstraint of validator.entries) {
+        this.entries.push(propertyConstraint)
       }
     }
     else {
-      let property = arg0
-      let constraint
+      let properties = typeof args[0] == 'string' ? [ args[0] ] : args[0] as string[]
+      let constraint: Constraint|undefined = undefined
+      let validator: Validator<any>|undefined = undefined
       let condition
 
-      if (typeof arg1 == 'string') {
-        constraint = new QuickConstraint(arg1, <any> arg2)
-        condition = arg3
+      if (typeof args[1] == 'string') {
+        constraint = new QuickConstraint(args[1], <any> args[2])
+        condition = args.length > 3 ? args[3] : undefined
       }
-      else if (arg1 instanceof Constraint) {
-        constraint = arg1
-        condition = arg2
+      else if (args[1] instanceof Constraint) {
+        constraint = args[1]
+        condition = args.length > 2 ? args[2] : undefined
       }
-      else if (arg1 instanceof Validator) {
-        constraint = arg1
-        condition = arg2
+      else if (args[1] instanceof Validator) {
+        validator = args[1]
+        condition = args.length > 2 ? args[2] : undefined
       }
       else {
         throw new Error('Wrong parameters')
       }
   
-      this.propertyConstraints.push(new PropertyConstraint(property, constraint, condition))
+      this.entries.push({
+        properties: properties,
+        constraint: constraint,
+        validator: validator,
+        condition: condition
+      })
     }
   }
 
-  get properties(): (string|string[])[] {
-    let properties: (string|string[])[] = []
-
-    for (let propertyConstraint of this.propertyConstraints) {
-      if (propertyConstraint.property != undefined) {
-        properties.push(propertyConstraint.property)
-      }
-      else if (propertyConstraint.properties != undefined) {
-        properties.push(propertyConstraint.properties)
-      }
-    }
-
-    return properties
-  }
-
-  get singleProperties(): string[] {
-    let properties: string[] = []
-
-    for (let propertyConstraint of this.propertyConstraints) {
-      if (propertyConstraint.property != undefined && properties.indexOf(propertyConstraint.property) == -1) {
-        properties.push(propertyConstraint.property)
-      }
-    }
-
-    return properties
-  }
-
-  get combinedProperties(): string[][] {
-    let properties: string[][] = []
-
-    for (let propertyConstraint of this.propertyConstraints) {
-      if (propertyConstraint.properties != undefined && ! properties.some((properties: string[]) => arePropertiesEqual(properties, propertyConstraint.properties))) {
-        properties.push(propertyConstraint.properties)
-      }
-    }
-
-    return properties
-  }
-
-  getConstraints(property: string|string[]): PropertyConstraint[] {
-    let propertyConstraints: PropertyConstraint[] = []
-    
-    for (let propertyConstraint of this.propertyConstraints) {
-      if (property === propertyConstraint.property) {
-        propertyConstraints.push(propertyConstraint)
-      }
-      else if (property instanceof Array && propertyConstraint.properties && arePropertiesEqual(property, propertyConstraint.properties)) {
-        propertyConstraints.push(propertyConstraint)
-      }
-    }
-
-    return propertyConstraints
-  }
-
-  async validate(object: any, options?: ValidatorOptions): Promise<Misfit[]> {
+  async validate(object: T, options?: ValidatorOptions): Promise<Misfit[]> {
     options = options || this.options
     let misfits: Misfit[] = []
     let misfittingProperties: string[] = []
 
-    for (let property of this.singleProperties) {
-      if (options && options.include instanceof Array && ! containsProperty(options.include, property)) {
+    for (let entry of this.entries) {
+      let propertyAlreadyHasAMisfit = false
+
+      for (let property of entry.properties) {
+        if (misfittingProperties.indexOf(property) > -1) {
+          propertyAlreadyHasAMisfit = true
+          break
+        }
+      }
+
+      if (propertyAlreadyHasAMisfit) {
         continue
       }
 
-      if (options && options.exclude instanceof Array && containsPropertyWithoutConstraints(options.exclude, property)) {
+      if (entry.condition && ! await entry.condition(object)) {
         continue
       }
 
-      if (object[property] === undefined && options && options.checkOnlyWhatIsThere) {
+      let atLeastOnePropertyExists = false
+      for (let property of entry.properties) {
+        if ((object as any)[property] !== undefined) {
+          atLeastOnePropertyExists = true
+          break
+        }
+      }
+
+      if (! atLeastOnePropertyExists && options && options.checkOnlyWhatIsThere) {
         continue
       }
-      
-      let constraints = this.getConstraints(property)
 
-      for (let constraint of constraints) {
-        if (options && options.include instanceof Array && ! (containsPropertyWithoutConstraints(options.include, property) || containsPropertyAndConstraint(options.include, property, constraint))) {
-          continue
+      if (entry.constraint != undefined) {
+        let misfit
+
+        if (entry.properties.length == 1) {
+          let property = entry.properties[0]
+          let value = (object as any)[property]
+          misfit = await entry.constraint.validate(value)
+        }
+        else {
+          misfit = await entry.constraint.validate(object)
         }
 
-        if (options && options.exclude instanceof Array && containsPropertyAndConstraint(options.exclude, property, constraint)) {
-          continue
-        }
-    
-        if (constraint.condition != undefined && ! await constraint.condition(object)) {
-          continue
-        }
-
-        if (constraint.constraint != undefined) {
-          let misfit = await constraint.validateConstraint(object, property)
-
-          if (misfit) {
-            misfit.setProperties(property)
-  
-            if (misfit.constraint === undefined) {
-              misfit.constraint = constraint.constraint.name
-            }
-  
-            misfittingProperties.push(property)
-            misfits.push(misfit)
-            break
-          }
-        }
-        else if (constraint.validator != undefined) {
-          let propertyValue = object[property]
-
-          if (propertyValue == undefined) {
-            continue
+        if (misfit) {
+          if (misfit.constraint === undefined) {
+            misfit.constraint = entry.constraint.name
           }
 
-          let subMisfits = await constraint.validateValidator(propertyValue)
+          misfit.properties = entry.properties
 
+          misfittingProperties.push(...entry.properties)
+          misfits.push(misfit)
+        }
+      }
+      else if (entry.validator != undefined) {
+        if (entry.properties.length != 1) {
+          throw new Error('Using another validator only works for one property')
+        }
+
+        let property = entry.properties[0]
+        let value = (object as any)[property]
+
+        if (value == undefined) {
+          continue
+        }
+
+        let subMisfits = await entry.validator.validate(value, options)
+
+        if (subMisfits.length > 0) {
           for (let misfit of subMisfits) {
             misfit.addPrefix(property + '.')
           }
-
+  
+          misfittingProperties.push(...entry.properties)
           misfits.push(...subMisfits)
-        }
-      }
-    }
-
-    for (let properties of this.combinedProperties) {
-      if (options && options.include instanceof Array && ! containsProperty(options.include, properties)) {
-        continue
-      }
-
-      if (options && options.exclude instanceof Array && containsPropertyWithoutConstraints(options.exclude, properties)) {
-        continue
-      }
-
-      let oneOfThePropertiesAlreadyHasAMisfit = false
-      for (let property of properties) {
-        if (misfittingProperties.indexOf(property) > -1) {
-          oneOfThePropertiesAlreadyHasAMisfit = true
-          break
-        }
-      }
-
-      if (oneOfThePropertiesAlreadyHasAMisfit) {
-        continue
-      }
-
-      let atLeastOneOfThePropertiesMissingInObject = false
-      for (let property of properties) {
-        if (object[property] === undefined) {
-          atLeastOneOfThePropertiesMissingInObject = true
-          break
-        }
-      }
-
-      if (atLeastOneOfThePropertiesMissingInObject && options && options.checkOnlyWhatIsThere) {
-        continue
-      }
-
-      let constraints = this.getConstraints(properties)
-
-      for (let constraint of constraints) {
-        if (options && options.include instanceof Array && ! (containsPropertyWithoutConstraints(options.include, properties) || containsPropertyAndConstraint(options.include, properties, constraint))) {
-          continue
-        }
-  
-        if (options && options.exclude instanceof Array && containsPropertyAndConstraint(options.exclude, properties, constraint)) {
-          continue
-        }
-  
-        if (constraint.condition != undefined && ! await constraint.condition(object)) {
-          continue
-        }
-
-        if (constraint.constraint != undefined) {
-          let misfit = await constraint.validateConstraint(object, properties)
-
-          if (misfit) {
-            misfit.properties = properties
-  
-            if (misfit.constraint === undefined) {
-              misfit.constraint = constraint.constraint.name
-            }
-  
-            misfits.push(misfit)
-            break
-          }
         }
       }
     }
 
     return misfits
   }
-}
-
-class PropertyConstraint {
-  property?: string
-  properties?: string[]
-  constraint?: Constraint
-  validator?: Validator<unknown>
-  condition?: (object: any) => Promise<boolean>
-
-  constructor(property: string|string[], constraintOrValidator: Constraint|Validator<unknown>, condition?: (object: any) => Promise<boolean>) {
-    this.property = typeof property == 'string' ? property : undefined
-    this.properties = property instanceof Array ? property : undefined
-    this.constraint = constraintOrValidator instanceof Constraint ? constraintOrValidator : undefined
-    this.validator = constraintOrValidator instanceof Validator ? constraintOrValidator : undefined
-    this.condition = condition
-  }
-
-  async validateConstraint(value: any, object: any): Promise<Misfit|null> {
-    if (this.constraint == undefined) {
-      throw new Error('Could not validate constraint because it is not set')
-    }
-
-    return this.constraint.validate(value, object)
-  }
-
-  async validateValidator(value: any): Promise<Misfit[]> {
-    if (this.validator == undefined) {
-      throw new Error('Could not validate with validator because it is not set')
-    }
-
-    return this.validator.validate(value)
-  }
-}
-
-function containsProperty(propertiesAndConstraints: (string|string[]|{properties: string|string[], constraint?: string|string[]})[], property: string|string[]): boolean {
-  for (let propertyAndConstraint of propertiesAndConstraints) {
-    if (typeof propertyAndConstraint == 'string') {
-      if (propertyAndConstraint == property) {
-        return true
-      }
-    }
-    else if (propertyAndConstraint instanceof Array) {
-      if (property instanceof Array && arePropertiesEqual(propertyAndConstraint, property)) {
-        return true
-      }
-    }
-    else if (typeof propertyAndConstraint == 'object' && 'properties' in propertyAndConstraint) {
-      if (containsProperty([propertyAndConstraint.properties], property)) {
-        return true
-      }
-    }
-  }
-
-  return false
-}
-
-function containsPropertyWithoutConstraints(propertiesAndConstraints: (string|string[]|{properties: string|string[], constraint?: string|string[]})[], property: string|string[]): boolean {
-  for (let propertyAndConstraint of propertiesAndConstraints) {
-    if (typeof propertyAndConstraint == 'string') {
-      if (propertyAndConstraint == property) {
-        return true
-      }
-    }
-    else if (propertyAndConstraint instanceof Array) {
-      if (property instanceof Array && arePropertiesEqual(propertyAndConstraint, property)) {
-        return true
-      }
-    }
-    else if (typeof propertyAndConstraint == 'object' && 'properties' in propertyAndConstraint) {
-      if (containsProperty([propertyAndConstraint.properties], property)) {
-        return propertyAndConstraint.constraint == undefined
-      }
-    }
-  }
-
-  return false
-}
-
-function containsPropertyAndConstraint(propertiesAndConstraints: (string|string[]|{properties: string|string[], constraint?: string|string[]})[], property: string|string[], constraint: string|Constraint|PropertyConstraint): boolean {
-  for (let propertyAndConstraint of propertiesAndConstraints) {
-    if (typeof propertyAndConstraint == 'object' && 'properties' in propertyAndConstraint && 'constraint' in propertyAndConstraint) {
-
-      if (typeof propertyAndConstraint.constraint == 'string') {
-        if (constraintNamesEqual(propertyAndConstraint.constraint, constraint)) {
-          if (typeof propertyAndConstraint.properties == 'string' && propertyAndConstraint.properties === property) {
-            return true
-          }
-        
-          if (propertyAndConstraint.properties instanceof Array && property instanceof Array && arePropertiesEqual(propertyAndConstraint.properties, property)) {
-            return true
-          }
-        }          
-      }
-      else if (propertyAndConstraint.constraint instanceof Array) {
-        for (let constraintName of propertyAndConstraint.constraint) {
-          if (constraintNamesEqual(constraintName, constraint)) {
-            if (typeof propertyAndConstraint.properties == 'string' && propertyAndConstraint.properties === property) {
-              return true
-            }
-          
-            if (propertyAndConstraint.properties instanceof Array && property instanceof Array && arePropertiesEqual(propertyAndConstraint.properties, property)) {
-              return true
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return false
-}
-
-function constraintNamesEqual(constraint1: string|Constraint|PropertyConstraint, constraint2: string|Constraint|PropertyConstraint): boolean {
-  if (constraint1 === constraint2) {
-    return true
-  }
-
-  if (constraint1 == undefined || constraint2 == undefined) {
-    return false
-  }
-
-  let constraintName1
-  let constraintName2
-
-  if (typeof constraint1 == 'string') {
-    constraintName1 = constraint1
-  }
-  else if (constraint1 instanceof Constraint) {
-    constraintName1 = constraint1.name
-  }
-  else if (constraint1 instanceof PropertyConstraint) {
-    constraintName1 = constraint1.constraint?.name
-  }
-  else {
-    throw new Error('Unexpected constraint type')
-  }
-
-  if (typeof constraint2 == 'string') {
-    constraintName2 = constraint2
-  }
-  else if (constraint2 instanceof Constraint) {
-    constraintName2 = constraint2.name
-  }
-  else if (constraint2 instanceof PropertyConstraint) {
-    constraintName2 = constraint2.constraint?.name
-  }
-  else {
-    throw new Error('Unexpected constraint type')
-  }
-
-  return constraintName1 === constraintName2
 }

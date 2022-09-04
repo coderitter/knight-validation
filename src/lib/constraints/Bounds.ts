@@ -9,44 +9,44 @@ export interface BoundsMisfitValues {
   lesserThanEqual?: number
 }
 
-export class Bounds<T = any> extends Constraint<T, BoundsMisfitValues> {
+export class Bounds extends Constraint<any, BoundsMisfitValues> {
 
   greaterThan?: number
   greaterThanEqual?: number
   lesserThan?: number
   lesserThanEqual?: number
 
-  constructor(constraints: Partial<Bounds<T>>) {
+  constructor(constraints: Partial<Bounds>) {
     super()
     Object.assign(this, constraints)
   }
 
-  async validate(obj: T, properties: string|string[]): Promise<Misfit<BoundsMisfitValues>|null> {
-    return this.defaultValidation(obj, properties, async value => {
-      if (typeof value == 'number' && ! isNaN(value)) {
-        if (this.lesserThan != undefined && value >= this.lesserThan) {
-          return this._createMisfit(properties, value)
-        }
-        
-        else if (this.lesserThanEqual != undefined && value > this.lesserThanEqual) {
-          return this._createMisfit(properties, value)
-        }
-        
-        else if (this.greaterThan != undefined && value <= this.greaterThan) {
-          return this._createMisfit(properties, value)
-        }
-
-        else if (this.greaterThanEqual != undefined && value < this.greaterThanEqual) {
-          return this._createMisfit(properties, value)
-        }
-      }
-
+  async validate(value: any): Promise<Misfit<BoundsMisfitValues>|null> {
+    if (typeof value != 'number' || isNaN(value)) {
       return null
-    })
+    }
+
+    if (this.lesserThan != undefined && value >= this.lesserThan) {
+      return this._createMisfit(value)
+    }
+    
+    else if (this.lesserThanEqual != undefined && value > this.lesserThanEqual) {
+      return this._createMisfit(value)
+    }
+    
+    else if (this.greaterThan != undefined && value <= this.greaterThan) {
+      return this._createMisfit(value)
+    }
+
+    else if (this.greaterThanEqual != undefined && value < this.greaterThanEqual) {
+      return this._createMisfit(value)
+    }
+
+    return null
   }
 
-  private _createMisfit(properties: string|string[], actual: any): Misfit<BoundsMisfitValues> {
-    return new Misfit<BoundsMisfitValues>(this.name, properties, {
+  private _createMisfit(actual: any): Misfit<BoundsMisfitValues> {
+    return new Misfit<BoundsMisfitValues>(this.name, {
       actual: actual,
       greaterThan: this.greaterThan,
       greaterThanEqual: this.greaterThanEqual,

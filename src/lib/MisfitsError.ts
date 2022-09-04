@@ -5,7 +5,6 @@ export class MisfitsError extends Error {
 
   constructor(misfits: Misfit|Misfit[]) {
     super('Misfits occured ' + JSON.stringify(misfits))
-    
     this.misfits = misfits instanceof Array ? misfits : [ misfits ]
   }
 }
