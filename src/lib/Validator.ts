@@ -9,7 +9,7 @@ export interface ValidatorOptions {
   exclude?: (string | string[] | { field: string|string[], constraint?: string|string[] })[]
 }
 
-export class Validator {
+export class Validator<T = any> {
 
   options?: ValidatorOptions
   fieldConstraints: FieldConstraint[] = []
@@ -18,7 +18,7 @@ export class Validator {
     this.options = options
   }
 
-  add(field: string|string[], constraint: Constraint, condition?: (object: any) => Promise<boolean>): void
+  add(field: string|string[], constraint: Constraint<T>, condition?: (object: any) => Promise<boolean>): void
   add(field: string|string[], constraintName: string, validate: (object: any, field: string|string[]) => Promise<Misfit|undefined>, condition?: (object: any) => Promise<boolean>): void
   add(field: string|string[], validator: Validator, condition?: (object: any) => Promise<boolean>): void
   add(validator: Validator): void

@@ -9,22 +9,20 @@ export interface BoundsMisfitValues {
   lesserThanEqual?: number
 }
 
-export class Bounds extends Constraint<BoundsMisfitValues> {
+export class Bounds<T = any> extends Constraint<T, BoundsMisfitValues> {
 
   greaterThan?: number
   greaterThanEqual?: number
   lesserThan?: number
   lesserThanEqual?: number
 
-  constructor(constraints: Partial<Bounds>) {
+  constructor(constraints: Partial<Bounds<T>>) {
     super()
     Object.assign(this, constraints)
   }
 
-  async validate(obj: any, field: string|string[]): Promise<Misfit<BoundsMisfitValues>|undefined> {
+  async validate(obj: T, field: string|string[]): Promise<Misfit<BoundsMisfitValues>|undefined> {
     return this.defaultValidation(obj, field, async value => {
-      let misfit
-
       if (typeof value == 'number' && ! isNaN(value)) {
         if (this.lesserThan != undefined && value >= this.lesserThan) {
           return this._createMisfit(field, value)

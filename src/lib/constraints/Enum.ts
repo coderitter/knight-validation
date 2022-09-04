@@ -6,7 +6,7 @@ export interface EnumMisfitValues {
   values: any[]
 }
 
-export class Enum extends Constraint<EnumMisfitValues> {
+export class Enum<T = any> extends Constraint<T, EnumMisfitValues> {
 
   values: any[] = []
 

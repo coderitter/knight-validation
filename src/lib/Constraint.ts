@@ -1,14 +1,14 @@
 import { Misfit } from './Misfit'
 
-export abstract class Constraint<MisfitValuesType = any> {
+export abstract class Constraint<T = any, MisfitValuesType = any> {
 
   name: string = this.constructor.name
 
-  abstract validate(obj: any, field: string|string[]): Promise<Misfit<MisfitValuesType>|undefined>
+  abstract validate(obj: T, field: string|string[]): Promise<Misfit<MisfitValuesType>|undefined>
 
-  protected async defaultValidation(obj: any, field: string|string[], validateValue: (value: any) => Promise<Misfit<MisfitValuesType>|undefined>, doNotValidateIfUndefined = true): Promise<Misfit<MisfitValuesType>|undefined> {
+  protected async defaultValidation(obj: T, field: string|string[], validateValue: (value: any) => Promise<Misfit<MisfitValuesType>|undefined>, doNotValidateIfUndefined = true): Promise<Misfit<MisfitValuesType>|undefined> {
     if (typeof field == 'string') {
-      let value = obj[field]
+      let value = (obj as any)[field]
 
       if (doNotValidateIfUndefined && value === undefined) {
         return
@@ -26,7 +26,7 @@ export abstract class Constraint<MisfitValuesType = any> {
       let everyValueAbsent = true
 
       for (let fld of field) {
-        let value = obj[fld]
+        let value = (obj as any)[fld]
 
         if (doNotValidateIfUndefined && value === undefined) {
           continue

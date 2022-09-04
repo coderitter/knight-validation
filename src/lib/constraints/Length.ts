@@ -8,7 +8,7 @@ export interface LengthMisfitValues {
   exact?: number
 }
 
-export class Length extends Constraint<LengthMisfitValues> {
+export class Length<T = any> extends Constraint<T, LengthMisfitValues> {
 
   min?: number
   max?: number
@@ -19,7 +19,7 @@ export class Length extends Constraint<LengthMisfitValues> {
     Object.assign(this, constraints)
   }
 
-  async validate(obj: any, field: string|string[]): Promise<Misfit<LengthMisfitValues>|undefined> {
+  async validate(obj: T, field: string|string[]): Promise<Misfit<LengthMisfitValues>|undefined> {
     return this.defaultValidation(obj, field, async value => {
       if (typeof value == 'string' || value instanceof Array) {
         if (this.min != undefined && value.length < this.min) {

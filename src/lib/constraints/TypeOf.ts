@@ -6,7 +6,7 @@ export interface TypeOfMisfitValues {
   actual: string|null
 }
 
-export class TypeOf extends Constraint<TypeOfMisfitValues> {
+export class TypeOf<T = any> extends Constraint<T, TypeOfMisfitValues> {
 
   valueTypes: (string|null|(new (...params: any[]) => any))[]
 
@@ -15,7 +15,7 @@ export class TypeOf extends Constraint<TypeOfMisfitValues> {
     this.valueTypes = valueTypes
   }
 
-  async validate(obj: any, field: string|string[]): Promise<Misfit<TypeOfMisfitValues>|undefined> {
+  async validate(obj: T, field: string|string[]): Promise<Misfit<TypeOfMisfitValues>|undefined> {
     return this.defaultValidation(obj, field, async (value: any) => {
       for (let valueType of this.valueTypes) {
         if (typeof valueType == 'string') {
