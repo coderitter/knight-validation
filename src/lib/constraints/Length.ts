@@ -19,19 +19,19 @@ export class Length<T = any> extends Constraint<T, LengthMisfitValues> {
     Object.assign(this, constraints)
   }
 
-  async validate(obj: T, property: string|string[]): Promise<Misfit<LengthMisfitValues>|null> {
-    return this.defaultValidation(obj, property, async value => {
+  async validate(obj: T, properties: string|string[]): Promise<Misfit<LengthMisfitValues>|null> {
+    return this.defaultValidation(obj, properties, async value => {
       if (typeof value == 'string' || value instanceof Array) {
         if (this.min != undefined && value.length < this.min) {
-          return this._createMisfit(property, value.length)
+          return this._createMisfit(properties, value.length)
         }
 
         else if (this.max != undefined && value.length > this.max) {
-          return this._createMisfit(property, value.length)
+          return this._createMisfit(properties, value.length)
         }
 
         else if (this.exact != undefined && value.length != this.exact) {
-          return this._createMisfit(property, value.length)
+          return this._createMisfit(properties, value.length)
         }
       }
 
@@ -39,8 +39,8 @@ export class Length<T = any> extends Constraint<T, LengthMisfitValues> {
     })
   }
 
-  private _createMisfit(property: string|string[], actual: any): Misfit<LengthMisfitValues> {
-    return new Misfit<LengthMisfitValues>(this.name, property, {
+  private _createMisfit(properties: string|string[], actual: any): Misfit<LengthMisfitValues> {
+    return new Misfit<LengthMisfitValues>(this.name, properties, {
       actual: actual,
       exact: this.exact,
       max: this.max,

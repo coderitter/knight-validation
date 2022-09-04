@@ -136,7 +136,7 @@ class UserValidator extends Validator {
 let misfits = validator.validate(user, { exclude: ['email'] })
 
 // Exclude only the required constraint of the email property
-let misfits = validator.validate(user, { exclude: [{ property: 'email', constraint: 'Required' }] })
+let misfits = validator.validate(user, { exclude: [{ properties: 'email', constraint: 'Required' }] })
 ```
 
 ### Anonymous custom constraints
@@ -173,15 +173,15 @@ import { Constraint } from 'knight-validation'
 class YourConstraint extends Constraint {
 
   // Override the abstract method validate
-  async validate(obj: any, property: string|string[]): Promise<Misfit|undefined> {
+  async validate(obj: any, properties: string|string[]): Promise<Misfit|undefined> {
 
-    // At first you want to check if the property is absent because in case of absense you do not want to validate because a property may be optional.
-    if (this.isPropertyAbsent(obj, property)) {
+    // At first you want to check if the properties are absent because in case of absense you do not want to validate because a property may be optional.
+    if (this.arePropertyAbsent(obj, properties)) {
       return
     }
 
-    // Next you need to check if the property was a single or a combined one. Maybe you just implement on of the two possibilities.
-    if (typeof property == 'string') {
+    // Next you need to check if the properties were single or a nultiple ones. Maybe you just implement on of the two possibilities.
+    if (typeof properties == 'string') {
       // In case of a single property
     }
     else {
@@ -197,8 +197,8 @@ Another possibility is to use the `defaultValidation` method. It will do the che
 import { Constraint } from 'knight-validation'
 
 class YourConstraint extends Constraint {
-  async validate(obj: any, property: string|string[]): Promise<Misfit|undefined> {
-    return this.defaultValidation(obj, property, async (value: any) => {
+  async validate(obj: any, properties: string|string[]): Promise<Misfit|undefined> {
+    return this.defaultValidation(obj, properties, async (value: any) => {
       if (value == 1) {  // Validate the value here
         return new Misfit
       }

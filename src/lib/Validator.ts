@@ -5,8 +5,8 @@ import { Misfit } from './Misfit'
 
 export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean,
-  include?: (string | string[] | { property: string|string[], constraint?: string|string[] })[]
-  exclude?: (string | string[] | { property: string|string[], constraint?: string|string[] })[]
+  include?: (string | string[] | { properties: string|string[], constraint?: string|string[] })[]
+  exclude?: (string | string[] | { properties: string|string[], constraint?: string|string[] })[]
 }
 
 export class Validator<T = any> {
@@ -18,9 +18,9 @@ export class Validator<T = any> {
     this.options = options
   }
 
-  add(property: string|string[], constraint: Constraint<T>, condition?: (object: any) => Promise<boolean>): void
-  add(property: string|string[], constraintName: string, validate: (object: any, property: string|string[]) => Promise<Misfit|null>, condition?: (object: any) => Promise<boolean>): void
-  add(property: string|string[], validator: Validator, condition?: (object: any) => Promise<boolean>): void
+  add(properties: string|string[], constraint: Constraint<T>, condition?: (object: any) => Promise<boolean>): void
+  add(properties: string|string[], constraintName: string, validate: (object: any, properties: string|string[]) => Promise<Misfit|null>, condition?: (object: any) => Promise<boolean>): void
+  add(properties: string|string[], validator: Validator, condition?: (object: any) => Promise<boolean>): void
   add(validator: Validator): void
   
   add(arg0: any, arg1?: any, arg2?: any, arg3?: any): void {
@@ -277,7 +277,7 @@ class PropertyConstraint {
   }
 }
 
-function containsProperty(propertiesAndConstraints: (string|string[]|{property: string|string[], constraint?: string|string[]})[], property: string|string[]): boolean {
+function containsProperty(propertiesAndConstraints: (string|string[]|{properties: string|string[], constraint?: string|string[]})[], property: string|string[]): boolean {
   for (let propertyAndConstraint of propertiesAndConstraints) {
     if (typeof propertyAndConstraint == 'string') {
       if (propertyAndConstraint == property) {
@@ -289,8 +289,8 @@ function containsProperty(propertiesAndConstraints: (string|string[]|{property: 
         return true
       }
     }
-    else if (typeof propertyAndConstraint == 'object' && 'property' in propertyAndConstraint) {
-      if (containsProperty([propertyAndConstraint.property], property)) {
+    else if (typeof propertyAndConstraint == 'object' && 'properties' in propertyAndConstraint) {
+      if (containsProperty([propertyAndConstraint.properties], property)) {
         return true
       }
     }
@@ -299,7 +299,7 @@ function containsProperty(propertiesAndConstraints: (string|string[]|{property: 
   return false
 }
 
-function containsPropertyWithoutConstraints(propertiesAndConstraints: (string|string[]|{property: string|string[], constraint?: string|string[]})[], property: string|string[]): boolean {
+function containsPropertyWithoutConstraints(propertiesAndConstraints: (string|string[]|{properties: string|string[], constraint?: string|string[]})[], property: string|string[]): boolean {
   for (let propertyAndConstraint of propertiesAndConstraints) {
     if (typeof propertyAndConstraint == 'string') {
       if (propertyAndConstraint == property) {
@@ -311,8 +311,8 @@ function containsPropertyWithoutConstraints(propertiesAndConstraints: (string|st
         return true
       }
     }
-    else if (typeof propertyAndConstraint == 'object' && 'property' in propertyAndConstraint) {
-      if (containsProperty([propertyAndConstraint.property], property)) {
+    else if (typeof propertyAndConstraint == 'object' && 'properties' in propertyAndConstraint) {
+      if (containsProperty([propertyAndConstraint.properties], property)) {
         return propertyAndConstraint.constraint == undefined
       }
     }
@@ -321,17 +321,17 @@ function containsPropertyWithoutConstraints(propertiesAndConstraints: (string|st
   return false
 }
 
-function containsPropertyAndConstraint(propertiesAndConstraints: (string|string[]|{property: string|string[], constraint?: string|string[]})[], property: string|string[], constraint: string|Constraint|PropertyConstraint): boolean {
+function containsPropertyAndConstraint(propertiesAndConstraints: (string|string[]|{properties: string|string[], constraint?: string|string[]})[], property: string|string[], constraint: string|Constraint|PropertyConstraint): boolean {
   for (let propertyAndConstraint of propertiesAndConstraints) {
-    if (typeof propertyAndConstraint == 'object' && 'property' in propertyAndConstraint && 'constraint' in propertyAndConstraint) {
+    if (typeof propertyAndConstraint == 'object' && 'properties' in propertyAndConstraint && 'constraint' in propertyAndConstraint) {
 
       if (typeof propertyAndConstraint.constraint == 'string') {
         if (constraintNamesEqual(propertyAndConstraint.constraint, constraint)) {
-          if (typeof propertyAndConstraint.property == 'string' && propertyAndConstraint.property === property) {
+          if (typeof propertyAndConstraint.properties == 'string' && propertyAndConstraint.properties === property) {
             return true
           }
         
-          if (propertyAndConstraint.property instanceof Array && property instanceof Array && arePropertiesEqual(propertyAndConstraint.property, property)) {
+          if (propertyAndConstraint.properties instanceof Array && property instanceof Array && arePropertiesEqual(propertyAndConstraint.properties, property)) {
             return true
           }
         }          
@@ -339,11 +339,11 @@ function containsPropertyAndConstraint(propertiesAndConstraints: (string|string[
       else if (propertyAndConstraint.constraint instanceof Array) {
         for (let constraintName of propertyAndConstraint.constraint) {
           if (constraintNamesEqual(constraintName, constraint)) {
-            if (typeof propertyAndConstraint.property == 'string' && propertyAndConstraint.property === property) {
+            if (typeof propertyAndConstraint.properties == 'string' && propertyAndConstraint.properties === property) {
               return true
             }
           
-            if (propertyAndConstraint.property instanceof Array && property instanceof Array && arePropertiesEqual(propertyAndConstraint.property, property)) {
+            if (propertyAndConstraint.properties instanceof Array && property instanceof Array && arePropertiesEqual(propertyAndConstraint.properties, property)) {
               return true
             }
           }

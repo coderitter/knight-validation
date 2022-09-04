@@ -21,23 +21,23 @@ export class Bounds<T = any> extends Constraint<T, BoundsMisfitValues> {
     Object.assign(this, constraints)
   }
 
-  async validate(obj: T, property: string|string[]): Promise<Misfit<BoundsMisfitValues>|null> {
-    return this.defaultValidation(obj, property, async value => {
+  async validate(obj: T, properties: string|string[]): Promise<Misfit<BoundsMisfitValues>|null> {
+    return this.defaultValidation(obj, properties, async value => {
       if (typeof value == 'number' && ! isNaN(value)) {
         if (this.lesserThan != undefined && value >= this.lesserThan) {
-          return this._createMisfit(property, value)
+          return this._createMisfit(properties, value)
         }
         
         else if (this.lesserThanEqual != undefined && value > this.lesserThanEqual) {
-          return this._createMisfit(property, value)
+          return this._createMisfit(properties, value)
         }
         
         else if (this.greaterThan != undefined && value <= this.greaterThan) {
-          return this._createMisfit(property, value)
+          return this._createMisfit(properties, value)
         }
 
         else if (this.greaterThanEqual != undefined && value < this.greaterThanEqual) {
-          return this._createMisfit(property, value)
+          return this._createMisfit(properties, value)
         }
       }
 
@@ -45,8 +45,8 @@ export class Bounds<T = any> extends Constraint<T, BoundsMisfitValues> {
     })
   }
 
-  private _createMisfit(property: string|string[], actual: any): Misfit<BoundsMisfitValues> {
-    return new Misfit<BoundsMisfitValues>(this.name, property, {
+  private _createMisfit(properties: string|string[], actual: any): Misfit<BoundsMisfitValues> {
+    return new Misfit<BoundsMisfitValues>(this.name, properties, {
       actual: actual,
       greaterThan: this.greaterThan,
       greaterThanEqual: this.greaterThanEqual,

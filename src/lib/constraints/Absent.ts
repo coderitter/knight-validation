@@ -7,10 +7,10 @@ export interface AbsentMisfitValues {
 
 export class Absent<T = any> extends Constraint<T, AbsentMisfitValues> {
 
-  async validate(obj: T, property: string|string[]): Promise<Misfit<AbsentMisfitValues>|null> {
-    return this.defaultValidation(obj, property, async (value: any) => {
+  async validate(obj: T, properties: string|string[]): Promise<Misfit<AbsentMisfitValues>|null> {
+    return this.defaultValidation(obj, properties, async (value: any) => {
       if (value !== undefined) {
-        return new Misfit('Absent', property, { actual: value })
+        return new Misfit('Absent', properties, { actual: value })
       }
 
       return null

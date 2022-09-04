@@ -7,7 +7,7 @@ export abstract class Constraint<T = any, MisfitValuesType = any> {
   abstract validate(obj: T, properties: string|string[]): Promise<Misfit<MisfitValuesType>|null>
 
   protected async defaultValidation(obj: T, properties: string|string[], validateValue: (value: any) => Promise<Misfit<MisfitValuesType>|null>, doNotValidateIfUndefined = true): Promise<Misfit<MisfitValuesType>|null> {
-    if (doNotValidateIfUndefined && this.isPropertyAbsent(obj, properties)) {
+    if (doNotValidateIfUndefined && this.arePropertiesAbsent(obj, properties)) {
       return null
     }
 
@@ -41,13 +41,13 @@ export abstract class Constraint<T = any, MisfitValuesType = any> {
     }
 
     if (misfit && (misfit.property == undefined || misfit.properties == undefined)) {
-      misfit.setProperty(properties)
+      misfit.setProperties(properties)
     }
 
     return misfit
   }
 
-  isPropertyAbsent(obj: T, properties: string|string[]): boolean {
+  arePropertiesAbsent(obj: T, properties: string|string[]): boolean {
     if (typeof properties == 'string') {
       return (obj as any)[properties] === undefined
     }
