@@ -133,19 +133,35 @@ export class Validator<T> {
         let property = entry.properties[0]
         let value = (object as any)[property]
 
-        if (value == undefined) {
+        if (typeof value != 'object' || value === null) {
           continue
         }
 
-        let subMisfits = await entry.validator.validate(value, options)
+        if (value instanceof Array) {
+          for (let i = 0; i < value.length; i++) {
+            let subMisfits = await entry.validator.validate(value[i], options)
 
-        if (subMisfits.length > 0) {
-          for (let misfit of subMisfits) {
-            misfit.addPrefix(property + '.')
+            if (subMisfits.length > 0) {
+              for (let misfit of subMisfits) {
+                misfit.addPrefix(`${property}[${i}].`)
+              }
+      
+              misfittingProperties.push(...entry.properties)
+              misfits.push(...subMisfits)
+            }
           }
-  
-          misfittingProperties.push(...entry.properties)
-          misfits.push(...subMisfits)
+        }
+        else {
+          let subMisfits = await entry.validator.validate(value, options)
+
+          if (subMisfits.length > 0) {
+            for (let misfit of subMisfits) {
+              misfit.addPrefix(property + '.')
+            }
+    
+            misfittingProperties.push(...entry.properties)
+            misfits.push(...subMisfits)
+          }
         }
       }
     }

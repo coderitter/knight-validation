@@ -89,7 +89,7 @@ describe('Validator', function() {
   })
 
   describe('validate', function() {
-    describe('property', function() {
+    describe('single property contstraints', function() {
       it('should have a misfit if it was a misfit', async function() {
         let validator = new Validator
         validator.add('a', 'TestConstraint', async () => new Misfit('TestConstraint1'))
@@ -261,7 +261,7 @@ describe('Validator', function() {
       })
     })
   
-    describe('property combination', function() {
+    describe('quick constraints', function() {
       it('should have a misfit if it was a misfit', async function() {
         let validator = new Validator
         validator.add(['a', 'b'], 'TestConstraint', async () => new Misfit('M1'))
@@ -401,6 +401,42 @@ describe('Validator', function() {
         let misfits = await validator.validate({})
   
         expect(misfits.length).to.equal(0)
+      })
+    })
+
+    describe('nested validators', function() {
+      it('should validate a sub object', async function() {
+        let nestedValidator = new Validator
+        nestedValidator.add('nestedA', new Required)
+        nestedValidator.add('nestedB', new TypeOf('number'))
+
+        let validator = new Validator
+        validator.add('a', nestedValidator)
+  
+        let misfits = await validator.validate({ a: { nestedB: 1 }})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].constraint).to.equal('Required')
+        expect(misfits[0].properties).to.deep.equal(['a.nestedA'])
+      })
+
+      it('should validate a sub array', async function() {
+        let nestedValidator = new Validator
+        nestedValidator.add('nestedA', new Required)
+        nestedValidator.add('nestedB', new TypeOf('number'))
+
+        let validator = new Validator
+        validator.add('a', nestedValidator)
+  
+        let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, { nestedB: 1 }]})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(2)
+        expect(misfits[0].constraint).to.equal('TypeOf')
+        expect(misfits[0].properties).to.deep.equal(['a[0].nestedB'])
+        expect(misfits[1].constraint).to.equal('Required')
+        expect(misfits[1].properties).to.deep.equal(['a[1].nestedA'])
       })
     })
   })
