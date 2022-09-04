@@ -1,7 +1,7 @@
-import Constraint from '../Constraint'
-import Misfit from '../Misfit'
+import { Constraint } from '../Constraint'
+import { Misfit } from '../Misfit'
 
-export default class TypeOf extends Constraint {
+export class TypeOf extends Constraint {
 
   valueTypes: (string|null|(new (...params: any[]) => any))[]
 

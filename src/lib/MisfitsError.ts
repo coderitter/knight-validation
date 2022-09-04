@@ -1,6 +1,6 @@
-import Misfit from './Misfit'
+import { Misfit } from './Misfit'
 
-export default class MisfitsError extends Error {
+export class MisfitsError extends Error {
   misfits: Misfit[]
 
   constructor(misfits: Misfit|Misfit[]) {

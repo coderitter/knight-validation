@@ -1,7 +1,7 @@
-import Constraint from '../Constraint'
-import Misfit from '../Misfit'
+import { Constraint } from '../Constraint'
+import { Misfit } from '../Misfit'
 
-export default class Exists extends Constraint {
+export class Exists extends Constraint {
 
   doesExist: (value: any, obj: any) => Promise<boolean>
 

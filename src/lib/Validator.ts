@@ -1,7 +1,7 @@
-import Constraint from './Constraint'
-import QuickConstraint from './constraints/QuickConstraint'
-import fieldsEqual from './fieldsEqual'
-import Misfit from './Misfit'
+import { Constraint } from './Constraint'
+import { QuickConstraint } from './constraints/QuickConstraint'
+import { fieldsEqual } from './fieldsEqual'
+import { Misfit } from './Misfit'
 
 export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean,

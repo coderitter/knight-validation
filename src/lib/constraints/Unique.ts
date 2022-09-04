@@ -1,7 +1,7 @@
-import Constraint from '../Constraint'
-import Misfit from '../Misfit'
+import { Constraint } from '../Constraint'
+import { Misfit } from '../Misfit'
 
-export default class Unique extends Constraint {
+export class Unique extends Constraint {
 
   isUnique: (value: any, obj: any) => Promise<boolean>
 

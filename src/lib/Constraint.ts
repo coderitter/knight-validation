@@ -1,6 +1,6 @@
-import Misfit from './Misfit'
+import { Misfit } from './Misfit'
 
-export default abstract class Constraint {
+export abstract class Constraint {
 
   name: string = this.constructor.name
 

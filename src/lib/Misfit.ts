@@ -1,11 +1,13 @@
-import Absent from './constraints/Absent'
-import Exists from './constraints/Exists'
-import Required from './constraints/Required'
-import TypeOf from './constraints/TypeOf'
-import Unique from './constraints/Unique'
-import fieldsEqual from './fieldsEqual'
+import { Absent } from './constraints/Absent'
+import { Bounds } from './constraints/Bounds'
+import { Exists } from './constraints/Exists'
+import { Length } from './constraints/Length'
+import { Required } from './constraints/Required'
+import { TypeOf } from './constraints/TypeOf'
+import { Unique } from './constraints/Unique'
+import { fieldsEqual } from './fieldsEqual'
 
-export default class Misfit {
+export class Misfit {
 
   name!: string
   field!: string
@@ -46,6 +48,14 @@ export default class Misfit {
 
   static required(field: string, message?: string) {
     return new Misfit(Required.name, field).setMessage(message)
+  }
+
+  static bounds(field: string, message?: string) {
+    return new Misfit(Bounds.name, field).setMessage(message)
+  }
+
+  static length_(field: string, message?: string) {
+    return new Misfit(Length.name, field).setMessage(message)
   }
 
   static absent(field: string, message?: string) {

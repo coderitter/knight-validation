@@ -1,7 +1,7 @@
-import Constraint from '../Constraint'
-import Misfit from '../Misfit'
+import { Constraint } from '../Constraint'
+import { Misfit } from '../Misfit'
 
-export default class Enum extends Constraint {
+export class Enum extends Constraint {
 
   values: any[] = []
 

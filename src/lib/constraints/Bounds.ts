@@ -1,7 +1,7 @@
-import Constraint from '../Constraint'
-import Misfit from '../Misfit'
+import { Constraint } from '../Constraint'
+import { Misfit } from '../Misfit'
 
-export default class Bounds extends Constraint {
+export class Bounds extends Constraint {
 
   greaterThan?: number
   greaterThanEqual?: number

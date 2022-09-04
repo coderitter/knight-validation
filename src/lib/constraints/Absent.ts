@@ -1,7 +1,7 @@
-import Constraint from '../Constraint'
-import Misfit from '../Misfit'
+import { Constraint } from '../Constraint'
+import { Misfit } from '../Misfit'
 
-export default class Absent extends Constraint {
+export class Absent extends Constraint {
 
   async validate(obj: any, field: string|string[]): Promise<Misfit|undefined> {
     if (typeof field == 'string') {
