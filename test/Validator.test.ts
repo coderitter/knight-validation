@@ -232,7 +232,7 @@ describe('Validator', function() {
         expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
 
-      it('should validate an object property does not have an object value', async function() {
+      it.only('should validate an object property does not have an object value', async function() {
         let propertyValidator = new Validator
         propertyValidator.add('property11', 'TestConstraint1', async () => null)
         propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
@@ -437,6 +437,31 @@ describe('Validator', function() {
         expect(misfits[0].properties).to.deep.equal(['a[0].nestedB'])
         expect(misfits[1].constraint).to.equal('Required')
         expect(misfits[1].properties).to.deep.equal(['a[1].nestedA'])
+      })
+
+      it('should be able to handle dot notifications', async function() {
+        let validator = new Validator
+
+        validator.add('a.b', 'TestConstraint1', async (value: any) => {
+          if (value !== undefined) {
+            return new Misfit('TestConstraint1')
+          }
+
+          return null
+        })
+
+        validator.add('a.c', 'TestConstraint2', async (value: any) => {
+          if (value !== undefined) {
+            return new Misfit('TestConstraint2')
+          }
+
+          return null
+        })
+        
+        let misfits = await validator.validate({ a: { b: 'b' }})
+  
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
       })
     })
   })
