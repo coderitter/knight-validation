@@ -232,7 +232,7 @@ describe('Validator', function() {
         expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
 
-      it.only('should validate an object property does not have an object value', async function() {
+      it('should validate an object property does not have an object value', async function() {
         let propertyValidator = new Validator
         propertyValidator.add('property11', 'TestConstraint1', async () => null)
         propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
@@ -247,7 +247,7 @@ describe('Validator', function() {
         expect(misfits[0].constraint).to.equal('TestConstraint2')
       })
 
-      it('should not validate an object property if it is undefined or null', async function() {
+      it('should not validate an object property if it is undefined', async function() {
         let propertyValidator = new Validator
         propertyValidator.add('property11', 'TestConstraint1', async () => null)
         propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
@@ -255,9 +255,22 @@ describe('Validator', function() {
         let validator = new Validator
         validator.add('property1', propertyValidator)
 
-        let misfits = await validator.validate({})
+        let misfits = await validator.validate({ property1: undefined })
 
         expect(misfits.length).to.equal(0)
+      })
+
+      it('should validate an object property if it is null', async function() {
+        let propertyValidator = new Validator
+        propertyValidator.add('property11', 'TestConstraint1', async () => null)
+        propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
+
+        let validator = new Validator
+        validator.add('property1', propertyValidator)
+
+        let misfits = await validator.validate({ property1: null })
+
+        expect(misfits.length).to.equal(1)
       })
     })
   

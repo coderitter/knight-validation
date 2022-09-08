@@ -138,7 +138,7 @@ export class Validator<T> {
         let dotNotification = new DotNotification(property)
         let value = dotNotification.get(object)
 
-        if (typeof value != 'object' || value === null) {
+        if (value === undefined) {
           continue
         }
 
