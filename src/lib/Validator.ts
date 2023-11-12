@@ -7,28 +7,28 @@ export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean
 }
 
-interface ValidatorEntry {
+interface ValidatorEntry<T = any> {
   properties: string[]
   constraint?: Constraint
-  validator?: Validator<any>
-  condition?: (object: any) => Promise<boolean>
+  validator?: Validator
+  condition?: (object: T) => Promise<boolean>
 }
 
-export class Validator<T> {
+export class Validator<T = any> {
 
   options?: ValidatorOptions
-  entries: ValidatorEntry[] = []
-  
+  entries: ValidatorEntry<T>[] = []
+
   constructor(options?: ValidatorOptions) {
     this.options = options
   }
 
-  add(properties: string, constraint: Constraint, condition?: (object: T) => Promise<boolean>): void
-  add(properties: string, constraintName: string, validate: (value: any) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
+  add(property: string, constraint: Constraint<T>, condition?: (object: T) => Promise<boolean>): void
+  add(property: string, constraintName: string, validate: (value: any) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
   add(properties: string[], constraintName: string, validate: (object: T) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
   add(property: string, validator: Validator<any>, condition?: (object: T) => Promise<boolean>): void
   add(validator: Validator<any>): void
-  
+
   add(...args: any[]): void {
     if (args[0] instanceof Validator) {
       let validator = args[0]
@@ -56,9 +56,9 @@ export class Validator<T> {
         condition = args.length > 2 ? args[2] : undefined
       }
       else {
-        throw new Error('Wrong parameters')
+        throw new Error('Invalid parameters')
       }
-  
+
       this.entries.push({
         properties: properties,
         constraint: constraint,
@@ -150,7 +150,7 @@ export class Validator<T> {
               for (let misfit of subMisfits) {
                 misfit.addPrefix(`${property}[${i}].`)
               }
-      
+
               misfittingProperties.push(...entry.properties)
               misfits.push(...subMisfits)
             }
@@ -163,7 +163,7 @@ export class Validator<T> {
             for (let misfit of subMisfits) {
               misfit.addPrefix(property + '.')
             }
-    
+
             misfittingProperties.push(...entry.properties)
             misfits.push(...subMisfits)
           }
