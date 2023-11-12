@@ -123,7 +123,7 @@ export class Validator<T = any> {
             misfit.constraint = entry.constraint.name
           }
 
-          misfit.properties = entry.properties
+          misfit.properties = entry.properties.slice()
 
           misfittingProperties.push(...entry.properties)
           misfits.push(misfit)
