@@ -33,7 +33,14 @@ import { Validator } from 'knight-validation'
 class UserValidator extends Validator {
   constructor(userDb: UserDb) {
     super()
-    this.add(['firstName', 'lastName'], ...)
+    
+    this.add(['firstName', 'lastName'], 'Different', async (user: User) => {
+      if (user.firstName == user.lastName) {
+        // You do not need to set the constraint name nor the properties on the misfit.
+        // Those will be set automatically.
+        return new Misfit
+      }
+    })
   }
 }
 ```
@@ -44,6 +51,11 @@ class UserValidator extends Validator {
 // Check if a property is absent
 new Absent
 
+// Check if a number is greater and/or lesser than a given number
+new Bounds({ greaterThan: 0, lesserThan: 10 })
+// Check if a number is greater and/or lesser than or equal a given number
+new Bounds({ greaterThanEqual: 0, lesserThanqEqual: 10 })
+
 // Check a property's value equals one of the three given strings
 new Enum('Moni', 'Lisa', 'Anna')
 // Check if a property's value equals one of the three given numbers
@@ -53,6 +65,11 @@ new Exists(async (user: User) => {
   // The user object is the object which is currently validated
   // Return true if your exists condition is met
 })
+
+// Check if the length of a string has a minmum and/or maximum length
+new Length({ min: 5, max: 10})
+// Check if the length of a string has exactly a specific length
+new Length({ exact: 5 })
 
 // Check if a property is there
 new Required
@@ -85,19 +102,16 @@ misfits.length == 1
 A misfit contains the following informations by default.
 
 ```typescript
-// The name of the misfit which defaults to the name of the constraint which was not met
+// The name of the constraint that resulted in the misfit
 misfit.constraint == 'Required'
 
-// The property where the misfit occured
-misfit.property == 'email'
+// The involved properties
+misfit.property == [ 'email' ]
 
-// The properties where the misfit occured
-misfit.properties == ['firstName', 'lastName']
+// Contextual values specific to the misfit at hand (Optional)
+misfit.values
 
-// It contains any information that is useful about why checking the constraint resulted in a misfit (Optional)
-misfit.value
-
-// A message (Optional)
+// A misfit message (Optional)
 misift.message == 'The property email is required.'
 ```
 
@@ -129,39 +143,45 @@ class UserValidator extends Validator {
 }
 ```
 
-#### Exclude rules
-
-```typescript
-// Exclude all constraints regarding the email property
-let misfits = validator.validate(user, { exclude: ['email'] })
-
-// Exclude only the required constraint of the email property
-let misfits = validator.validate(user, { exclude: [{ properties: 'email', constraint: 'Required' }] })
-```
-
 ### Anonymous custom constraints
 
-You can add constraints on the fly without creating a class.
+You can create custom constraints on the fly without having to create a dedicated constraint class. 
 
 ```typescript
 let validator = new Validator
 
+// Second parameter is the name of the contstraint
+// Third parameter is the validation function which receives the value of the property
+validator.add('email', 'OnlyGermanMails', async (email: string) {
+  if (! email.endsWith('.de')) {
+
+    // You do not need to set the constraint name nor the property on the misfit.
+    // Those will be set automatically.
+    return new Misfit
+  }
+})
+
+// Second parameter is the name of the contstraint
+// Third parameter is the validation function which receives the complete object owning both properties
 validator.add(['firstName', 'lastName'], 'Different', async (user: User) => {
   if (user.firstName == user.lastName) {
     let misfit = new Misfit
 
-    // You can skip setting a name and the property(s) for the misfit. These will be set automatically.
+    // You do not need to set the constraint name nor the properties on the misfit.
+    // Those will be set automatically.
     
-    // We give it some information here on what went wrong. What you put in here depends on your needs.
-    misfit.constraints = {
+    // You can provide some contextual information
+    misfit.values = {
       firstName: user.firstName,
       lastName: user.lastName
     }
 
-    return misfits
+    return misfit
   }
 })
 ```
+
+In the case the misfit involves exactly one property, its corresponding validation function receives the value of that one property as a parameter. In the case the misfit involves more than one property, the corresponding validation function receives the whole object that is being validated, so that all of the involved properties can be accessed.
 
 ### Custom constraints as classes
 
@@ -170,39 +190,29 @@ If you want to reuse a constraint over and over again, create a new class for it
 ```typescript
 import { Constraint } from 'knight-validation'
 
-class YourConstraint extends Constraint {
+export interface DifferentMisfitValues {
+  firstName: string
+  lastName: string
+}
+
+export class Different extends Constraint<User, DifferentMisfitValues> {
 
   // Override the abstract method validate
-  async validate(obj: any, properties: string|string[]): Promise<Misfit|undefined> {
+  validate(user: User): Promise<Misfit<DifferentMisfitValues>|null> {
+  if (user.firstName == user.lastName) {
+    let misfit = new Misfit<DifferentMisfitValues>
 
-    // At first you want to check if the properties are absent because in case of absense you do not want to validate because a property may be optional.
-    if (this.arePropertyAbsent(obj, properties)) {
-      return
+    // You do not need to set the constraint name nor the properties on the misfit.
+    // Those will be set automatically.
+    
+    misfit.values = {
+      firstName: user.firstName,
+      lastName: user.lastName
     }
 
-    // Next you need to check if the properties were single or a nultiple ones. Maybe you just implement on of the two possibilities.
-    if (typeof properties == 'string') {
-      // In case of a single property
-    }
-    else {
-      // In case of multiple properties
-    }
+    return misfit
   }
 }
 ```
 
-Another possibility is to use the `defaultValidation` method. It will do the check for absence and will implement the validation of combined properties.
-
-```typescript
-import { Constraint } from 'knight-validation'
-
-class YourConstraint extends Constraint {
-  async validate(obj: any, properties: string|string[]): Promise<Misfit|undefined> {
-    return this.defaultValidation(obj, properties, async (value: any) => {
-      if (value == 1) {  // Validate the value here
-        return new Misfit
-      }
-    })
-  }
-}
-```
+You need to pay attention to the parameter of the validate method. In the case your constraint is assigned to a single property, that parameter will have the value of the mentioned property. In the case your constraint is assigned to an array of properties, that parameter will have the complete object as its value which ought to contain the mentioned properties.
