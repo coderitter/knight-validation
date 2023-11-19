@@ -432,6 +432,30 @@ describe('Validator', function() {
         expect(misfits.length).to.equal(1)
         expect(misfits[0].constraint).to.equal('Required')
         expect(misfits[0].properties).to.deep.equal(['a.nestedA'])
+
+        // Test a second time to make sure to catch bugs which appear only the second time
+        misfits = await validator.validate({ a: { nestedB: 1 }})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].constraint).to.equal('Required')
+        expect(misfits[0].properties).to.deep.equal(['a.nestedA'])
+      })
+
+      it('should validate a sub object', async function() {
+        let nestedValidator = new Validator
+        nestedValidator.add('nestedA', new Required)
+        nestedValidator.add('nestedB', new TypeOf('number'))
+
+        let validator = new Validator
+        validator.add('a', nestedValidator)
+  
+        let misfits = await validator.validate({ a: { nestedB: 1 }})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].constraint).to.equal('Required')
+        expect(misfits[0].properties).to.deep.equal(['a.nestedA'])
       })
 
       it('should validate a sub array', async function() {
