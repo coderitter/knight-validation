@@ -1,3 +1,4 @@
+export * from './lib/Constraint'
 export * from './lib/constraints/Absent'
 export * from './lib/constraints/Bounds'
 export * from './lib/constraints/Enum'
