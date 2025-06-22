@@ -1,7 +1,7 @@
-import { Constraint } from '../Constraint'
+import { Constraint, ConstraintMisfitValues } from '../Constraint'
 import { Misfit } from '../Misfit'
 
-export interface TypeOfMisfitValues {
+export interface TypeOfMisfitValues extends ConstraintMisfitValues {
   types: (string|null)[]
   actual: string|null
 }

@@ -1,7 +1,7 @@
-import { Constraint } from '../Constraint'
+import { Constraint, ConstraintMisfitValues } from '../Constraint'
 import { Misfit } from '../Misfit'
 
-export interface LengthMisfitValues {
+export interface LengthMisfitValues extends ConstraintMisfitValues {
   actual: any
   min?: number
   max?: number

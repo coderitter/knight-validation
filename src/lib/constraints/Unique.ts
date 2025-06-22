@@ -1,7 +1,7 @@
-import { Constraint } from '../Constraint'
+import { Constraint, ConstraintMisfitValues } from '../Constraint'
 import { Misfit } from '../Misfit'
 
-export interface UniqueMisfitValues {
+export interface UniqueMisfitValues extends ConstraintMisfitValues {
   notUniqueValue: any
 }
 

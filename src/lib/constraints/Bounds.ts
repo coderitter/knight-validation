@@ -1,7 +1,7 @@
-import { Constraint } from '../Constraint'
+import { Constraint, ConstraintMisfitValues } from '../Constraint'
 import { Misfit } from '../Misfit'
 
-export interface BoundsMisfitValues {
+export interface BoundsMisfitValues extends ConstraintMisfitValues {
   actual: any
   greaterThan?: number
   greaterThanEqual?: number

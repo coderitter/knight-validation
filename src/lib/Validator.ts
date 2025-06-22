@@ -26,7 +26,7 @@ export class Validator<T = any> {
   add(property: string, constraint: Constraint<T>, condition?: (object: T) => Promise<boolean>): void
   add(property: string, constraintName: string, validate: (value: any) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
   add(properties: string[], constraint: Constraint<T>, condition?: (object: T) => Promise<boolean>): void
-  add(properties: string[], constraintName: string, validate: (object: T) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
+  add(properties: string[], constraintName: string, validate: (object: T, properties: string[]) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
   add(property: string, validator: Validator<any>, condition?: (object: T) => Promise<boolean>): void
   add(validator: Validator<any>): void
 
@@ -45,7 +45,13 @@ export class Validator<T = any> {
       let condition
 
       if (typeof args[1] == 'string') {
-        constraint = new QuickConstraint(args[1], <any> args[2])
+        if (typeof args[0] == 'string') {
+          constraint = new QuickConstraint(args[1], <any> args[2], undefined)
+        }
+        else {
+          constraint = new QuickConstraint(args[1], undefined, <any> args[2])
+        }
+        
         condition = args.length > 3 ? args[3] : undefined
       }
       else if (args[1] instanceof Constraint) {
@@ -116,7 +122,7 @@ export class Validator<T = any> {
           misfit = await entry.constraint.validate(value)
         }
         else {
-          misfit = await entry.constraint.validate(object)
+          misfit = await entry.constraint.validateMultipleProperties(object, entry.properties)
         }
 
         if (misfit) {
