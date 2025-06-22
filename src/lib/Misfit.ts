@@ -25,7 +25,7 @@ export class Misfit<ValuesType = any> {
     }
   }
 
-  isSinglePropery(): boolean {
+  isSingleProperty(): boolean {
     return this.properties && this.properties.length == 1
   }
 
