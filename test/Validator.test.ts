@@ -32,6 +32,20 @@ describe('Validator', function() {
       expect(entry.condition).to.be.undefined
     })
 
+    it('should accept multiple properties and a constraint', function() {
+      let validator = new Validator
+      validator.add(['testField1', 'testField2'], new Required)
+
+      expect(validator.entries.length).to.equal(1)
+
+      let entry = validator.entries[0]
+
+      expect(entry.properties).to.deep.equal(['testField1', 'testField2'])
+      expect(entry.constraint).to.be.instanceOf(Required)
+      expect(entry.validator).to.be.undefined
+      expect(entry.condition).to.be.undefined
+    })
+
     it('should accept multiple properties, a constraint name and a validate function', function() {
       let validator = new Validator
       validator.add(['testField1', 'testField2'], 'TestConstraint', async () => null)
