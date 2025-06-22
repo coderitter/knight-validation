@@ -1,5 +1,5 @@
-import { Constraint } from './Constraint'
-import { Misfit } from './Misfit'
+import { Constraint } from '../Constraint'
+import { Misfit } from '../Misfit'
 
 export class QuickConstraint<T> extends Constraint<T, any> {
 

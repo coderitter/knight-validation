@@ -1,7 +1,7 @@
 import { Constraint } from './Constraint'
 import { DotNotification } from './DotNotification'
 import { Misfit } from './Misfit'
-import { QuickConstraint } from './QuickConstraint'
+import { QuickConstraint } from './constraints/QuickConstraint'
 
 export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean

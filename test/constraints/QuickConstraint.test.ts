@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import 'mocha'
-import { Misfit, QuickConstraint } from '../src'
+import { Misfit, QuickConstraint } from '../../src'
 
 describe('QuickConstraint', function() {
   describe('validate', function() {
