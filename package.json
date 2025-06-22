@@ -22,14 +22,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/c0deritter/knight-validation.git"
+    "url": "git+https://github.com/coderitter/knight-validation.git"
   },
   "keywords": [
     ""
   ],
   "author": "Coderitter GmbH",
   "bugs": {
-    "url": "https://github.com/c0deritter/knight-validation/issues"
+    "url": "https://github.com/coderitter/knight-validation/issues"
   },
-  "homepage": "https://github.com/c0deritter/knight-validation#readme"
+  "homepage": "https://github.com/coderitter/knight-validation#readme"
 }
