@@ -8,14 +8,16 @@ export interface ConstraintMisfitValues {
   misfits?: Misfit[]
 }
 
-export abstract class Constraint<T = any, MisfitValuesType extends ConstraintMisfitValues = ConstraintMisfitValues> {
+export abstract class Constraint<T = any, MisfitValuesType = ConstraintMisfitValues> {
   
   name: string = this.constructor.name
   minFits?: number
   maxFits?: number
   exactFits?: number
   
-  abstract validate(value: T): Promise<Misfit<MisfitValuesType>|null>
+  async validate(value: T): Promise<Misfit<MisfitValuesType>|null> {
+    return null
+  }
   
   async validateMultipleProperties(object: any, properties: string[]): Promise<Misfit<MisfitValuesType>|null> {
     let misfits: Misfit[] = []
