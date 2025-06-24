@@ -1,5 +1,5 @@
 import { Constraint } from './Constraint'
-import { DotNotification } from './DotNotification'
+import { DotNotation } from './DotNotation'
 import { Misfit } from './Misfit'
 import { QuickConstraint } from './constraints/QuickConstraint'
 
@@ -100,7 +100,7 @@ export class Validator<T = any> {
 
       let atLeastOnePropertyExists = false
       for (let property of entry.properties) {
-        let dotNotification = new DotNotification(property)
+        let dotNotification = new DotNotation(property)
 
         if (dotNotification.exists(object)) {
           atLeastOnePropertyExists = true
@@ -117,7 +117,7 @@ export class Validator<T = any> {
 
         if (entry.properties.length == 1) {
           let property = entry.properties[0]
-          let dotNotification = new DotNotification(property)
+          let dotNotification = new DotNotation(property)
           let value = dotNotification.get(object)
           misfit = await entry.constraint.validate(value)
         }
@@ -142,7 +142,7 @@ export class Validator<T = any> {
         }
 
         let property = entry.properties[0]
-        let dotNotification = new DotNotification(property)
+        let dotNotification = new DotNotation(property)
         let value = dotNotification.get(object)
 
         if (value === undefined) {

@@ -1,4 +1,4 @@
-export class DotNotification {
+export class DotNotation {
     properties: string[]
 
     constructor(dotNotification: string) {

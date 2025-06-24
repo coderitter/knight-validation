@@ -1,4 +1,4 @@
-import { DotNotification } from './DotNotification'
+import { DotNotation } from './DotNotation'
 import { Misfit } from './Misfit'
 
 export interface ConstraintMisfitValues {
@@ -23,7 +23,7 @@ export abstract class Constraint<T = any, MisfitValuesType = ConstraintMisfitVal
     let misfits: Misfit[] = []
 
     for (let property of properties) {
-      let dotNotification = new DotNotification(property)
+      let dotNotification = new DotNotation(property)
       let value = dotNotification.get(object)
       let misfit = await this.validate(value)
 
