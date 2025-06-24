@@ -8,6 +8,8 @@
 
 ### Constraints for single properties
 
+Add constraints to single properties.
+
 ```typescript
 import { Required, TypeOf, Unique, Validator } from 'knight-validation'
 
@@ -27,20 +29,39 @@ class UserValidator extends Validator {
 
 ### Constraints for multiple properties
 
+You can also use any constraint on multiple properties at once.
+
 ```typescript
-import { Validator } from 'knight-validation'
+import { Required, Validator } from 'knight-validation'
 
 class UserValidator extends Validator {
-  constructor(userDb: UserDb) {
+  constructor() {
     super()
-    
-    this.add(['firstName', 'lastName'], 'Different', async (user: User) => {
-      if (user.firstName == user.lastName) {
-        // You do not need to set the constraint name nor the properties on the misfit.
-        // Those will be set automatically.
-        return new Misfit
-      }
-    })
+
+    this.add(['fistName', 'lastName', 'email'], new Required)
+  }
+}
+```
+
+The given constraint is being applied to every given property. If one property is not fitting the constraint, the whole constraint will be regarded as not fulfilled.
+
+Every constraint offers a set of parameters with which you can fine tune its behavior.
+
+```typescript
+import { Required, Validator } from 'knight-validation'
+
+class UserValidator extends Validator {
+  constructor() {
+    super()
+
+    // Exactly one property is required
+    this.add(['fistName', 'lastName', 'email'], new Required({ exactFits: 1 }))
+
+    // At least two properties are required
+    this.add(['fistName', 'lastName', 'email'], new Required({ minFits: 2 }))
+
+    // At most two properties are required
+    this.add(['fistName', 'lastName', 'email'], new Required({ maxFits: 2 }))
   }
 }
 ```
@@ -54,7 +75,7 @@ new Absent
 // Check if a number is greater and/or lesser than a given number
 new Bounds({ greaterThan: 0, lesserThan: 10 })
 // Check if a number is greater and/or lesser than or equal a given number
-new Bounds({ greaterThanEqual: 0, lesserThanqEqual: 10 })
+new Bounds({ greaterThanEqual: 0, lesserThanEqual: 10 })
 
 // Check a property's value equals one of the three given strings
 new Enum('Moni', 'Lisa', 'Anna')
@@ -66,16 +87,16 @@ new Exists(async (user: User) => {
   // Return true if your exists condition is met
 })
 
-// Check if the length of a string has a minmum and/or maximum length
+// Check if the length of a string or array has a minmum and/or maximum length
 new Length({ min: 5, max: 10})
-// Check if the length of a string has exactly a specific length
+// Check if the length of a string or array has exactly a specific length
 new Length({ exact: 5 })
 
-// Check if a property is there
+// Check that a property is not undefined
 new Required
 
-// Check if a property's value is of the given JavaScript type
-new TypeOf('number')
+// Check if a property's value is one of the given JavaScript type
+new TypeOf('number', null)
 // Check if a property's value is an instance if the given class
 new TypeOf(Date)
 
@@ -99,7 +120,7 @@ let misfits = validator.validate(user)
 misfits.length == 1
 ```
 
-A misfit contains the following informations by default.
+A misfit contains the following information.
 
 ```typescript
 // The name of the constraint that resulted in the misfit
@@ -115,9 +136,24 @@ misfit.values
 misift.message == 'The property email is required.'
 ```
 
+The optional `message` needs to be provided by your application, it is not part of this package.
+
+Every misfit has a `values` property which holds an object containing contextual information specific to the constraint that created the misfit. Every misfit that is provided in this package, extends the interface `ConstraintMisfitValues` to define the appearance of the `values` object. 
+
+```typescript
+interface ConstraintMisfitValues {
+  minFits?: number
+  maxFits?: number
+  exactFits?: number
+  misfits?: Misfit[]
+}
+```
+
+Its properties come into play if the misfit was applied to multiple properties. The `misfits` property references an array of misfits that were found when the constraint was checked on each property individually.
+
 #### Check only what is there
 
-You can validate only what is there. This means any constraint becomes optional.
+You can validate only what is there. This means, every constraint is only applied when the value of a property is not `undefined`. This is useful if you want to work with partial objects for updating purposes.
 
 ```typescript
 let user = new User
@@ -129,6 +165,8 @@ misfits.length == 0 // There are no misfits even though the email property is re
 ```
 
 ### Constraints that are only checked if a condition is met
+
+You can provide a condition which is evaluated before the constraint is being checked. If the condition is not met, the constraint will not be checked.
 
 ```typescript
 import { Required, Validator } from 'knight-validation'
@@ -181,15 +219,47 @@ validator.add(['firstName', 'lastName'], 'Different', async (user: User) => {
 })
 ```
 
-In the case the misfit involves exactly one property, its corresponding validation function receives the value of that one property as a parameter. In the case the misfit involves more than one property, the corresponding validation function receives the whole object that is being validated, so that all of the involved properties can be accessed.
+In the case the misfit involves exactly one property, its corresponding validation function receives the value of that one property as a parameter. In the case the misfit involves more than one property, the corresponding validation function receives the whole object that is being validated plus the properties that are to be involved in the check. That way, the individual properties can be accessed and involved in the check.
 
 ### Custom constraints as classes
 
 If you want to reuse a constraint over and over again, create a new class for it.
 
 ```typescript
+import { Constraint, ConstraintMisfitValues } from 'knight-validation'
+
+// You need to extend from the default ConstraintMisfitValues since it provides 
+// the properties being used when the constraint is being applied to multiple properties
+export interface OnlyGermanMailsMisfitValues extends ConstraintMisfitValues {
+  actualTld?: string
+}
+
+export class OnlyGermanMailsConstraint extends Constraint<string, OnlyGermanMailsMisfitValues> {
+
+validate(email: string): Promise<Misfit<OnlyGermanMailsMisfitValues>|null> {
+    if (! email.endsWith('.de')) {
+      let misfit = new Misfit<OnlyGermanMailsMisfitValues>
+      
+      misfit.values = {
+        actualTld: email.split('.').slice(-1)[0]
+      }
+
+      // You do not need to set the constraint name nor the property on the misfit.
+      // Those will be set automatically.
+
+      return new Misfit
+    }
+  }
+}
+```
+
+If you want to define specific behavior for the case that the constraint is being used to validate multiple properties instead of only one, then overwrite the method `validateMultipleProperties`.
+
+```typescript
 import { Constraint } from 'knight-validation'
 
+// You do not need to extend the default ConstraintMisfitValues since we are overriding the 
+// method that defines the behavior when the misfit is being used on multiple properties
 export interface DifferentMisfitValues {
   firstName: string
   lastName: string
@@ -197,22 +267,21 @@ export interface DifferentMisfitValues {
 
 export class Different extends Constraint<User, DifferentMisfitValues> {
 
-  // Override the abstract method validate
-  validate(user: User): Promise<Misfit<DifferentMisfitValues>|null> {
+  validateMultipleProperties(object: any, properties: string[]): Promise<Misfit<DifferentMisfitValues>|null> {
   if (user.firstName == user.lastName) {
     let misfit = new Misfit<DifferentMisfitValues>
 
-    // You do not need to set the constraint name nor the properties on the misfit.
-    // Those will be set automatically.
-    
     misfit.values = {
       firstName: user.firstName,
       lastName: user.lastName
     }
 
+    // You do not need to set the constraint name nor the properties on the misfit.
+    // Those will be set automatically.
+    
     return misfit
   }
 }
 ```
 
-You need to pay attention to the parameter of the validate method. In the case your constraint is assigned to a single property, that parameter will have the value of the mentioned property. In the case your constraint is assigned to an array of properties, that parameter will have the complete object as its value which ought to contain the mentioned properties.
+In the `Constraint` super class, the method `validateMultipleProperties` is being implemented with a useful default behavior. It iterates through every property and uses the `validate` method to check each property individually, while also offering the parameters `exactFits`, `minFits` and `maxFits` to adjust its behavior.
