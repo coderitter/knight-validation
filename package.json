@@ -7,15 +7,6 @@
   "files": [
     "lib/**/*"
   ],
-  "devDependencies": {
-    "@types/chai": "^4.3.3",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "^13.5.0",
-    "chai": "^4.3.6",
-    "mocha": "^10.0.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.8.2"
-  },
   "scripts": {
     "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
     "build": "rm -rf lib && tsc"
@@ -31,5 +22,14 @@
   "bugs": {
     "url": "https://github.com/coderitter/knight-validation/issues"
   },
-  "homepage": "https://github.com/coderitter/knight-validation#readme"
+  "homepage": "https://github.com/coderitter/knight-validation#readme",
+  "devDependencies": {
+    "@types/chai": "^5.2.2",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.0.4",
+    "chai": "^5.2.0",
+    "mocha": "^11.7.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
 }
