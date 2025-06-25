@@ -1,5 +1,5 @@
+import { Misfit } from 'knight-misfit'
 import { DotNotation } from './DotNotation'
-import { Misfit } from './Misfit'
 
 export interface ConstraintMisfitValues {
   minFits?: number
@@ -36,7 +36,7 @@ export abstract class Constraint<T = any, MisfitValuesType = ConstraintMisfitVal
 
     if (this.exactFits != undefined) {
       if (fits != this.exactFits) {
-        return new Misfit<MisfitValuesType>(this.name + 'ExactFits', {
+        return new Misfit<MisfitValuesType>(this.name + 'ExactFits', undefined, {
           atLeastFits: this.minFits,
           atMostFits: this.maxFits,
           exactFits: this.exactFits,
@@ -47,7 +47,7 @@ export abstract class Constraint<T = any, MisfitValuesType = ConstraintMisfitVal
 
     else if (this.minFits != undefined && this.maxFits != undefined) {
       if (fits < this.minFits || fits > this.maxFits) {
-        return new Misfit<MisfitValuesType>(this.name + 'MinAndMaxFits', {
+        return new Misfit<MisfitValuesType>(this.name + 'MinAndMaxFits', undefined, {
           atLeastFits: this.minFits,
           atMostFits: this.maxFits,
           exactFits: this.exactFits,
@@ -58,7 +58,7 @@ export abstract class Constraint<T = any, MisfitValuesType = ConstraintMisfitVal
 
     else if (this.minFits != undefined) {
       if (fits < this.minFits) {
-        return new Misfit<MisfitValuesType>(this.name + 'MinFits', {
+        return new Misfit<MisfitValuesType>(this.name + 'MinFits', undefined, {
           atLeastFits: this.minFits,
           atMostFits: this.maxFits,
           exactFits: this.exactFits,
@@ -69,7 +69,7 @@ export abstract class Constraint<T = any, MisfitValuesType = ConstraintMisfitVal
 
     else if (this.maxFits != undefined) {
       if (fits > this.maxFits) {
-        return new Misfit<MisfitValuesType>(this.name + 'MaxFits', {
+        return new Misfit<MisfitValuesType>(this.name + 'MaxFits', undefined, {
           atLeastFits: this.minFits,
           atMostFits: this.maxFits,
           exactFits: this.exactFits,
@@ -79,7 +79,7 @@ export abstract class Constraint<T = any, MisfitValuesType = ConstraintMisfitVal
     }
 
     else if (misfits.length > 0) {
-      return new Misfit<MisfitValuesType>(this.name, {
+      return new Misfit<MisfitValuesType>(this.name, undefined, {
           atLeastFits: this.minFits,
           atMostFits: this.maxFits,
           exactFits: this.exactFits,

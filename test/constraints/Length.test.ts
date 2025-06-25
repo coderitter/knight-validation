@@ -1,6 +1,7 @@
 import { expect } from 'chai'
+import { Misfit } from 'knight-misfit'
 import 'mocha'
-import { Length, Misfit } from '../../src'
+import { Length } from '../../src'
 
 describe('constraints', function() {
   describe('Max', function() {

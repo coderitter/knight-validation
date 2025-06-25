@@ -1,5 +1,5 @@
+import { Misfit } from 'knight-misfit'
 import { Constraint, ConstraintMisfitValues } from '../Constraint'
-import { Misfit } from '../Misfit'
 
 export class Required extends Constraint {
   async validate(value: any): Promise<Misfit<ConstraintMisfitValues>|null> {

@@ -1,6 +1,7 @@
 import { expect } from 'chai'
+import { Misfit } from 'knight-misfit'
 import 'mocha'
-import { Exists, Misfit } from '../../src'
+import { Exists } from '../../src'
 
 describe('constraints', function() {
   describe('Exists', function() {

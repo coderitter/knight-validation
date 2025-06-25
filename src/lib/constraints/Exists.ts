@@ -1,5 +1,5 @@
+import { Misfit } from 'knight-misfit'
 import { Constraint, ConstraintMisfitValues } from '../Constraint'
-import { Misfit } from '../Misfit'
 
 export interface ExistsMisfitValues extends ConstraintMisfitValues {
   notExistingValue: any
@@ -17,7 +17,7 @@ export class Exists<T> extends Constraint<T, ExistsMisfitValues> {
   async validate(value: T): Promise<Misfit<ExistsMisfitValues>|null> {
     if (value !== undefined) {
       if (! await this.doesExist(value)) {
-        return new Misfit(this.name, {
+        return new Misfit(this.name, undefined, {
           notExistingValue: value
         })
       }  

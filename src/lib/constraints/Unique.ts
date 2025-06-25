@@ -1,5 +1,5 @@
+import { Misfit } from 'knight-misfit'
 import { Constraint, ConstraintMisfitValues } from '../Constraint'
-import { Misfit } from '../Misfit'
 
 export interface UniqueMisfitValues extends ConstraintMisfitValues {
   notUniqueValue: any
@@ -20,7 +20,7 @@ export class Unique<T> extends Constraint<T, UniqueMisfitValues> {
     }
 
     if (! await this.isUnique(value)) {
-      return new Misfit(this.name, { notUniqueValue: value })
+      return new Misfit(this.name, undefined, { notUniqueValue: value })
     }
 
     return null

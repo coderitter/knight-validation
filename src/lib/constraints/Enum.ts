@@ -1,5 +1,5 @@
+import { Misfit } from 'knight-misfit'
 import { Constraint, ConstraintMisfitValues } from '../Constraint'
-import { Misfit } from '../Misfit'
 
 export interface EnumMisfitValues extends ConstraintMisfitValues {
   actual: any
@@ -42,7 +42,7 @@ export class Enum extends Constraint<any, EnumMisfitValues> {
     }
 
     if (this.values.indexOf(value) == -1) {
-      return new Misfit<EnumMisfitValues>(this.name, {
+      return new Misfit<EnumMisfitValues>(this.name, undefined, {
         actual: value,
         values: this.values
       })

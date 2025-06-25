@@ -1,6 +1,7 @@
 import { expect } from 'chai'
+import { Misfit } from 'knight-misfit'
 import 'mocha'
-import { Misfit, Unique } from '../../src'
+import { Unique } from '../../src'
 
 describe('constraints', function() {
   describe('Unqiue', function() {

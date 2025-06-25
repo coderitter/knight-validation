@@ -1,5 +1,5 @@
+import { Misfit } from 'knight-misfit'
 import { Constraint, ConstraintMisfitValues } from '../Constraint'
-import { Misfit } from '../Misfit'
 
 export interface TypeOfMisfitValues extends ConstraintMisfitValues {
   types: (string|null)[]
@@ -48,21 +48,20 @@ export class TypeOf extends Constraint<any, TypeOfMisfitValues> {
       actualType = typeof value
     }
 
-    let misfit = new Misfit<TypeOfMisfitValues>(this.name)
-    misfit.values = {
+    let misfit = new Misfit<TypeOfMisfitValues>(this.name, undefined, {
       actual: actualType,
       types: []
-    }
+    })
 
     for (let valueType of this.valueTypes) {
       if (typeof valueType == 'string') {
-        misfit.values.types.push(valueType)
+        misfit.values!.types.push(valueType)
       }
       else if (valueType === null) {
-        misfit.values.types.push(null)
+        misfit.values!.types.push(null)
       }
       else {
-        misfit.values.types.push(valueType.name)
+        misfit.values!.types.push(valueType.name)
       }
     }
 

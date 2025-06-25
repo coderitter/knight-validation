@@ -1,6 +1,7 @@
 import { expect } from 'chai'
+import { Misfit } from 'knight-misfit'
 import 'mocha'
-import { Bounds, Misfit } from '../../src'
+import { Bounds } from '../../src'
 
 describe('constraints', function() {
   describe('Bounds', function() {

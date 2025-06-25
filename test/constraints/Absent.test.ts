@@ -1,6 +1,7 @@
 import { expect } from 'chai'
+import { Misfit } from 'knight-misfit'
 import 'mocha'
-import { Absent, Misfit } from '../../src'
+import { Absent } from '../../src'
 
 describe('constraints', function() {
   describe('Absent', function() {

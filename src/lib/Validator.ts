@@ -1,6 +1,6 @@
+import { Misfit } from 'knight-misfit'
 import { Constraint } from './Constraint'
 import { DotNotation } from './DotNotation'
-import { Misfit } from './Misfit'
 import { QuickConstraint } from './constraints/QuickConstraint'
 
 export interface ValidatorOptions {

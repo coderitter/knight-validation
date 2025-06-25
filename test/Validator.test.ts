@@ -1,6 +1,7 @@
 import { expect } from 'chai'
+import { Misfit } from 'knight-misfit'
 import 'mocha'
-import { Absent, Exists, Misfit, QuickConstraint, Required, TypeOf, Unique, Validator } from '../src'
+import { Absent, QuickConstraint, Required, TypeOf, Validator } from '../src'
 
 describe('Validator', function() {
   describe('add', function() {

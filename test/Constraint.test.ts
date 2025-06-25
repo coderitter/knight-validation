@@ -1,6 +1,7 @@
 import { expect } from 'chai'
+import { Misfit } from 'knight-misfit'
 import 'mocha'
-import { Constraint, ConstraintMisfitValues, Misfit } from '../src'
+import { Constraint, ConstraintMisfitValues } from '../src'
 
 interface TestConstraintMisfitValues extends ConstraintMisfitValues {
   value: number
@@ -13,7 +14,7 @@ class TestConstraint extends Constraint<number, TestConstraintMisfitValues> {
   }
 
   async validate(value: number): Promise<Misfit<TestConstraintMisfitValues> | null> {
-    return value % 2 ? null : new Misfit('TestConstraint', { value: value })
+    return value % 2 ? null : new Misfit('TestConstraint', undefined, { value: value })
   }
 }
 

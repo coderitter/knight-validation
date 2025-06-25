@@ -1,5 +1,5 @@
+import { Misfit } from 'knight-misfit'
 import { Constraint, ConstraintMisfitValues } from '../Constraint'
-import { Misfit } from '../Misfit'
 
 export interface BoundsMisfitValues extends ConstraintMisfitValues {
   actual: any
@@ -46,7 +46,7 @@ export class Bounds extends Constraint<any, BoundsMisfitValues> {
   }
 
   private _createMisfit(actual: any): Misfit<BoundsMisfitValues> {
-    return new Misfit<BoundsMisfitValues>(this.name, {
+    return new Misfit<BoundsMisfitValues>(this.name, undefined, {
       actual: actual,
       greaterThan: this.greaterThan,
       greaterThanEqual: this.greaterThanEqual,

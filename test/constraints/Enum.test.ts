@@ -1,6 +1,7 @@
 import { expect } from 'chai'
+import { Misfit } from 'knight-misfit'
 import 'mocha'
-import { Enum, Misfit } from '../../src'
+import { Enum } from '../../src'
 
 describe('constraints', function() {
   describe('Enum', function() {
