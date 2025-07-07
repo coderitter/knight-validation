@@ -10,28 +10,42 @@ export class Enum extends Constraint<any, EnumMisfitValues> {
 
   values: any[] = []
 
-  constructor(values: any[])
+  constructor(values: any[], constraints?: Partial<Constraint>)
   constructor(...values: any[])
-  constructor(values: object)
+  constructor(values: object, constraints?: Partial<Constraint>)
 
-  constructor(...values: any) {
+  constructor(...args: any[]) {
     super()
 
-    for (let value of values) {
-      if (value instanceof Array) {
-        this.values.push(...value)
+    for (let i = 0; i < args.length; i++) {
+      let arg = args[i]
+
+      if (i == 0) {
+        if (Array.isArray(arg)) {
+          this.values.push(...arg)
+        }
+
+        else if (typeof arg == 'object') {
+          for (let key in arg) {
+            if (isNaN(parseInt(key, 10))) {
+              this.values.push(arg[key])
+            }
+          }
+        }
+
+        else {
+          this.values.push(arg)
+        }
       }
 
-      else if (typeof value == 'object') {
-        for (let key in value) {
-          if (isNaN(parseInt(key, 10))) {
-            this.values.push(value[key])
-          }
-        }  
+      else if (i == args.length - 1) {
+        if (typeof arg == 'object') {
+          Object.assign(this, arg)
+        }
       }
 
       else {
-        this.values.push(value)
+        this.values.push(arg)
       }
     }
   }

@@ -7,28 +7,43 @@ describe('constraints', function () {
   describe('Enum', function () {
     describe('constructor', function () {
       it('should accept an array of values', function () {
-        let e = new Enum(['a', 'b'])
+        let e = new Enum(['a', 'b'], { minFits: 1, maxFits: 2, exactFits: 3 })
         expect(e.values).to.deep.equal(['a', 'b'])
+        expect(e.minFits).to.equal(1)
+        expect(e.maxFits).to.equal(2)
+        expect(e.exactFits).to.equal(3)
       })
 
       it('should accept the values individually', function () {
-        let e = new Enum('a', 'b')
+        let e = new Enum('a', 'b', { minFits: 1, maxFits: 2, exactFits: 3 })
         expect(e.values).to.deep.equal(['a', 'b'])
+        expect(e.minFits).to.equal(1)
+        expect(e.maxFits).to.equal(2)
+        expect(e.exactFits).to.equal(3)
       })
 
       it('should accept the values of an TypeScript enum using string values', function () {
-        let e = new Enum(StringEnum)
+        let e = new Enum(StringEnum, { minFits: 1, maxFits: 2, exactFits: 3 })
         expect(e.values).to.deep.equal(['A', 'B'])
+        expect(e.minFits).to.equal(1)
+        expect(e.maxFits).to.equal(2)
+        expect(e.exactFits).to.equal(3)
       })
 
       it('should accept the values of an TypeScript enum using number values', function () {
-        let e = new Enum(NumberEnum)
+        let e = new Enum(NumberEnum, { minFits: 1, maxFits: 2, exactFits: 3 })
         expect(e.values).to.deep.equal([1, 2])
+        expect(e.minFits).to.equal(1)
+        expect(e.maxFits).to.equal(2)
+        expect(e.exactFits).to.equal(3)
       })
 
       it('should accept the values of an TypeScript enum using mixed values', function () {
-        let e = new Enum(MixedEnum)
+        let e = new Enum(MixedEnum, { minFits: 1, maxFits: 2, exactFits: 3 })
         expect(e.values).to.deep.equal(['A', 2])
+        expect(e.minFits).to.equal(1)
+        expect(e.maxFits).to.equal(2)
+        expect(e.exactFits).to.equal(3)
       })
     })
 

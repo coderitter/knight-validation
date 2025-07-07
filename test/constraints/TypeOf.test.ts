@@ -5,6 +5,16 @@ import { TypeOf, TypeOfMisfitValues } from '../../src'
 
 describe('constraints', function () {
   describe('TypeOf', function () {
+    describe('constructor', function() {
+      it('should set all possible constraints', function() {
+        let typeOf = new TypeOf('string', TypeOf, null, { minFits: 1, maxFits: 2, exactFits: 3 })
+        expect(typeOf.types).to.deep.equal(['string', TypeOf, null])
+        expect(typeOf.minFits).to.equal(1)
+        expect(typeOf.maxFits).to.equal(2)
+        expect(typeOf.exactFits).to.equal(3)
+      })
+    })
+
     describe('validate', function () {
       it('should return undefined if correct type', async function () {
         let typeOf = new TypeOf('number')

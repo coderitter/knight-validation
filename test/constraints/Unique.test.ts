@@ -5,6 +5,15 @@ import { Unique } from '../../src'
 
 describe('constraints', function () {
   describe('Unqiue', function () {
+    describe('constructor', function() {
+      it('should set all possible constraints', function() {
+        let unique = new Unique(async () => true, { minFits: 1, maxFits: 2, exactFits: 3 })
+        expect(unique.minFits).to.equal(1)
+        expect(unique.maxFits).to.equal(2)
+        expect(unique.exactFits).to.equal(3)
+      })
+    })
+
     describe('validate', function () {
       it('should return undefined if unique', async function () {
         let unique = new Unique(async (value: any) => value === 1)

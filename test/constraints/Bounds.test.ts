@@ -5,6 +5,27 @@ import { Bounds } from '../../src'
 
 describe('constraints', function () {
   describe('Bounds', function () {
+    describe('constructor', function() {
+      it('should set all possible constraints', function() {
+        let bounds = new Bounds({ 
+          greaterThan: 1,
+          greaterThanEqual: 2,
+          lesserThan: 3,
+          lesserThanEqual: 4,
+          minFits: 5,
+          maxFits: 6, 
+          exactFits: 7 
+        })
+        expect(bounds.greaterThan).to.equal(1)
+        expect(bounds.greaterThanEqual).to.equal(2)
+        expect(bounds.lesserThan).to.equal(3)
+        expect(bounds.lesserThanEqual).to.equal(4)
+        expect(bounds.minFits).to.equal(5)
+        expect(bounds.maxFits).to.equal(6)
+        expect(bounds.exactFits).to.equal(7)
+      })
+    })
+
     describe('validate', function () {
       it('should return a misfit if a number is not greater than', async function () {
         let max = new Bounds({ greaterThan: 5 })

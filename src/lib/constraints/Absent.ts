@@ -6,6 +6,12 @@ export interface AbsentMisfitValues extends ConstraintMisfitValues {
 }
 
 export class Absent extends Constraint<any, AbsentMisfitValues> {
+
+  constructor(constraints?: Partial<Absent>) {
+    super()
+    Object.assign(this, constraints)
+  }
+
   async validate(value: any): Promise<Misfit<AbsentMisfitValues>|null> {
     return value !== undefined ? new Misfit(this.name, undefined, { actual: value }) : null
   }

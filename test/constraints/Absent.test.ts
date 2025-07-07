@@ -5,6 +5,15 @@ import { Absent } from '../../src'
 
 describe('constraints', function () {
   describe('Absent', function () {
+    describe('constructor', function() {
+      it('should set all possible constraints', function() {
+        let absent = new Absent({ minFits: 1, maxFits: 2, exactFits: 3 })
+        expect(absent.minFits).to.equal(1)
+        expect(absent.maxFits).to.equal(2)
+        expect(absent.exactFits).to.equal(3)
+      })
+    })
+
     describe('validate', function () {
       it('should not return a misfit on undefined', async function () {
         let absent = new Absent

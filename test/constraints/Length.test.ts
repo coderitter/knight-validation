@@ -4,7 +4,26 @@ import 'mocha'
 import { Length } from '../../src'
 
 describe('constraints', function () {
-  describe('Max', function () {
+  describe('Length', function () {
+    describe('constructor', function() {
+      it('should set all possible constraints', function() {
+        let length = new Length({ 
+          min: 1,
+          max: 2,
+          exact: 3,
+          minFits: 4,
+          maxFits: 5, 
+          exactFits: 6 
+        })
+        expect(length.min).to.equal(1)
+        expect(length.max).to.equal(2)
+        expect(length.exact).to.equal(3)
+        expect(length.minFits).to.equal(4)
+        expect(length.maxFits).to.equal(5)
+        expect(length.exactFits).to.equal(6)
+      })
+    })
+
     describe('validate', function () {
       it('should return a misfit if the length of a string is below the minimum', async function () {
         let max = new Length({ min: 5 })

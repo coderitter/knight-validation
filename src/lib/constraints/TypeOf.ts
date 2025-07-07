@@ -8,11 +8,24 @@ export interface TypeOfMisfitValues extends ConstraintMisfitValues {
 
 export class TypeOf extends Constraint<any, TypeOfMisfitValues> {
 
-  valueTypes: (string|null|(new (...params: any[]) => any))[]
+  types: (string|null|(new (...params: any[]) => any))[] = []
 
-  constructor(...valueTypes: (string|null|(new (...params: any[]) => any))[]) {
+  constructor(...valueTypes: (string|null|(new (...params: any[]) => any)|Partial<Constraint>)[]) {
     super()
-    this.valueTypes = valueTypes
+
+    for (let i = 0; i < valueTypes.length; i++) {
+      let valueType = valueTypes[i]
+
+      if (i == valueTypes.length - 1 && 
+        typeof valueType == 'object' && 
+        valueType !== null
+      ) {
+        Object.assign(this, valueType)
+      }
+      else if (! (typeof valueType == 'object') || valueType === null) {
+        this.types.push(valueType)
+      }
+    }
   }
 
   async validate(value: any): Promise<Misfit<TypeOfMisfitValues>|null> {
@@ -20,7 +33,7 @@ export class TypeOf extends Constraint<any, TypeOfMisfitValues> {
       return null
     }
 
-    for (let valueType of this.valueTypes) {
+    for (let valueType of this.types) {
       if (typeof valueType == 'string') {
         if (typeof value === valueType) {
           return null
@@ -53,7 +66,7 @@ export class TypeOf extends Constraint<any, TypeOfMisfitValues> {
       types: []
     })
 
-    for (let valueType of this.valueTypes) {
+    for (let valueType of this.types) {
       if (typeof valueType == 'string') {
         misfit.values!.types.push(valueType)
       }

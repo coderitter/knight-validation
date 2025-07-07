@@ -9,8 +9,9 @@ export class Exists<T> extends Constraint<T, ExistsMisfitValues> {
 
   doesExist: (value: T) => Promise<boolean>
 
-  constructor(doesExist: (value: T) => Promise<boolean>) {
+  constructor(doesExist: (value: T) => Promise<boolean>, constraints?: Partial<Constraint>) {
     super()
+    Object.assign(this, constraints)
     this.doesExist = doesExist
   }
 

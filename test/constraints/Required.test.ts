@@ -5,6 +5,15 @@ import { Required } from '../../src'
 
 describe('constraints', function () {
   describe('Required', function () {
+    describe('constructor', function() {
+      it('should set all possible constraints', function() {
+        let required = new Required({ minFits: 1, maxFits: 2, exactFits: 3 })
+        expect(required.minFits).to.equal(1)
+        expect(required.maxFits).to.equal(2)
+        expect(required.exactFits).to.equal(3)
+      })
+    })
+
     describe('validate', function () {
       it('should return a misfit on undefined', async function () {
         let required = new Required
