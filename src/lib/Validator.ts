@@ -23,6 +23,8 @@ export class Validator<T = any> {
     this.options = options
   }
 
+  add(constraint: Constraint, condition?: (object: T) => Promise<boolean>): void
+  add(constraintName: string, validate: (value: any) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
   add(property: string, constraint: Constraint, condition?: (object: T) => Promise<boolean>): void
   add(property: string, constraintName: string, validate: (value: any) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
   add(properties: string[], constraint: Constraint, condition?: (object: T) => Promise<boolean>): void
@@ -38,7 +40,21 @@ export class Validator<T = any> {
         this.entries.push(propertyConstraint)
       }
     }
-    else {
+    else if (args[0] instanceof Constraint) {
+      this.entries.push({
+        properties: [],
+        constraint: args[0],
+        condition: args.length > 1 ? args[1] : undefined
+      })
+    }
+    else if (typeof args[0] == 'string' && typeof args[1] == 'function') {
+      this.entries.push({
+        properties: [],
+        constraint: new QuickConstraint(args[0], args[1]),
+        condition: args.length > 2 ? args[2] : undefined
+      })
+    }
+    else if (typeof args[0] == 'string' || Array.isArray(args[0])) {
       let properties = typeof args[0] == 'string' ? [ args[0] ] : args[0] as string[]
       let constraint: Constraint|undefined = undefined
       let validator: Validator<any>|undefined = undefined
@@ -115,7 +131,10 @@ export class Validator<T = any> {
       if (entry.constraint != undefined) {
         let misfit
 
-        if (entry.properties.length == 1) {
+        if (entry.properties.length == 0) {
+          misfit = await entry.constraint.validate(object)
+        }
+        else if (entry.properties.length == 1) {
           let property = entry.properties[0]
           let dotNotation = new DotNotation(property)
           let value = dotNotation.get(object)

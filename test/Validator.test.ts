@@ -5,9 +5,37 @@ import { Absent, QuickConstraint, Required, TypeOf, Validator } from '../src'
 
 describe('Validator', function() {
   describe('add', function() {
-    it('should accept a property and a constraint', function() {
+    it('should accept a constraint and a condition', function() {
       let validator = new Validator      
-      validator.add('testField', new Required)
+      validator.add(new Required, async obj => true)
+
+      expect(validator.entries.length).to.equal(1)
+      
+      let entry = validator.entries[0]
+
+      expect(entry.properties).to.deep.equal([])
+      expect(entry.constraint).to.be.instanceOf(Required)
+      expect(entry.validator).to.be.undefined
+      expect(entry.condition).to.be.a('function')
+    })
+
+    it('should accept a constraint name, a validate function and a condition', function() {
+      let validator = new Validator      
+      validator.add('TestConstraint', async () => null, async obj => true)
+
+      expect(validator.entries.length).to.equal(1)
+      
+      let entry = validator.entries[0]
+
+      expect(entry.properties).to.deep.equal([])
+      expect(entry.constraint).to.be.instanceOf(QuickConstraint)
+      expect(entry.validator).to.be.undefined
+      expect(entry.condition).to.be.a('function')
+    })
+
+    it('should accept a property, a constraint and a condition', function() {
+      let validator = new Validator      
+      validator.add('testField', new Required, async obj => true)
 
       expect(validator.entries.length).to.equal(1)
       
@@ -16,12 +44,12 @@ describe('Validator', function() {
       expect(entry.properties).to.deep.equal(['testField'])
       expect(entry.constraint).to.be.instanceOf(Required)
       expect(entry.validator).to.be.undefined
-      expect(entry.condition).to.be.undefined
+      expect(entry.condition).to.be.a('function')
     })
 
-    it('should accept a property, a constraint name and a validate function', function() {
+    it('should accept a property, a constraint name, a validate function and a condition', function() {
       let validator = new Validator      
-      validator.add('testField', 'TestConstraint', async () => null)
+      validator.add('testField', 'TestConstraint', async () => null, async obj => true)
 
       expect(validator.entries.length).to.equal(1)
 
@@ -30,12 +58,12 @@ describe('Validator', function() {
       expect(entry.properties).to.deep.equal(['testField'])
       expect(entry.constraint).to.be.instanceOf(QuickConstraint)
       expect(entry.validator).to.be.undefined
-      expect(entry.condition).to.be.undefined
+      expect(entry.condition).to.be.a('function')
     })
 
-    it('should accept multiple properties and a constraint', function() {
+    it('should accept multiple properties, a constraint and a condition', function() {
       let validator = new Validator
-      validator.add(['testField1', 'testField2'], new Required)
+      validator.add(['testField1', 'testField2'], new Required, async obj => true)
 
       expect(validator.entries.length).to.equal(1)
 
@@ -44,12 +72,12 @@ describe('Validator', function() {
       expect(entry.properties).to.deep.equal(['testField1', 'testField2'])
       expect(entry.constraint).to.be.instanceOf(Required)
       expect(entry.validator).to.be.undefined
-      expect(entry.condition).to.be.undefined
+      expect(entry.condition).to.be.a('function')
     })
 
-    it('should accept multiple properties, a constraint name and a validate function', function() {
+    it('should accept multiple properties, a constraint name, a validate function and a condition', function() {
       let validator = new Validator
-      validator.add(['testField1', 'testField2'], 'TestConstraint', async () => null)
+      validator.add(['testField1', 'testField2'], 'TestConstraint', async () => null, async obj => true)
 
       expect(validator.entries.length).to.equal(1)
 
@@ -58,7 +86,7 @@ describe('Validator', function() {
       expect(entry.properties).to.deep.equal(['testField1', 'testField2'])
       expect(entry.constraint).to.be.instanceOf(QuickConstraint)
       expect(entry.validator).to.be.undefined
-      expect(entry.condition).to.be.undefined
+      expect(entry.condition).to.be.a('function')
     })
 
     it('should accept another validator for a property', function() {
