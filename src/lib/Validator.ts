@@ -100,9 +100,9 @@ export class Validator<T = any> {
 
       let atLeastOnePropertyExists = false
       for (let property of entry.properties) {
-        let dotNotification = new DotNotation(property)
+        let dotNotation = new DotNotation(property)
 
-        if (dotNotification.exists(object)) {
+        if (dotNotation.exists(object)) {
           atLeastOnePropertyExists = true
           break
         }
@@ -117,8 +117,8 @@ export class Validator<T = any> {
 
         if (entry.properties.length == 1) {
           let property = entry.properties[0]
-          let dotNotification = new DotNotation(property)
-          let value = dotNotification.get(object)
+          let dotNotation = new DotNotation(property)
+          let value = dotNotation.get(object)
           misfit = await entry.constraint.validate(value)
         }
         else {
@@ -142,8 +142,8 @@ export class Validator<T = any> {
         }
 
         let property = entry.properties[0]
-        let dotNotification = new DotNotation(property)
-        let value = dotNotification.get(object)
+        let dotNotation = new DotNotation(property)
+        let value = dotNotation.get(object)
 
         if (value === undefined) {
           continue
