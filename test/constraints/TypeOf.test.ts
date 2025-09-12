@@ -22,9 +22,8 @@ describe('constraints', function () {
         expect(misfit).to.be.null
       })
 
-      it('should return undefined the value is undefined', async function () {
+      it('should return undefined when the value is undefined', async function () {
         let typeOf = new TypeOf('number')
-
         expect(await typeOf.validate(undefined)).to.be.null
       })
 
@@ -37,6 +36,13 @@ describe('constraints', function () {
         expect(await typeOf.validate(null)).to.be.instanceOf(Misfit)
         expect(await typeOf.validate('')).to.be.instanceOf(Misfit)
         expect(await typeOf.validate(NaN)).to.be.null
+      })
+
+      it('should return a misfit when the type is object but the value is null', async function() {
+        let typeOf = new TypeOf('object')
+        let misfit = await typeOf.validate(null)
+        expect(misfit).to.be.instanceOf(Misfit)
+        expect(misfit?.values).to.deep.equal({ types: ['object'], actual: null } as TypeOfMisfitValues)
       })
 
       it('should return a misfit if the wrong class', async function () {

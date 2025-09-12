@@ -35,7 +35,7 @@ export class TypeOf extends Constraint<any, TypeOfMisfitValues> {
 
     for (let valueType of this.types) {
       if (typeof valueType == 'string') {
-        if (typeof value === valueType) {
+        if (typeof value === valueType && value !== null) {
           return null
         }  
       }
