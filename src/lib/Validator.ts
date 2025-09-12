@@ -155,7 +155,7 @@ export class Validator<T = any> {
           l.called('entry.constraint.validate')
         }
         else if (entry.properties.length == 1) {
-          l.dev('Constraint is to be applied to one property. Fetching its value...')
+          l.dev('Constraint is to be applied to one property')
           let property = entry.properties[0]
           let dotNotation = new DotNotation(property)
           let value = dotNotation.get(object)
