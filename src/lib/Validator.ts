@@ -139,7 +139,7 @@ export class Validator<T = any> {
         l.creator('Property does not exist', property)
       }
 
-      if (! atLeastOnePropertyExists && options && options.checkOnlyWhatIsThere) {
+      if (! atLeastOnePropertyExists && options && options.checkOnlyWhatIsThere && misfittingProperties.length > 0) {
         l.dev('Not one of the given properties exist but it should only be checked what is there. Skipping...')
         continue
       }

@@ -132,8 +132,54 @@ describe('Validator', function() {
   })
 
   describe('validate', function() {
-    describe('single property contstraints', function() {
-      it('should have a misfit if it was a misfit', async function() {
+    describe('whole object constraints', function() {
+      it('should return a misfit for the whole object', async function() {
+        let validator = new Validator
+        validator.add('TestConstraint', async () => new Misfit('TestConstraint1'))
+  
+        let misfits = await validator.validate({})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
+        expect(misfits[0].properties).to.deep.equal([])
+      })
+  
+      it('should not return a misfit for the whole object', async function() {
+        let validator = new Validator
+        validator.add('TestConstraint', async () => null)
+  
+        let misfits = await validator.validate({})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(0)
+      })
+  
+      it('should return a misfit for the whole object if it should check only what is there', async function() {
+        let validator = new Validator
+        validator.add('TestConstraint', async () => new Misfit('TestConstraint1'))
+  
+        let misfits = await validator.validate({}, { checkOnlyWhatIsThere: true })
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
+        expect(misfits[0].properties).to.deep.equal([])
+      })
+
+      it('should not return a misfit for the whole object if it should check only what is there', async function() {
+        let validator = new Validator
+        validator.add('TestConstraint', async () => null)
+  
+        let misfits = await validator.validate({}, { checkOnlyWhatIsThere: true })
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(0)
+      })  
+    })
+
+    describe('single property constraints', function() {
+      it('should return a misfit for a property', async function() {
         let validator = new Validator
         validator.add('a', 'TestConstraint', async () => new Misfit('TestConstraint1'))
   
@@ -142,9 +188,10 @@ describe('Validator', function() {
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(1)
         expect(misfits[0].constraint).to.equal('TestConstraint1')
+        expect(misfits[0].properties).to.deep.equal(['a'])
       })
   
-      it('should have a not misfit if it was not a misfit', async function() {
+      it('should not return a misfit for a property', async function() {
         let validator = new Validator
         validator.add('a', 'TestConstraint', async () => null)
   
@@ -152,17 +199,6 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(0)
-      })
-  
-      it('should add the property name to the misfit', async function() {
-        let validator = new Validator
-        validator.add('a', 'TestConstraint', async () => new Misfit())
-  
-        let misfits = await validator.validate({})
-  
-        expect(misfits).to.be.instanceOf(Array)
-        expect(misfits.length).to.equal(1)
-        expect(misfits[0].properties).to.deep.equal(['a'])
       })
   
       it('should collect misfits for different properties', async function() {
@@ -178,7 +214,7 @@ describe('Validator', function() {
         expect(misfits[1].properties).to.deep.equal(['b'])
       })
   
-      it('should consider only one constraint if more are given', async function () {
+      it('should only collect one misfit per property', async function () {
         let validator = new Validator
         validator.add('a', 'TestConstraint', async () => new Misfit('M1'))
         validator.add('a', 'TestConstraint', async () => new Misfit('M2'))
@@ -203,7 +239,7 @@ describe('Validator', function() {
         expect(misfits[0].properties).to.deep.equal(['a'])
       })
   
-      it('should check all constraints for a property ', async function () {
+      it('should check all constraints of a property ', async function () {
         let validator = new Validator
         validator.add('a', 'TestConstraint', async () => null)
         validator.add('a', 'TestConstraint', async () => new Misfit('M2'))
@@ -361,7 +397,7 @@ describe('Validator', function() {
         expect(misfits.length).to.equal(1)
       })
     })
-  
+
     describe('quick constraints', function() {
       it('should have a misfit if it was a misfit', async function() {
         let validator = new Validator
