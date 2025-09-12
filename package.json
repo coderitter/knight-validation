@@ -28,11 +28,15 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.0.4",
     "chai": "^5.2.0",
+    "knight-log": "^2.0.0-rc.3",
     "mocha": "^11.7.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
     "knight-misfit": "^1.0.0"
+  },
+  "peerDependencies": {
+    "knight-log": "^2.0.0-rc.3"
   }
 }

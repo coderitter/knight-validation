@@ -1,7 +1,10 @@
+import { Log } from 'knight-log'
 import { Misfit } from 'knight-misfit'
 import { Constraint } from './Constraint'
 import { DotNotation } from './DotNotation'
 import { QuickConstraint } from './constraints/QuickConstraint'
+
+let log = new Log('knight-log/Validator.ts')
 
 export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean
@@ -92,13 +95,19 @@ export class Validator<T = any> {
   }
 
   async validate(object: T, options?: ValidatorOptions): Promise<Misfit[]> {
+    let l = log.mt('validate')
+    l.param('object', object)
+    l.param('options', options)
+
     options = options || this.options
     let misfits: Misfit[] = []
     let misfittingProperties: string[] = []
 
     for (let entry of this.entries) {
+      let constraintOrValidatorName = entry.constraint ? entry.constraint?.name : entry.validator ? entry.validator.constructor.name : ''
+      l.location = ['' + entry.properties + ' ' + constraintOrValidatorName]
+      
       let propertyAlreadyHasAMisfit = false
-
       for (let property of entry.properties) {
         if (misfittingProperties.indexOf(property) > -1) {
           propertyAlreadyHasAMisfit = true
@@ -107,45 +116,64 @@ export class Validator<T = any> {
       }
 
       if (propertyAlreadyHasAMisfit) {
+        l.dev('Property already has misfit. Skipping...')
         continue
       }
 
       if (entry.condition && ! await entry.condition(object)) {
+        l.dev('The given condition is not met. Skipping...')
         continue
       }
 
       let atLeastOnePropertyExists = false
+      l.creator('Check if at least one property exists...')
       for (let property of entry.properties) {
         let dotNotation = new DotNotation(property)
 
         if (dotNotation.exists(object)) {
+          l.creator('Property exists', property)
           atLeastOnePropertyExists = true
           break
         }
+
+        l.creator('Property does not exist', property)
       }
 
       if (! atLeastOnePropertyExists && options && options.checkOnlyWhatIsThere) {
+        l.dev('Not one of the given properties exist but it should only be checked what is there. Skipping...')
         continue
       }
 
       if (entry.constraint != undefined) {
+        l.dev('Property will be checked by a single constraint')
         let misfit
 
         if (entry.properties.length == 0) {
+          l.dev('Constraint is to be applied to the whole object')
+          l.calling('entry.constraint.validate', object)
           misfit = await entry.constraint.validate(object)
+          l.called('entry.constraint.validate')
         }
         else if (entry.properties.length == 1) {
+          l.dev('Constraint is to be applied to one property. Fetching its value...')
           let property = entry.properties[0]
           let dotNotation = new DotNotation(property)
           let value = dotNotation.get(object)
+          l.calling('entry.constraint.validate', value)
           misfit = await entry.constraint.validate(value)
+          l.called('entry.constraint.validate')
         }
         else {
+          l.dev('Constraint is to be applied tu multiple properties')
+          l.calling('entry.constraint.validateMultipleProperties', object)
           misfit = await entry.constraint.validateMultipleProperties(object, entry.properties)
+          l.called('entry.constraint.validateMultipleProperties')
         }
 
         if (misfit) {
+          l.dev('Misfit was returned', misfit)
           if (misfit.constraint === undefined) {
+            l.creator('Setting the constraint name on the misfit')
             misfit.constraint = entry.constraint.name
           }
 
@@ -156,8 +184,11 @@ export class Validator<T = any> {
         }
       }
       else if (entry.validator != undefined) {
+        l.dev('Property will be checked by a validator')
+
         if (entry.properties.length != 1) {
-          throw new Error('Using another validator only works for one property')
+          l.error('Cannot apply validator because multiple properties were given')
+          throw new Error('Using a whole validator only works for one property')
         }
 
         let property = entry.properties[0]
@@ -165,10 +196,15 @@ export class Validator<T = any> {
         let value = dotNotation.get(object)
 
         if (value instanceof Array) {
+          l.dev('Value of the property is an array. Iterating its elements...')
           for (let i = 0; i < value.length; i++) {
+            l.calling('entry.validator.validate', value[i], options)
             let subMisfits = await entry.validator.validate(value[i], options)
+            l.called('entry.validator.validate')
 
             if (subMisfits.length > 0) {
+              l.dev('Validator returned misfits', subMisfits)
+              l.creator('Adding prefix to misfit properties...', `${property}[${i}].`)
               for (let misfit of subMisfits) {
                 misfit.addPrefix(`${property}[${i}].`)
               }
@@ -179,9 +215,15 @@ export class Validator<T = any> {
           }
         }
         else {
+          l.dev('Value of the property is not an array')
+
+          l.calling('entry.validator.validate', value, options)
           let subMisfits = await entry.validator.validate(value, options)
+          l.called('entry.validator.validate')
 
           if (subMisfits.length > 0) {
+            l.dev('Validator returned misfits', subMisfits)
+            l.creator('Adding prefix to misfit properties...', property + '.')
             for (let misfit of subMisfits) {
               misfit.addPrefix(property + '.')
             }
@@ -193,6 +235,7 @@ export class Validator<T = any> {
       }
     }
 
+    l.returning('Returning misfits', misfits)
     return misfits
   }
 }
