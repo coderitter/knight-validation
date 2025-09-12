@@ -4,7 +4,7 @@ import { Constraint } from './Constraint'
 import { DotNotation } from './DotNotation'
 import { QuickConstraint } from './constraints/QuickConstraint'
 
-let log = new Log('knight-log/Validator.ts')
+let log = new Log('knight-validation/Validator.ts')
 
 export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean
