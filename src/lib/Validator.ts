@@ -101,7 +101,7 @@ export class Validator<T = any> {
 
     options = options || this.options
     let misfits: Misfit[] = []
-    let misfittingProperties: string[] = []
+    let misfittingProperties: (string|null)[] = []
 
     for (let entry of this.entries) {
       let constraintOrValidatorName = entry.constraint ? entry.constraint?.name : entry.validator ? entry.validator.constructor.name : ''
@@ -113,6 +113,10 @@ export class Validator<T = any> {
           propertyAlreadyHasAMisfit = true
           break
         }
+      }
+
+      if (entry.properties.length == 0 && misfittingProperties.indexOf(null) > -1) {
+        propertyAlreadyHasAMisfit = true
       }
 
       if (propertyAlreadyHasAMisfit) {
@@ -180,6 +184,10 @@ export class Validator<T = any> {
           misfit.properties = entry.properties.slice()
 
           misfittingProperties.push(...entry.properties)
+          if (entry.properties.length == 0) {
+            misfittingProperties.push(null)
+          }
+
           misfits.push(misfit)
         }
       }
@@ -216,7 +224,12 @@ export class Validator<T = any> {
               l.dev('Validator returned misfits', subMisfits)
               l.creator('Adding prefix to misfit properties...', `${property}[${i}].`)
               for (let misfit of subMisfits) {
-                misfit.addPrefix(`${property}[${i}].`)
+                if (misfit.properties.length == 0) {
+                  misfit.properties.push(`${property}[${i}]`)
+                }
+                else {
+                  misfit.addPrefix(`${property}[${i}].`)
+                }
               }
 
               misfittingProperties.push(...entry.properties)
@@ -235,7 +248,12 @@ export class Validator<T = any> {
             l.dev('Validator returned misfits', subMisfits)
             l.creator('Adding prefix to misfit properties...', property + '.')
             for (let misfit of subMisfits) {
-              misfit.addPrefix(property + '.')
+                if (misfit.properties.length == 0) {
+                  misfit.properties.push(property)
+                }
+                else {
+                  misfit.addPrefix(property + '.')
+                }
             }
 
             misfittingProperties.push(...entry.properties)
