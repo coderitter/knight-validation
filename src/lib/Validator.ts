@@ -164,10 +164,6 @@ export class Validator<T = any> {
         let dotNotation = new DotNotation(property)
         let value = dotNotation.get(object)
 
-        if (value === undefined) {
-          continue
-        }
-
         if (value instanceof Array) {
           for (let i = 0; i < value.length; i++) {
             let subMisfits = await entry.validator.validate(value[i], options)
