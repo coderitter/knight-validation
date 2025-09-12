@@ -175,7 +175,20 @@ describe('Validator', function() {
   
         expect(misfits).to.be.instanceOf(Array)
         expect(misfits.length).to.equal(0)
-      })  
+      })
+
+      it('should only collect one misfit of all the given constraints for the whole object', async function() {
+        let validator = new Validator
+        validator.add('TestConstraint', async () => new Misfit('TestConstraint1'))
+        validator.add('TestConstraint', async () => new Misfit('TestConstraint2'))
+  
+        let misfits = await validator.validate({})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(1)
+        expect(misfits[0].constraint).to.equal('TestConstraint1')
+        expect(misfits[0].properties).to.deep.equal([])
+      })
     })
 
     describe('single property constraints', function() {
