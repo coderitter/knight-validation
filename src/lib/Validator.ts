@@ -195,9 +195,19 @@ export class Validator<T = any> {
         let dotNotation = new DotNotation(property)
         let value = dotNotation.get(object)
 
+        if (typeof value != 'object' || value === null) {
+          l.dev('Value of the property is not of type object or null. Skipping...', value)
+          continue
+        }
+
         if (value instanceof Array) {
           l.dev('Value of the property is an array. Iterating its elements...')
           for (let i = 0; i < value.length; i++) {
+            if (typeof value[i] != 'object' || value[i] === null) {
+              l.dev('Array element is not of type object or null. Skipping...', value[i])
+              continue
+            }
+
             l.calling('entry.validator.validate', value[i], options)
             let subMisfits = await entry.validator.validate(value[i], options)
             l.called('entry.validator.validate')

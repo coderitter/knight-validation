@@ -308,107 +308,6 @@ describe('Validator', function() {
   
         expect(misfits.length).to.equal(0)
       })
-  
-      it('should validate an object property with the given validator', async function() {
-        let propertyValidator = new Validator
-        propertyValidator.add('property11', 'TestConstraint1', async () => null)
-        propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
-
-        let validator = new Validator
-        validator.add('property1', propertyValidator)
-
-        let misfits = await validator.validate({ property1: {}})
-
-        expect(misfits.length).to.equal(1)
-        expect(misfits[0].properties).to.deep.equal(['property1.property12'])
-        expect(misfits[0].constraint).to.equal('TestConstraint2')
-      })
-
-      it('should validate an object property does not have an object value', async function() {
-        let propertyValidator = new Validator
-        propertyValidator.add('property11', 'TestConstraint1', async () => null)
-        propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
-
-        let validator = new Validator
-        validator.add('property1', propertyValidator)
-
-        let misfits = await validator.validate({ property1: 1 })
-
-        expect(misfits.length).to.equal(1)
-        expect(misfits[0].properties).to.deep.equal(['property1.property12'])
-        expect(misfits[0].constraint).to.equal('TestConstraint2')
-      })
-
-      it('should not validate an object property if it is undefined', async function() {
-        let propertyValidator = new Validator
-        propertyValidator.add('property11', 'TestConstraint1', async () => null)
-        propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
-
-        let validator = new Validator
-        validator.add('property1', propertyValidator)
-
-        let misfits = await validator.validate({ property1: undefined })
-
-        expect(misfits.length).to.equal(1)
-        expect(misfits[0].properties).to.deep.equal(['property1.property12'])
-        expect(misfits[0].constraint).to.equal('TestConstraint2')
-      })
-
-      it('should validate an object property if it is null', async function() {
-        let propertyValidator = new Validator
-        propertyValidator.add('property11', 'TestConstraint1', async () => null)
-        propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
-
-        let validator = new Validator
-        validator.add('property1', propertyValidator)
-
-        let misfits = await validator.validate({ property1: null })
-
-        expect(misfits.length).to.equal(1)
-      })
-      
-      it('should validate an array which elements are not objects', async function() {
-        let propertyValidator = new Validator
-        propertyValidator.add('property11', 'TestConstraint1', async () => null)
-        propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
-
-        let validator = new Validator
-        validator.add('property1', propertyValidator)
-
-        let misfits = await validator.validate({ property1: [1] })
-
-        expect(misfits.length).to.equal(1)
-        expect(misfits[0].properties).to.deep.equal(['property1[0].property12'])
-        expect(misfits[0].constraint).to.equal('TestConstraint2')
-      })
-
-      it('should not validate an array element is undefined', async function() {
-        let propertyValidator = new Validator
-        propertyValidator.add('property11', 'TestConstraint1', async () => null)
-        propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
-
-        let validator = new Validator
-        validator.add('property1', propertyValidator)
-
-        let misfits = await validator.validate({ property1: [undefined] })
-
-        expect(misfits.length).to.equal(1)
-        expect(misfits[0].properties).to.deep.equal(['property1[0].property12'])
-        expect(misfits[0].constraint).to.equal('TestConstraint2')
-      })
-
-      it('should validate an object property if it is null', async function() {
-        let propertyValidator = new Validator
-        propertyValidator.add('property11', 'TestConstraint1', async () => null)
-        propertyValidator.add('property12', 'TestConstraint2', async () => new Misfit)
-
-        let validator = new Validator
-        validator.add('property1', propertyValidator)
-
-        let misfits = await validator.validate({ property1: [null] })
-
-        expect(misfits.length).to.equal(1)
-      })
     })
 
     describe('quick constraints', function() {
@@ -579,7 +478,7 @@ describe('Validator', function() {
         expect(misfits[0].properties).to.deep.equal(['a.nestedA'])
       })
 
-      it('should validate a sub object', async function() {
+      it('should not validate a sub object which is undefined', async function() {
         let nestedValidator = new Validator
         nestedValidator.add('nestedA', new Required)
         nestedValidator.add('nestedB', new TypeOf('number'))
@@ -587,12 +486,38 @@ describe('Validator', function() {
         let validator = new Validator
         validator.add('a', nestedValidator)
   
-        let misfits = await validator.validate({ a: { nestedB: 1 }})
+        let misfits = await validator.validate({ a: undefined})
   
         expect(misfits).to.be.instanceOf(Array)
-        expect(misfits.length).to.equal(1)
-        expect(misfits[0].constraint).to.equal('Required')
-        expect(misfits[0].properties).to.deep.equal(['a.nestedA'])
+        expect(misfits.length).to.equal(0)
+      })
+
+      it('should not validate a sub object which is null', async function() {
+        let nestedValidator = new Validator
+        nestedValidator.add('nestedA', new Required)
+        nestedValidator.add('nestedB', new TypeOf('number'))
+
+        let validator = new Validator
+        validator.add('a', nestedValidator)
+  
+        let misfits = await validator.validate({ a: null})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(0)
+      })
+
+      it('should not validate a sub object which is not of type object', async function() {
+        let nestedValidator = new Validator
+        nestedValidator.add('nestedA', new Required)
+        nestedValidator.add('nestedB', new TypeOf('number'))
+
+        let validator = new Validator
+        validator.add('a', nestedValidator)
+  
+        let misfits = await validator.validate({ a: 1})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(0)
       })
 
       it('should validate a sub array', async function() {
@@ -611,6 +536,60 @@ describe('Validator', function() {
         expect(misfits[0].properties).to.deep.equal(['a[0].nestedB'])
         expect(misfits[1].constraint).to.equal('Required')
         expect(misfits[1].properties).to.deep.equal(['a[1].nestedA'])
+      })
+
+      it('should not validate undefined elements of a sub array', async function() {
+        let nestedValidator = new Validator
+        nestedValidator.add('nestedA', new Required)
+        nestedValidator.add('nestedB', new TypeOf('number'))
+
+        let validator = new Validator
+        validator.add('a', nestedValidator)
+  
+        let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, undefined, { nestedB: 1 }]})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(2)
+        expect(misfits[0].constraint).to.equal('TypeOf')
+        expect(misfits[0].properties).to.deep.equal(['a[0].nestedB'])
+        expect(misfits[1].constraint).to.equal('Required')
+        expect(misfits[1].properties).to.deep.equal(['a[2].nestedA'])
+      })
+
+      it('should not validate null elements of a sub array', async function() {
+        let nestedValidator = new Validator
+        nestedValidator.add('nestedA', new Required)
+        nestedValidator.add('nestedB', new TypeOf('number'))
+
+        let validator = new Validator
+        validator.add('a', nestedValidator)
+  
+        let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, null, { nestedB: 1 }]})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(2)
+        expect(misfits[0].constraint).to.equal('TypeOf')
+        expect(misfits[0].properties).to.deep.equal(['a[0].nestedB'])
+        expect(misfits[1].constraint).to.equal('Required')
+        expect(misfits[1].properties).to.deep.equal(['a[2].nestedA'])
+      })
+
+      it('should not validate elements which are not of type object of a sub array', async function() {
+        let nestedValidator = new Validator
+        nestedValidator.add('nestedA', new Required)
+        nestedValidator.add('nestedB', new TypeOf('number'))
+
+        let validator = new Validator
+        validator.add('a', nestedValidator)
+  
+        let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, null, { nestedB: 1 }]})
+  
+        expect(misfits).to.be.instanceOf(Array)
+        expect(misfits.length).to.equal(2)
+        expect(misfits[0].constraint).to.equal('TypeOf')
+        expect(misfits[0].properties).to.deep.equal(['a[0].nestedB'])
+        expect(misfits[1].constraint).to.equal('Required')
+        expect(misfits[1].properties).to.deep.equal(['a[2].nestedA'])
       })
 
       it('should be able to handle dot notifications', async function() {
