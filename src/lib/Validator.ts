@@ -33,7 +33,7 @@ export class Validator<T = any> {
   add(properties: string[], constraint: Constraint, condition?: (object: T) => Promise<boolean>): void
   add(properties: string[], constraintName: string, validate: (object: T, properties: string[]) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
   add(property: string, validator: Validator<any>, condition?: (object: T) => Promise<boolean>): void
-  add(validator: Validator<T>): void
+  add(validator: Validator): void
 
   add(...args: any[]): void {
     if (args[0] instanceof Validator) {
