@@ -136,7 +136,8 @@ describe('Validator', function() {
       validator.add('property1', new Required)
       validator.add('property1', new TypeOf('number'))
       validator.add('property2', new Required)
-      validator.add('property2', new TypeOf('number'))
+      validator.add('property2', 'TestConstraint', async value => null)
+      validator.add('property2', new Validator)
       validator.add('property3', new Required)
       validator.add('property3', new TypeOf('number'))
 

@@ -40,22 +40,24 @@ export class Validator<T = any> {
     let l = log.mt('add')
     l.param('args', args)
 
+    let entries: ValidatorEntry[] = []
+
     if (args[0] instanceof Validator) {
       let validator = args[0]
 
       for (let propertyConstraint of validator.entries) {
-        this.entries.push(propertyConstraint)
+        entries.push(propertyConstraint)
       }
     }
     else if (args[0] instanceof Constraint) {
-      this.entries.push({
+      entries.push({
         properties: [],
         constraint: args[0],
         condition: args.length > 1 ? args[1] : undefined
       })
     }
     else if (typeof args[0] == 'string' && typeof args[1] == 'function') {
-      this.entries.push({
+      entries.push({
         properties: [],
         constraint: new QuickConstraint(args[0], args[1]),
         condition: args.length > 2 ? args[2] : undefined
@@ -89,31 +91,33 @@ export class Validator<T = any> {
         throw new Error('Invalid parameters')
       }
 
-      l.dev('properties', properties)
-      l.dev('constraint', constraint)
-      l.dev('validator', validator)
-      l.dev('condition', condition)
-
-      if (properties.length == 1 && this.options?.exclude) {
-        for (let property of this.options?.exclude) {
-          if (property == properties[0]) {
-            l.dev('Not adding constraint since the property was excluded')
-            l.returning()
-            return
-          }
-        }
-      }
-
-      this.entries.push({
+      entries.push({
         properties: properties,
         constraint: constraint,
         validator: validator,
         condition: condition
       })
-
-      l.dev('Constraint was added')
-      l.returning()
     }
+
+    for (let entry of entries) {
+      let propertyExcluded = false
+      if (entry?.properties.length == 1 && this.options?.exclude) {
+        for (let property of this.options?.exclude) {
+          if (property == entry.properties[0]) {
+            propertyExcluded = true
+            l.dev('Not adding constraint since the property was excluded', entry)
+            break
+          }
+        }
+      }
+
+      if (!propertyExcluded) {
+        this.entries.push(entry)
+        l.dev('Constraint was added', entry)        
+      }
+    }
+
+    l.returning()
   }
 
   async validate(object: T, options?: ValidatorOptions): Promise<Misfit[]> {
