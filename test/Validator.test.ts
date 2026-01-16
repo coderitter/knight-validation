@@ -129,6 +129,20 @@ describe('Validator', function() {
       expect(validator2.entries[2].validator).to.be.undefined
       expect(validator2.entries[2].condition).to.be.undefined
     })
+
+    it('should not add excluded constraints', function() {
+      let validator = new Validator({ exclude: ['property2']})
+
+      validator.add('property1', new Required)
+      validator.add('property1', new TypeOf('number'))
+      validator.add('property2', new Required)
+      validator.add('property2', new TypeOf('number'))
+      validator.add('property3', new Required)
+      validator.add('property3', new TypeOf('number'))
+
+      expect(validator.entries.some(entry => entry.properties.length == 1 && entry.properties[0] == 'property2')).to.be.false
+      expect(validator.entries.filter(entry => entry.properties.length == 1 && entry.properties[0] != 'property2').length).to.equal(4)
+    })
   })
 
   describe('validate', function() {
@@ -633,7 +647,7 @@ describe('Validator', function() {
         expect(misfits[1].properties).to.deep.equal(['a[2].nestedA'])
       })
 
-      it.only('should only collect one misfit for object constraints of the sub validator', async function() {
+      it('should only collect one misfit for object constraints of the sub validator', async function() {
         let nestedValidator = new Validator
         nestedValidator.add('TestConstraint1', async () => new Misfit)
         nestedValidator.add('TestConstraint2', async () => new Misfit)

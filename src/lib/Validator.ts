@@ -8,6 +8,7 @@ let log = new Log('knight-validation/Validator.ts')
 
 export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean
+  exclude?: string[]
 }
 
 interface ValidatorEntry<T = any> {
@@ -36,6 +37,9 @@ export class Validator<T = any> {
   add(validator: Validator): void
 
   add(...args: any[]): void {
+    let l = log.mt('add')
+    l.param('args', args)
+
     if (args[0] instanceof Validator) {
       let validator = args[0]
 
@@ -85,12 +89,30 @@ export class Validator<T = any> {
         throw new Error('Invalid parameters')
       }
 
+      l.dev('properties', properties)
+      l.dev('constraint', constraint)
+      l.dev('validator', validator)
+      l.dev('condition', condition)
+
+      if (properties.length == 1 && this.options?.exclude) {
+        for (let property of this.options?.exclude) {
+          if (property == properties[0]) {
+            l.dev('Not adding constraint since the property was excluded')
+            l.returning()
+            return
+          }
+        }
+      }
+
       this.entries.push({
         properties: properties,
         constraint: constraint,
         validator: validator,
         condition: condition
       })
+
+      l.dev('Constraint was added')
+      l.returning()
     }
   }
 
