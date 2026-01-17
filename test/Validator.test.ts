@@ -132,17 +132,26 @@ describe('Validator', function() {
 
     it('should not add excluded constraints', function() {
       let validator = new Validator({ exclude: ['property2']})
+      
+      let property2Validator = new Validator
+      property2Validator.add('property2.1', new Required)
+      property2Validator.add('property2.2', new Required)
+
+      let property3Validator = new Validator
+      property3Validator.add('property2', new Required)
+      property3Validator.add('property4', new Required)
 
       validator.add('property1', new Required)
       validator.add('property1', new TypeOf('number'))
       validator.add('property2', new Required)
       validator.add('property2', 'TestConstraint', async value => null)
-      validator.add('property2', new Validator)
+      validator.add('property2', property2Validator)
       validator.add('property3', new Required)
       validator.add('property3', new TypeOf('number'))
+      validator.add(property3Validator)
 
       expect(validator.entries.some(entry => entry.properties.length == 1 && entry.properties[0] == 'property2')).to.be.false
-      expect(validator.entries.filter(entry => entry.properties.length == 1 && entry.properties[0] != 'property2').length).to.equal(4)
+      expect(validator.entries.filter(entry => entry.properties.length == 1 && entry.properties[0] != 'property2').length).to.equal(5)
     })
   })
 
