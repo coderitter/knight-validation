@@ -54,13 +54,13 @@ class UserValidator extends Validator {
   constructor() {
     super()
 
-    // Exactly one property is required
+    // Exactly one property must be there
     this.add(['fistName', 'lastName', 'email'], new Required({ exactFits: 1 }))
 
-    // At least two properties are required
+    // At least two properties must be there
     this.add(['fistName', 'lastName', 'email'], new Required({ minFits: 2 }))
 
-    // At most two properties are required
+    // At most two properties must be there
     this.add(['fistName', 'lastName', 'email'], new Required({ maxFits: 2 }))
   }
 }
@@ -133,7 +133,7 @@ misfit.property == [ 'email' ]
 misfit.values
 
 // A misfit message (Optional)
-misift.message == 'The property email is required.'
+misfit.message == 'The property email is required.'
 ```
 
 The optional `message` needs to be provided by your application, it is not part of this package.
