@@ -18,8 +18,20 @@ export interface ValidatorEntry<T = any> {
   condition?: (object: T) => Promise<boolean>
 }
 
-abstract class ValidatorFactory<T = any> {
-  abstract create(): Validator<T>
+export interface ValidatorFactory<T = any> {
+  create(): Validator<T>
+}
+
+export class SimpleValidatorFactory<T = any> implements ValidatorFactory<T> {
+  createFn: () => Validator<T>
+
+  constructor(createFn: () => Validator<T>) {
+    this.createFn = createFn
+  }
+
+  create(): Validator<T> {
+    return this.createFn()
+  }
 }
 
 export class Validator<T = any> {
