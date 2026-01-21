@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { Misfit } from 'knight-misfit'
 import 'mocha'
-import { Absent, QuickConstraint, Required, TypeOf, Validator } from '../src'
+import { Absent, QuickConstraint, Required, TypeOf, Validator, ValidatorOptions } from '../src'
 
 describe('Validator', function() {
   describe('add', function() {
@@ -91,7 +91,7 @@ describe('Validator', function() {
 
     it('should accept another validator for a property', function() {
       let validator = new Validator
-      validator.add('property', new Validator)
+      validator.add('property', { create: () => new Validator })
 
       expect(validator.entries.length).to.equal(1)
 
@@ -110,7 +110,7 @@ describe('Validator', function() {
       validator1.add('property2', new Required)
 
       let validator2 = new Validator
-      validator2.add(validator1)
+      validator2.add({ create: () => validator1 })
 
       expect(validator2.entries.length).to.equal(3)
 
@@ -145,13 +145,34 @@ describe('Validator', function() {
       validator.add('property1', new TypeOf('number'))
       validator.add('property2', new Required)
       validator.add('property2', 'TestConstraint', async value => null)
-      validator.add('property2', property2Validator)
+      validator.add('property2', { create: () => property2Validator })
       validator.add('property3', new Required)
       validator.add('property3', new TypeOf('number'))
-      validator.add(property3Validator)
+      validator.add({ create: () => property3Validator })
 
       expect(validator.entries.some(entry => entry.properties.length == 1 && entry.properties[0] == 'property2')).to.be.false
       expect(validator.entries.filter(entry => entry.properties.length == 1 && entry.properties[0] != 'property2').length).to.equal(5)
+    })
+
+    it('should not get stuck in a circular validator dependency', function() {
+      class Validator1 extends Validator {
+        constructor() {
+          super()
+          // Validator2 should exclude property2 which references Validator1 and thus creates a circular dependency
+          this.add('property1', { create: () => new Validator2({ exclude: ['property2'] }) })
+        }
+      }
+
+      class Validator2 extends Validator {
+        constructor(options?: ValidatorOptions) {
+          super(options)
+          // The validator is being put their as a function so that the class will only be 
+          this.add('property2', { create: () => new Validator1 })
+        }
+      }
+
+      new Validator1
+      expect(true).to.be.true
     })
   })
 
@@ -509,7 +530,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', nestedValidator)
+        validator.add('a', { create: () => nestedValidator })
   
         let misfits = await validator.validate({ a: { nestedB: 1 }})
   
@@ -533,7 +554,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', nestedValidator)
+        validator.add('a', { create: () => nestedValidator })
   
         let misfits = await validator.validate({ a: undefined})
   
@@ -547,7 +568,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', nestedValidator)
+        validator.add('a',  { create: () => nestedValidator })
   
         let misfits = await validator.validate({ a: null})
   
@@ -561,7 +582,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', nestedValidator)
+        validator.add('a', { create: () => nestedValidator })
   
         let misfits = await validator.validate({ a: 1})
   
@@ -575,7 +596,7 @@ describe('Validator', function() {
         nestedValidator.add('TestConstraint2', async () => new Misfit)
 
         let validator = new Validator
-        validator.add('a', nestedValidator)
+        validator.add('a', { create: () => nestedValidator })
   
         let misfits = await validator.validate({ a: {} })
   
@@ -591,7 +612,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', nestedValidator)
+        validator.add('a', { create: () => nestedValidator })
   
         let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, { nestedB: 1 }]})
   
@@ -609,7 +630,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', nestedValidator)
+        validator.add('a', { create: () => nestedValidator })
   
         let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, undefined, { nestedB: 1 }]})
   
@@ -627,7 +648,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', nestedValidator)
+        validator.add('a', { create: () => nestedValidator })
   
         let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, null, { nestedB: 1 }]})
   
@@ -645,7 +666,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', nestedValidator)
+        validator.add('a', { create: () => nestedValidator })
   
         let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, null, { nestedB: 1 }]})
   
@@ -663,7 +684,7 @@ describe('Validator', function() {
         nestedValidator.add('TestConstraint2', async () => new Misfit)
 
         let validator = new Validator
-        validator.add('a', nestedValidator)
+        validator.add('a', { create: () => nestedValidator })
   
         let misfits = await validator.validate({ a: [ {}, {} ]})
   

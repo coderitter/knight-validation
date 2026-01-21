@@ -11,11 +11,15 @@ export interface ValidatorOptions {
   exclude?: string[]
 }
 
-interface ValidatorEntry<T = any> {
+export interface ValidatorEntry<T = any> {
   properties: string[]
   constraint?: Constraint
   validator?: Validator
   condition?: (object: T) => Promise<boolean>
+}
+
+abstract class ValidatorFactory<T = any> {
+  abstract create(): Validator<T>
 }
 
 export class Validator<T = any> {
@@ -29,45 +33,55 @@ export class Validator<T = any> {
 
   add(constraint: Constraint, condition?: (object: T) => Promise<boolean>): void
   add(constraintName: string, validate: (value: any) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
+  add(validatorFactory: ValidatorFactory): void
   add(property: string, constraint: Constraint, condition?: (object: T) => Promise<boolean>): void
   add(property: string, constraintName: string, validate: (value: any) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
+  add(property: string, validatorFactory: ValidatorFactory, condition?: (object: T) => Promise<boolean>): void
   add(properties: string[], constraint: Constraint, condition?: (object: T) => Promise<boolean>): void
   add(properties: string[], constraintName: string, validate: (object: T, properties: string[]) => Promise<Misfit|null>, condition?: (object: T) => Promise<boolean>): void
-  add(property: string, validator: Validator<any>, condition?: (object: T) => Promise<boolean>): void
-  add(validator: Validator): void
+  add(validatorEntry: ValidatorEntry): void
 
   add(...args: any[]): void {
     let l = log.mt('add')
     l.param('args', args)
 
-    let entries: ValidatorEntry[] = []
+    let properties: string[]|undefined
+    let constraint: Constraint|undefined
+    let validatorFactory: ValidatorFactory|undefined
+    let condition: ((object: T) => Promise<boolean>)|undefined
 
-    if (args[0] instanceof Validator) {
-      let validator = args[0]
+    if (typeof args[0] == 'object' && args[0] !== null && 'create' in args[0] && typeof args[0].create == 'function') {
+      let validator = args[0].create()
 
-      for (let propertyConstraint of validator.entries) {
-        entries.push(propertyConstraint)
+      if (typeof validator == 'object' && validator !== null && 'entries' in validator && Array.isArray(validator.entries)) {
+        for (let entry of validator.entries) {
+          this.add(entry)
+        }
+      }
+    }
+    else if (typeof args[0] == 'object' && args[0] !== null && 'properties' in args[0] && Array.isArray(args[0].properties)) {
+      properties = (args[0] as ValidatorEntry).properties
+      constraint = (args[0] as ValidatorEntry).constraint
+      validatorFactory = (args[0] as ValidatorEntry).validator ? 
+        { create: () => (args[0] as ValidatorEntry).validator } as ValidatorFactory : undefined
+      condition = (args[0] as ValidatorEntry).condition
+
+      if (constraint != undefined && validatorFactory != undefined) {
+        throw new Error('The provided parameter is a ValidatorEntry with both a constraint and a validator defined. This is invalid! Only one may be specified at a time!')
       }
     }
     else if (args[0] instanceof Constraint) {
-      entries.push({
-        properties: [],
-        constraint: args[0],
-        condition: args.length > 1 ? args[1] : undefined
-      })
+      properties = []
+      constraint = args[0],
+      condition = args.length > 1 ? args[1] : undefined
     }
-    else if (typeof args[0] == 'string' && typeof args[1] == 'function') {
-      entries.push({
-        properties: [],
-        constraint: new QuickConstraint(args[0], args[1]),
-        condition: args.length > 2 ? args[2] : undefined
-      })
+    else if (typeof args[0] == 'string' && typeof args[1] == 'function' && args[1].prototype?.constructor !== args[1] ) {
+      properties = []
+      constraint = new QuickConstraint(args[0], args[1])
+      condition = args.length > 2 ? args[2] : undefined
     }
     else if (typeof args[0] == 'string' || Array.isArray(args[0])) {
-      let properties = typeof args[0] == 'string' ? [ args[0] ] : args[0] as string[]
-      let constraint: Constraint|undefined = undefined
-      let validator: Validator<any>|undefined = undefined
-      let condition
+      properties = typeof args[0] == 'string' ? [ args[0] ] : args[0] as string[]
 
       if (typeof args[1] == 'string') {
         if (typeof args[0] == 'string') {
@@ -83,38 +97,43 @@ export class Validator<T = any> {
         constraint = args[1]
         condition = args.length > 2 ? args[2] : undefined
       }
-      else if (args[1] instanceof Validator) {
-        validator = args[1]
+      else if (typeof args[1] == 'object' && args[1] !== null && 'create' in args[1] && typeof args[1].create == 'function') {
+        validatorFactory = args[1]
         condition = args.length > 2 ? args[2] : undefined
       }
-      else {
-        throw new Error('Invalid parameters')
-      }
-
-      entries.push({
-        properties: properties,
-        constraint: constraint,
-        validator: validator,
-        condition: condition
-      })
     }
 
-    for (let entry of entries) {
-      let propertyExcluded = false
-      if (entry?.properties.length == 1 && this.options?.exclude) {
-        for (let property of this.options?.exclude) {
-          if (property == entry.properties[0]) {
-            propertyExcluded = true
-            l.dev('Not adding constraint since the property was excluded', entry)
-            break
-          }
+    if (properties == undefined) {
+      l.returning()
+      return
+    }
+
+    let propertyExcluded = false
+    if (properties.length == 1 && this.options?.exclude) {
+      for (let property of this.options?.exclude) {
+        if (property == properties[0]) {
+          propertyExcluded = true
+          l.dev('Not adding constraint since the property was excluded', {
+            properties: properties,
+            constraint: constraint,
+            validatorFactory: validatorFactory,
+            condition: condition
+          })
+          break
         }
       }
+    }
 
-      if (!propertyExcluded) {
-        this.entries.push(entry)
-        l.dev('Constraint was added', entry)        
+    if (!propertyExcluded) {
+      let entry: ValidatorEntry = {
+        properties: properties,
+        constraint: constraint,
+        validator: validatorFactory ? validatorFactory.create() : undefined,
+        condition: condition
       }
+
+      this.entries.push(entry)
+      l.dev('Constraint was added', entry)        
     }
 
     l.returning()
