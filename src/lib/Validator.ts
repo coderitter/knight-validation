@@ -6,6 +6,10 @@ import { QuickConstraint } from './constraints/QuickConstraint'
 
 let log = new Log('knight-validation/Validator.ts')
 
+export interface ValidatorMap {
+  [validatorId: string]: Validator
+}
+
 export interface ValidatorOptions {
   checkOnlyWhatIsThere?: boolean
   exclude?: string[]
@@ -18,29 +22,51 @@ export interface ValidatorEntry<T = any> {
   condition?: (object: T) => Promise<boolean>
 }
 
-export interface ValidatorFactory<T = any> {
-  create(): Validator<T>
-}
+export class ValidatorFactory<T = any> {
+  validatorId: string
+  createFn: (validators: ValidatorMap) => Validator<T>
 
-export class SimpleValidatorFactory<T = any> implements ValidatorFactory<T> {
-  createFn: () => Validator<T>
-
-  constructor(createFn: () => Validator<T>) {
+  constructor(validatorId: string|(new (...args: any[]) => any), createFn: (validators: ValidatorMap) => Validator<T>) {
+    this.validatorId = typeof validatorId == 'string' ? validatorId : validatorId.name
     this.createFn = createFn
   }
 
-  create(): Validator<T> {
-    return this.createFn()
+  createOrGetExisting(validators: ValidatorMap): Validator<T> {
+    let l = log.cls('ValidatorFactory', 'createOrGetExisting')
+    l.param('validators', validators)
+    l.creator('this.validatorId', this.validatorId)
+
+    if (this.validatorId in validators) {
+      l.returning('existing validator', validators[this.validatorId])
+      return validators[this.validatorId]
+    }
+
+    l.returning('created validator')
+    return this.createFn(validators)
   }
 }
 
 export class Validator<T = any> {
-
+  validatorId: string
   options?: ValidatorOptions
+  validators: ValidatorMap
   entries: ValidatorEntry<T>[] = []
 
-  constructor(options?: ValidatorOptions) {
+  constructor(validators?: ValidatorMap, options?: ValidatorOptions, validatorId?: string|(new (...args: any[]) => any)) {
     this.options = options
+    this.validators = validators || {}
+
+    if (typeof validatorId == 'string') {
+      this.validatorId = validatorId
+    }
+    else if (typeof validatorId == 'function') {
+      this.validatorId = validatorId.name
+    }
+    else {
+      this.validatorId = this.constructor.name
+    }
+
+    this.validators[this.validatorId] = this
   }
 
   add(constraint: Constraint, condition?: (object: T) => Promise<boolean>): void
@@ -62,21 +88,45 @@ export class Validator<T = any> {
     let validatorFactory: ValidatorFactory|undefined
     let condition: ((object: T) => Promise<boolean>)|undefined
 
-    if (typeof args[0] == 'object' && args[0] !== null && 'create' in args[0] && typeof args[0].create == 'function') {
-      let validator = args[0].create()
+    if (args[0] instanceof ValidatorFactory) {
+      if (this.options == undefined) {
+        this.options = {}
+      } 
 
-      if (typeof validator == 'object' && validator !== null && 'entries' in validator && Array.isArray(validator.entries)) {
+      let validator = args[0].createOrGetExisting(this.validators)
+
+      if (validator == this) {
+        throw new Error('Cannot add add another validator that is itself which would result in an endless loop of adding itself!')
+      }
+
+      if (
+        typeof validator == 'object' && 
+        validator !== null && 
+        'entries' in validator && 
+        Array.isArray(validator.entries) && 
+        validator.entries.length > 0
+      ) {
+        l.dev('Adding entries from validator', validator)
+
         for (let entry of validator.entries) {
           this.add(entry)
         }
+      }
+      else {
+        l.warn('Given validator to add does not have any entries!', validator)
       }
     }
     else if (typeof args[0] == 'object' && args[0] !== null && 'properties' in args[0] && Array.isArray(args[0].properties)) {
       properties = (args[0] as ValidatorEntry).properties
       constraint = (args[0] as ValidatorEntry).constraint
-      validatorFactory = (args[0] as ValidatorEntry).validator ? 
-        { create: () => (args[0] as ValidatorEntry).validator } as ValidatorFactory : undefined
       condition = (args[0] as ValidatorEntry).condition
+
+      if ((args[0] as ValidatorEntry).validator) {
+        validatorFactory = new ValidatorFactory(
+          (args[0] as ValidatorEntry).validator!.constructor.name,
+          () => (args[0] as ValidatorEntry).validator!
+        )
+      }
 
       if (constraint != undefined && validatorFactory != undefined) {
         throw new Error('The provided parameter is a ValidatorEntry with both a constraint and a validator defined. This is invalid! Only one may be specified at a time!')
@@ -109,7 +159,7 @@ export class Validator<T = any> {
         constraint = args[1]
         condition = args.length > 2 ? args[2] : undefined
       }
-      else if (typeof args[1] == 'object' && args[1] !== null && 'create' in args[1] && typeof args[1].create == 'function') {
+      else if (args[1] instanceof ValidatorFactory) {
         validatorFactory = args[1]
         condition = args.length > 2 ? args[2] : undefined
       }
@@ -137,10 +187,24 @@ export class Validator<T = any> {
     }
 
     if (!propertyExcluded) {
+      let validator: Validator|undefined
+      
+      if (validatorFactory) {
+        if (this.options == undefined) {
+          this.options = {}
+        } 
+
+        validator = validatorFactory.createOrGetExisting(this.validators)
+
+        if (validator == undefined) {
+          throw new Error('Validator factory did not create a validator!')
+        }
+      }
+
       let entry: ValidatorEntry = {
         properties: properties,
         constraint: constraint,
-        validator: validatorFactory ? validatorFactory.create() : undefined,
+        validator: validator,
         condition: condition
       }
 

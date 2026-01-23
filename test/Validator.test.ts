@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { Misfit } from 'knight-misfit'
 import 'mocha'
-import { Absent, QuickConstraint, Required, TypeOf, Validator, ValidatorOptions } from '../src'
+import { Absent, QuickConstraint, Required, TypeOf, Validator, ValidatorFactory, ValidatorMap, ValidatorOptions } from '../src'
 
 describe('Validator', function() {
   describe('add', function() {
@@ -91,17 +91,34 @@ describe('Validator', function() {
 
     it('should accept another validator for a property', function() {
       let validator = new Validator
-      validator.add('property', { create: () => new Validator })
+      validator.add('property', new ValidatorFactory('PropertyValidator', () => new Validator))
 
       expect(validator.entries.length).to.equal(1)
 
       let entry = validator.entries[0]
-    
+
       expect(entry.properties).to.deep.equal(['property'])
       expect(entry.constraint).to.be.undefined
       expect(entry.validator).to.be.instanceOf(Validator)
       expect(entry.condition).to.be.undefined
     })
+
+    // it('should accept another validator for a property recursive', function() {
+    //   let validator1 = new Validator
+    //   let validator2 = new Validator
+
+    //   validator1.add('property', new ValidatorFactory('Validator2', () => validator2))
+    //   validator2.add('property', new ValidatorFactory('Validator1', () => validator1))
+
+    //   expect(validator1.entries.length).to.equal(1)
+
+    //   let entry = validator1.entries[0]
+
+    //   expect(entry.properties).to.deep.equal(['property'])
+    //   expect(entry.constraint).to.be.undefined
+    //   expect(entry.validator).to.be.instanceOf(Validator)
+    //   expect(entry.condition).to.be.undefined
+    // })
 
     it('should accept another validator', function() {
       let validator1 = new Validator
@@ -110,7 +127,7 @@ describe('Validator', function() {
       validator1.add('property2', new Required)
 
       let validator2 = new Validator
-      validator2.add({ create: () => validator1 })
+      validator2.add(new ValidatorFactory('Validator1', () => validator1))
 
       expect(validator2.entries.length).to.equal(3)
 
@@ -130,44 +147,52 @@ describe('Validator', function() {
       expect(validator2.entries[2].condition).to.be.undefined
     })
 
+    it('should throw an error if the other validator is also the adding validator', function() {
+      let validator = new Validator
+
+      expect(
+        () => validator.add(new ValidatorFactory('Validator', () => validator ))
+      ).to.throw('Cannot add add another validator that is itself which would result in an endless loop of adding itself!')
+    })
+
     it('should not add excluded constraints', function() {
-      let validator = new Validator({ exclude: ['property2']})
+      let validator1 = new Validator(undefined, { exclude: ['property2']})
       
-      let property2Validator = new Validator
-      property2Validator.add('property2.1', new Required)
-      property2Validator.add('property2.2', new Required)
+      let validator2 = new Validator
+      validator2.add('property2.1', new Required)
+      validator2.add('property2.2', new Required)
 
-      let property3Validator = new Validator
-      property3Validator.add('property2', new Required)
-      property3Validator.add('property4', new Required)
+      let validator3 = new Validator
+      validator3.add('property2', new Required)
+      validator3.add('property4', new Required)
 
-      validator.add('property1', new Required)
-      validator.add('property1', new TypeOf('number'))
-      validator.add('property2', new Required)
-      validator.add('property2', 'TestConstraint', async value => null)
-      validator.add('property2', { create: () => property2Validator })
-      validator.add('property3', new Required)
-      validator.add('property3', new TypeOf('number'))
-      validator.add({ create: () => property3Validator })
+      validator1.add('property1', new Required)
+      validator1.add('property1', new TypeOf('number'))
+      validator1.add('property2', new Required)
+      validator1.add('property2', 'TestConstraint', async value => null)
+      validator1.add('property2', new ValidatorFactory('Validator2', () => validator2))
+      validator1.add('property3', new Required)
+      validator1.add('property3', new TypeOf('number'))
+      validator1.add(new ValidatorFactory('Validator3', () => validator3))
 
-      expect(validator.entries.some(entry => entry.properties.length == 1 && entry.properties[0] == 'property2')).to.be.false
-      expect(validator.entries.filter(entry => entry.properties.length == 1 && entry.properties[0] != 'property2').length).to.equal(5)
+      expect(validator1.entries.some(entry => entry.properties.length == 1 && entry.properties[0] == 'property2')).to.be.false
+      expect(validator1.entries.filter(entry => entry.properties.length == 1 && entry.properties[0] != 'property2').length).to.equal(5)
     })
 
     it('should not get stuck in a circular validator dependency', function() {
       class Validator1 extends Validator {
-        constructor() {
-          super()
+        constructor(validators?: ValidatorMap) {
+          super(validators)
           // Validator2 should exclude property2 which references Validator1 and thus creates a circular dependency
-          this.add('property1', { create: () => new Validator2({ exclude: ['property2'] }) })
+          this.add('property1', new ValidatorFactory(Validator2, (validators: ValidatorMap) => new Validator2(validators)))
         }
       }
 
       class Validator2 extends Validator {
-        constructor(options?: ValidatorOptions) {
-          super(options)
+        constructor(validators?: ValidatorMap) {
+          super(validators)
           // The validator is being put their as a function so that the class will only be 
-          this.add('property2', { create: () => new Validator1 })
+          this.add('property2', new ValidatorFactory(Validator1, () => new Validator1(validators)))
         }
       }
 
@@ -497,7 +522,7 @@ describe('Validator', function() {
         expect(misfits.length).to.equal(0)
       })
 
-            it('should be able to handle dot notifications', async function() {
+      it('should be able to handle dot notifications', async function() {
         let validator = new Validator
 
         validator.add('a.b', 'TestConstraint1', async (value: any) => {
@@ -530,7 +555,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', { create: () => nestedValidator })
+        validator.add('a', new ValidatorFactory('NestedValidator', () => nestedValidator))
   
         let misfits = await validator.validate({ a: { nestedB: 1 }})
   
@@ -554,7 +579,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', { create: () => nestedValidator })
+        validator.add('a', new ValidatorFactory('NestedValidator', () => nestedValidator))
   
         let misfits = await validator.validate({ a: undefined})
   
@@ -568,7 +593,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a',  { create: () => nestedValidator })
+        validator.add('a', new ValidatorFactory('NestedValidator', () => nestedValidator))
   
         let misfits = await validator.validate({ a: null})
   
@@ -582,7 +607,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', { create: () => nestedValidator })
+        validator.add('a',new ValidatorFactory('NestedValidator', () => nestedValidator))
   
         let misfits = await validator.validate({ a: 1})
   
@@ -596,7 +621,7 @@ describe('Validator', function() {
         nestedValidator.add('TestConstraint2', async () => new Misfit)
 
         let validator = new Validator
-        validator.add('a', { create: () => nestedValidator })
+        validator.add('a', new ValidatorFactory('NestedValidator', () => nestedValidator))
   
         let misfits = await validator.validate({ a: {} })
   
@@ -612,7 +637,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', { create: () => nestedValidator })
+        validator.add('a', new ValidatorFactory('NestedValidator', () => nestedValidator))
   
         let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, { nestedB: 1 }]})
   
@@ -630,7 +655,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', { create: () => nestedValidator })
+        validator.add('a', new ValidatorFactory('NestedValidator', () => nestedValidator))
   
         let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, undefined, { nestedB: 1 }]})
   
@@ -648,7 +673,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', { create: () => nestedValidator })
+        validator.add('a', new ValidatorFactory('NestedValidator', () => nestedValidator))
   
         let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, null, { nestedB: 1 }]})
   
@@ -666,7 +691,7 @@ describe('Validator', function() {
         nestedValidator.add('nestedB', new TypeOf('number'))
 
         let validator = new Validator
-        validator.add('a', { create: () => nestedValidator })
+        validator.add('a', new ValidatorFactory('NestedValidator', () => nestedValidator))
   
         let misfits = await validator.validate({ a: [{ nestedA: 'a', nestedB: false }, null, { nestedB: 1 }]})
   
@@ -684,7 +709,7 @@ describe('Validator', function() {
         nestedValidator.add('TestConstraint2', async () => new Misfit)
 
         let validator = new Validator
-        validator.add('a', { create: () => nestedValidator })
+        validator.add('a', new ValidatorFactory('NestedValidator', () => nestedValidator))
   
         let misfits = await validator.validate({ a: [ {}, {} ]})
   
