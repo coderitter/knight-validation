@@ -720,6 +720,23 @@ describe('Validator', function() {
         expect(misfits[1].constraint).to.equal('TestConstraint1')
         expect(misfits[1].properties).to.deep.equal(['a[1]'])
       })
+
+      it('should validate every object only once and not get stuck in an endless loop', async function() {
+        let validator1 = new Validator
+        let validator2 = new Validator
+
+        validator1.add('object2', new ValidatorFactory('Validator2', () => validator2))
+        validator2.add('object1', new ValidatorFactory('Validator1', () => validator1))
+
+        let object1: any = {}
+        let object2: any = {}
+
+        object1.object2 = object2
+        object2.object1 = object1
+
+        await validator1.validate(object1)
+        expect(true).to.be.true
+      })
     })
   })
 })

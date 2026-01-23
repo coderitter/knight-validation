@@ -215,10 +215,16 @@ export class Validator<T = any> {
     l.returning()
   }
 
-  async validate(object: T, options?: ValidatorOptions): Promise<Misfit[]> {
+  async validate(object: T, options?: ValidatorOptions, validated?: WeakSet<any>): Promise<Misfit[]> {
     let l = log.mt('validate')
     l.param('object', object)
     l.param('options', options)
+
+    if (validated == undefined) {
+      validated = new WeakSet<any>
+    }
+
+    validated.add(object)
 
     options = options || this.options
     let misfits: Misfit[] = []
@@ -226,6 +232,7 @@ export class Validator<T = any> {
 
     for (let entry of this.entries) {
       let constraintOrValidatorName = entry.constraint ? entry.constraint?.name : entry.validator ? entry.validator.constructor.name : ''
+      l.dev('Checking constraint', JSON.stringify(entry.properties), constraintOrValidatorName)
       l.location = ['' + JSON.stringify(entry.properties) + ' > ' + constraintOrValidatorName]
       
       let propertyAlreadyHasAMisfit = false
@@ -329,6 +336,11 @@ export class Validator<T = any> {
           continue
         }
 
+        if (validated.has(value)) {
+          l.dev('Object is or was already being validated. Skipping...', value)
+          continue
+        }
+
         if (value instanceof Array) {
           l.dev('Value of the property is an array. Iterating its elements...')
           for (let i = 0; i < value.length; i++) {
@@ -338,7 +350,7 @@ export class Validator<T = any> {
             }
 
             l.calling('entry.validator.validate', value[i], options)
-            let subMisfits = await entry.validator.validate(value[i], options)
+            let subMisfits = await entry.validator.validate(value[i], options, validated)
             l.called('entry.validator.validate')
 
             if (subMisfits.length > 0) {
@@ -362,7 +374,7 @@ export class Validator<T = any> {
           l.dev('Value of the property is not an array')
 
           l.calling('entry.validator.validate', value, options)
-          let subMisfits = await entry.validator.validate(value, options)
+          let subMisfits = await entry.validator.validate(value, options, validated)
           l.called('entry.validator.validate')
 
           if (subMisfits.length > 0) {
