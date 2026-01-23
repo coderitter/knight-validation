@@ -24,9 +24,12 @@ export interface ValidatorEntry<T = any> {
 
 export class ValidatorFactory<T = any> {
   validatorId: string
-  createFn: (validators: ValidatorMap) => Validator<T>
+  createFn: (validators: ValidatorMap, validatorId: string) => Validator<T>
 
-  constructor(validatorId: string|(new (...args: any[]) => any), createFn: (validators: ValidatorMap) => Validator<T>) {
+  constructor(
+    validatorId: string|(new (...args: any[]) => any), 
+    createFn: (validators: ValidatorMap, validatorId: string) => Validator<T>
+  ) {
     this.validatorId = typeof validatorId == 'string' ? validatorId : validatorId.name
     this.createFn = createFn
   }
@@ -42,7 +45,7 @@ export class ValidatorFactory<T = any> {
     }
 
     l.returning('created validator')
-    return this.createFn(validators)
+    return this.createFn(validators, this.validatorId)
   }
 }
 
