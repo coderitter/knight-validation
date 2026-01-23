@@ -52,7 +52,7 @@ export class Validator<T = any> {
   validators: ValidatorMap
   entries: ValidatorEntry<T>[] = []
 
-  constructor(validators?: ValidatorMap, options?: ValidatorOptions, validatorId?: string|(new (...args: any[]) => any)) {
+  constructor(options?: ValidatorOptions, validators?: ValidatorMap, validatorId?: string|(new (...args: any[]) => any)) {
     this.options = options
     this.validators = validators || {}
 

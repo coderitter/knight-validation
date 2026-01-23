@@ -156,7 +156,7 @@ describe('Validator', function() {
     })
 
     it('should not add excluded constraints', function() {
-      let validator1 = new Validator(undefined, { exclude: ['property2']})
+      let validator1 = new Validator({ exclude: ['property2']})
       
       let validator2 = new Validator
       validator2.add('property2.1', new Required)
@@ -182,7 +182,7 @@ describe('Validator', function() {
     it('should not get stuck in a circular validator dependency', function() {
       class Validator1 extends Validator {
         constructor(validators?: ValidatorMap) {
-          super(validators)
+          super(undefined, validators)
           // Validator2 should exclude property2 which references Validator1 and thus creates a circular dependency
           this.add('property1', new ValidatorFactory(Validator2, (validators: ValidatorMap) => new Validator2(validators)))
         }
@@ -190,7 +190,7 @@ describe('Validator', function() {
 
       class Validator2 extends Validator {
         constructor(validators?: ValidatorMap) {
-          super(validators)
+          super(undefined, validators)
           // The validator is being put their as a function so that the class will only be 
           this.add('property2', new ValidatorFactory(Validator1, () => new Validator1(validators)))
         }
