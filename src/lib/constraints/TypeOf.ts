@@ -37,7 +37,7 @@ export class TypeOf extends Constraint<any, TypeOfMisfitValues> {
       if (typeof valueType == 'string') {
         if (typeof value === valueType && value !== null) {
           return null
-        }  
+        }
       }
       else if (valueType === null) {
         if (value === null) {
