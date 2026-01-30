@@ -25,7 +25,7 @@ describe('Constraint', function() {
       
       let misfit = await constraint.validateMultipleProperties({ a: 1, b: 3, c: 5 }, ['a', 'b', 'c'])
       expect(misfit).to.be.not.null
-      expect(misfit!.constraint).to.equal('TestConstraintExactFits')
+      expect(misfit!.constraint).to.equal('TestConstraint')
       expect(misfit!.values).to.be.not.undefined
       expect(misfit!.values!.misfits).to.be.not.undefined
       expect(misfit!.values!.misfits!.length).to.equal(0)
@@ -35,7 +35,7 @@ describe('Constraint', function() {
 
       misfit = await constraint.validateMultipleProperties({ a: 0, b: 2, c: 5 }, ['a', 'b', 'c'])
       expect(misfit).to.be.not.null
-      expect(misfit!.constraint).to.equal('TestConstraintExactFits')
+      expect(misfit!.constraint).to.equal('TestConstraint')
       expect(misfit!.values).to.be.not.undefined
       expect(misfit!.values!.misfits).to.be.not.undefined
       expect(misfit!.values!.misfits!.length).to.equal(2)
@@ -50,7 +50,7 @@ describe('Constraint', function() {
 
       misfit = await constraint.validateMultipleProperties({ a: 0, b: 2, c: 4 }, ['a', 'b', 'c'])
       expect(misfit).to.be.not.null
-      expect(misfit!.constraint).to.equal('TestConstraintExactFits')
+      expect(misfit!.constraint).to.equal('TestConstraint')
       expect(misfit!.values).to.be.not.undefined
       expect(misfit!.values!.misfits).to.be.not.undefined
       expect(misfit!.values!.misfits!.length).to.equal(3)
@@ -73,7 +73,7 @@ describe('Constraint', function() {
       
       let misfit = await constraint.validateMultipleProperties({ a: 1, b: 3, c: 5 }, ['a', 'b', 'c'])
       expect(misfit).to.be.not.null
-      expect(misfit!.constraint).to.equal('TestConstraintMinAndMaxFits')
+      expect(misfit!.constraint).to.equal('TestConstraint')
       expect(misfit!.values).to.be.not.undefined
       expect(misfit!.values!.misfits).to.be.not.undefined
       expect(misfit!.values!.misfits!.length).to.equal(0)
@@ -86,7 +86,7 @@ describe('Constraint', function() {
 
       misfit = await constraint.validateMultipleProperties({ a: 0, b: 2, c: 4 }, ['a', 'b', 'c'])
       expect(misfit).to.be.not.null
-      expect(misfit!.constraint).to.equal('TestConstraintMinAndMaxFits')
+      expect(misfit!.constraint).to.equal('TestConstraint')
       expect(misfit!.values).to.be.not.undefined
       expect(misfit!.values!.misfits).to.be.not.undefined
       expect(misfit!.values!.misfits!.length).to.equal(3)
@@ -115,7 +115,7 @@ describe('Constraint', function() {
 
       misfit = await constraint.validateMultipleProperties({ a: 0, b: 2, c: 5 }, ['a', 'b', 'c'])
       expect(misfit).to.be.not.null
-      expect(misfit!.constraint).to.equal('TestConstraintMinFits')
+      expect(misfit!.constraint).to.equal('TestConstraint')
       expect(misfit!.values).to.be.not.undefined
       expect(misfit!.values!.misfits).to.be.not.undefined
       expect(misfit!.values!.misfits!.length).to.equal(2)
@@ -130,7 +130,7 @@ describe('Constraint', function() {
 
       misfit = await constraint.validateMultipleProperties({ a: 0, b: 2, c: 4 }, ['a', 'b', 'c'])
       expect(misfit).to.be.not.null
-      expect(misfit!.constraint).to.equal('TestConstraintMinFits')
+      expect(misfit!.constraint).to.equal('TestConstraint')
       expect(misfit!.values).to.be.not.undefined
       expect(misfit!.values!.misfits).to.be.not.undefined
       expect(misfit!.values!.misfits!.length).to.equal(3)
@@ -153,7 +153,7 @@ describe('Constraint', function() {
       
       let misfit = await constraint.validateMultipleProperties({ a: 1, b: 3, c: 5 }, ['a', 'b', 'c'])
       expect(misfit).to.be.not.null
-      expect(misfit!.constraint).to.equal('TestConstraintMaxFits')
+      expect(misfit!.constraint).to.equal('TestConstraint')
       expect(misfit!.values).to.be.not.undefined
       expect(misfit!.values!.misfits).to.be.not.undefined
       expect(misfit!.values!.misfits!.length).to.equal(0)
