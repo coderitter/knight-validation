@@ -238,7 +238,12 @@ export class Validator<T = any> {
     for (let entry of this.entries) {
       l.location = [this.constructor.name]
       let constraintOrValidatorName = entry.constraint ? entry.constraint?.name : entry.validator ? entry.validator.constructor.name : ''
-      l.dev('Checking constraint', JSON.stringify(entry.properties), constraintOrValidatorName, entry.constraint ? entry.constraint : entry.validator)
+      l.dev('Checking constraint', JSON.stringify(entry.properties), constraintOrValidatorName)
+
+      if (entry.constraint) {
+        l.dev('Constraint', entry.constraint)
+      }
+
       l.location = [this.constructor.name, JSON.stringify(entry.properties), constraintOrValidatorName]
       
       let propertyAlreadyHasAMisfit = false
