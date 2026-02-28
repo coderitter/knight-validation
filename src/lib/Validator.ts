@@ -235,6 +235,7 @@ export class Validator<T = any> {
 
     for (let entry of this.entries) {
       let constraintOrValidatorName = entry.constraint ? entry.constraint?.name : entry.validator ? entry.validator.constructor.name : ''
+      l.location = undefined
       l.dev('Checking constraint', JSON.stringify(entry.properties), constraintOrValidatorName)
       l.location = ['' + JSON.stringify(entry.properties) + ' > ' + constraintOrValidatorName]
       
@@ -287,7 +288,7 @@ export class Validator<T = any> {
           l.dev('Constraint is to be applied to the whole object')
           l.calling('entry.constraint.validate', object)
           misfit = await entry.constraint.validate(object)
-          l.called('entry.constraint.validate')
+          l.called('entry.constraint.validate', misfit)
         }
         else if (entry.properties.length == 1) {
           l.dev('Constraint is to be applied to one property')
@@ -296,13 +297,13 @@ export class Validator<T = any> {
           let value = dotNotation.get(object)
           l.calling('entry.constraint.validate', value)
           misfit = await entry.constraint.validate(value)
-          l.called('entry.constraint.validate')
+          l.called('entry.constraint.validate', misfit)
         }
         else {
-          l.dev('Constraint is to be applied tu multiple properties')
+          l.dev('Constraint is to be applied to multiple properties')
           l.calling('entry.constraint.validateMultipleProperties', object)
           misfit = await entry.constraint.validateMultipleProperties(object, entry.properties)
-          l.called('entry.constraint.validateMultipleProperties')
+          l.called('entry.constraint.validateMultipleProperties', misfit)
         }
 
         if (misfit) {
@@ -354,7 +355,7 @@ export class Validator<T = any> {
 
             l.calling('entry.validator.validate', value[i], options)
             let subMisfits = await entry.validator.validate(value[i], options, validated)
-            l.called('entry.validator.validate')
+            l.called('entry.validator.validate', subMisfits)
 
             if (subMisfits.length > 0) {
               l.dev('Validator returned misfits', subMisfits)
@@ -378,7 +379,7 @@ export class Validator<T = any> {
 
           l.calling('entry.validator.validate', value, options)
           let subMisfits = await entry.validator.validate(value, options, validated)
-          l.called('entry.validator.validate')
+          l.called('entry.validator.validate', subMisfits)
 
           if (subMisfits.length > 0) {
             l.dev('Validator returned misfits', subMisfits)
