@@ -8,7 +8,7 @@ export interface AbsentMisfitValues extends ConstraintMisfitValues {
 export class Absent extends Constraint<any, AbsentMisfitValues> {
 
   constructor(constraints?: Partial<Absent>) {
-    super()
+    super(Absent.name)
     Object.assign(this, constraints)
   }
 

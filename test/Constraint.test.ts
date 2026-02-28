@@ -9,7 +9,7 @@ interface TestConstraintMisfitValues extends ConstraintMisfitValues {
 
 class TestConstraint extends Constraint<number, TestConstraintMisfitValues> {
   constructor(params?: Partial<TestConstraint>) {
-    super()
+    super(TestConstraint.name)
     Object.assign(this, params)
   }
 

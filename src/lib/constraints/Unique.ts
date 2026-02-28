@@ -10,7 +10,7 @@ export class Unique<T> extends Constraint<T, UniqueMisfitValues> {
   isUnique: (value: T) => Promise<boolean>
 
   constructor(isUnique: (value: T) => Promise<boolean>, constraints?: Partial<Constraint>) {
-    super()
+    super(Unique.name)
     Object.assign(this, constraints)
     this.isUnique = isUnique
   }

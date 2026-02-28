@@ -10,10 +10,14 @@ export interface ConstraintMisfitValues {
 
 export abstract class Constraint<T = any, MisfitValuesType = ConstraintMisfitValues> {
   
-  name: string = this.constructor.name
+  name: string
   minFits?: number
   maxFits?: number
   exactFits?: number
+
+  constructor(name: string) {
+    this.name = name
+  }
   
   async validate(value: T): Promise<Misfit<MisfitValuesType>|null> {
     return null

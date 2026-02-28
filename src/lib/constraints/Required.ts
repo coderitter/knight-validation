@@ -4,7 +4,7 @@ import { Constraint, ConstraintMisfitValues } from '../Constraint'
 export class Required extends Constraint {
 
   constructor(constraints?: Partial<Required>) {
-    super()
+    super(Required.name)
     Object.assign(this, constraints)
   }
 

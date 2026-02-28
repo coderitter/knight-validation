@@ -15,7 +15,7 @@ export class Length extends Constraint<any, LengthMisfitValues> {
   exact?: number
 
   constructor(constraints: Partial<Length>) {
-    super()
+    super(Length.name)
     Object.assign(this, constraints)
   }
 

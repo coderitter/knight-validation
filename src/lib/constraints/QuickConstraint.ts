@@ -3,7 +3,6 @@ import { Constraint } from '../Constraint'
 
 export class QuickConstraint<T> extends Constraint<T, any> {
 
-  name: string
   validateFn?: (obj: T) => Promise<Misfit|null>
   validateMultiplePropertiesFn?: (obj: T, properties: string[]) => Promise<Misfit|null>
 
@@ -12,8 +11,7 @@ export class QuickConstraint<T> extends Constraint<T, any> {
     validateFn?: (obj: T) => Promise<Misfit|null>,
     validateMultiplePropertiesFn?: (obj: T, properties: string[]) => Promise<Misfit|null>
   ) {
-    super()
-    this.name = name
+    super(name)
     this.validateFn = validateFn
     this.validateMultiplePropertiesFn = validateMultiplePropertiesFn
   }

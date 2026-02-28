@@ -11,7 +11,7 @@ export class TypeOf extends Constraint<any, TypeOfMisfitValues> {
   types: (string|null|(new (...params: any[]) => any))[] = []
 
   constructor(...valueTypes: (string|null|(new (...params: any[]) => any)|Partial<Constraint>)[]) {
-    super()
+    super(TypeOf.name)
 
     for (let i = 0; i < valueTypes.length; i++) {
       let valueType = valueTypes[i]

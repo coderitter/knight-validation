@@ -15,7 +15,7 @@ export class Enum extends Constraint<any, EnumMisfitValues> {
   constructor(values: object, constraints?: Partial<Constraint>)
 
   constructor(...args: any[]) {
-    super()
+    super(Enum.name)
 
     for (let i = 0; i < args.length; i++) {
       let arg = args[i]

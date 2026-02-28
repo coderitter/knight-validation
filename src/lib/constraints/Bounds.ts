@@ -17,7 +17,7 @@ export class Bounds extends Constraint<any, BoundsMisfitValues> {
   lesserThanEqual?: number
 
   constructor(constraints: Partial<Bounds>) {
-    super()
+    super(Bounds.name)
     Object.assign(this, constraints)
   }
 
