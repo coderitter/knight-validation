@@ -236,7 +236,11 @@ export interface OnlyGermanMailsMisfitValues extends ConstraintMisfitValues {
 
 export class OnlyGermanMailsConstraint extends Constraint<string, OnlyGermanMailsMisfitValues> {
 
-validate(email: string): Promise<Misfit<OnlyGermanMailsMisfitValues>|null> {
+  constructor() {
+    super(OnlyGermanMailsConstraint.name)
+  }
+
+  validate(email: string): Promise<Misfit<OnlyGermanMailsMisfitValues>|null> {
     if (! email.endsWith('.de')) {
       let misfit = new Misfit<OnlyGermanMailsMisfitValues>
       
@@ -266,6 +270,10 @@ export interface DifferentMisfitValues {
 }
 
 export class Different extends Constraint<User, DifferentMisfitValues> {
+
+  constructor() {
+    super(Different.name)
+  }
 
   validateMultipleProperties(object: any, properties: string[]): Promise<Misfit<DifferentMisfitValues>|null> {
   if (user.firstName == user.lastName) {
