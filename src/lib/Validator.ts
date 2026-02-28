@@ -84,6 +84,7 @@ export class Validator<T = any> {
 
   add(...args: any[]): void {
     let l = log.mt('add')
+    l.location = [this.constructor.name]
     l.param('args', args)
 
     let properties: string[]|undefined
@@ -220,6 +221,7 @@ export class Validator<T = any> {
 
   async validate(object: T, options?: ValidatorOptions, validated?: WeakSet<any>): Promise<Misfit[]> {
     let l = log.mt('validate')
+    l.location = [this.constructor.name]
     l.param('object', object)
     l.param('options', options)
 
@@ -234,10 +236,10 @@ export class Validator<T = any> {
     let misfittingProperties: (string|null)[] = []
 
     for (let entry of this.entries) {
+      l.location = [this.constructor.name]
       let constraintOrValidatorName = entry.constraint ? entry.constraint?.name : entry.validator ? entry.validator.constructor.name : ''
-      l.location = undefined
-      l.dev('Checking constraint', JSON.stringify(entry.properties), constraintOrValidatorName)
-      l.location = ['' + JSON.stringify(entry.properties) + ' > ' + constraintOrValidatorName]
+      l.dev('Checking constraint', JSON.stringify(entry.properties), constraintOrValidatorName, entry.constraint ? entry.constraint : entry.validator)
+      l.location = [this.constructor.name, JSON.stringify(entry.properties), constraintOrValidatorName]
       
       let propertyAlreadyHasAMisfit = false
       for (let property of entry.properties) {
@@ -358,7 +360,6 @@ export class Validator<T = any> {
             l.called('entry.validator.validate', subMisfits)
 
             if (subMisfits.length > 0) {
-              l.dev('Validator returned misfits', subMisfits)
               l.creator('Adding prefix to misfit properties...', `${property}[${i}].`)
               for (let misfit of subMisfits) {
                 if (misfit.properties.length == 0) {
@@ -375,14 +376,13 @@ export class Validator<T = any> {
           }
         }
         else {
-          l.dev('Value of the property is not an array')
+          l.dev('Value of the property is a single object')
 
           l.calling('entry.validator.validate', value, options)
           let subMisfits = await entry.validator.validate(value, options, validated)
           l.called('entry.validator.validate', subMisfits)
 
           if (subMisfits.length > 0) {
-            l.dev('Validator returned misfits', subMisfits)
             l.creator('Adding prefix to misfit properties...', property + '.')
             for (let misfit of subMisfits) {
                 if (misfit.properties.length == 0) {
@@ -400,7 +400,8 @@ export class Validator<T = any> {
       }
     }
 
-    l.returning('Returning misfits', misfits)
+    l.location = [this.constructor.name]
+    l.returning('misfits', misfits)
     return misfits
   }
 }
